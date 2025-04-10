@@ -5,14 +5,14 @@ import oru.inf.InfException;
 
 public class Material {
 
-    private final String MaterialId;
+    private final String materialId;
     private String name;
     private String unit;
-    private InfDB idb;
+    private final InfDB idb;
 
     public Material(String materialId, InfDB idb) {
         this.idb = idb;
-        this.MaterialId = materialId;
+        this.materialId = materialId;
         this.name = fetchSingle(materialId, name);
         this.unit = fetchSingle(materialId, unit);
     }
@@ -56,6 +56,10 @@ public class Material {
         if (Validerare.validateName(name)) {
             this.name = name;
         }
+    }
+
+    public String getMaterialId() {
+        return materialId;
     }
 
     public String getUnit() {
