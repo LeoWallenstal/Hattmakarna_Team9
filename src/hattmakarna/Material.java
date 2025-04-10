@@ -13,13 +13,13 @@ public class Material {
     public Material(String materialId, InfDB idb) {
         this.idb = idb;
         this.materialId = materialId;
-        this.name = fetchSingle(materialId, name);
-        this.unit = fetchSingle(materialId, unit);
+        this.name = fetchSingle(materialId, "name");
+        this.unit = fetchSingle(materialId, "unit");
     }
 
     private String fetchSingle(String id, String column) {
         String result = "";
-        String query = "SELECT " + column + " FROM Material WHERE material_id = " + id;
+        String query = "SELECT " + column + " FROM Material WHERE material_id = '" + id + "'";
         try {
             result = idb.fetchSingle(query);
         } catch (InfException ex) {
@@ -29,7 +29,7 @@ public class Material {
     }
 
     public void addMaterial(String name, String unit) {
-        String sqlAddQuery = "INSERT INTO Material VALUES (" + name + ", " + unit + ")";
+        String sqlAddQuery = "INSERT INTO Material VALUES ('" + name + "', '" + unit + "')";
 
         try {
             idb.insert(sqlAddQuery);
