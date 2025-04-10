@@ -4,6 +4,7 @@
  */
 package hattmakarna;
 
+import hattmakarna.UI.MainMenu;
 import oru.inf.InfDB;
 import oru.inf.InfException;
 /**
@@ -54,6 +55,10 @@ public class LogInWindow extends javax.swing.JFrame {
 
         lblPassword.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblPassword.setText("Lösenord:");
+
+        txtEmail.setText("otto@hatt.se");
+
+        pwdPassword.setText("pass123");
 
         btnLogIn.setText("Logga In");
         btnLogIn.addActionListener(new java.awt.event.ActionListener() {
@@ -120,7 +125,11 @@ public class LogInWindow extends javax.swing.JFrame {
                 
                 String dbPassword = idb.fetchSingle(query);
                 if (password.equals(dbPassword)) {
-                    new CustomerWindow().setVisible(true);
+                    query = "SELECT user_id FROM user WHERE email = '" + email + "'";
+                    String id = idb.fetchSingle(query);
+                    User userLoggedIn = new User(id, idb);
+                    new MainMenu(userLoggedIn, idb).setVisible(true);
+                    this.setVisible(false);
                 }
                 else {
                     lblError.setVisible(true);
