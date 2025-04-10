@@ -32,9 +32,10 @@ public class Customer {
     public Customer(HashMap<String, String> customerMap, InfDB idb){
         this.idb = idb;
         
+        this.customerID = customerMap.get("customer_id");
         this.firstName = customerMap.get("first_name");
         this.lastName = customerMap.get("last_name");
-        this.adress = customerMap.get("adress");
+        this.adress = customerMap.get("address");
         this.postalCode = customerMap.get("postalcode");
         this.country = customerMap.get("country");
         this.telephoneNumbers = initTelephoneNumbers();
@@ -61,7 +62,7 @@ public class Customer {
     
     private ArrayList<String> initTelephoneNumbers(){
         
-        String sqlQuery = "SELECT * FROM phone WHERE ID = " 
+        String sqlQuery = "SELECT * FROM phone WHERE customer_id = " 
             + customerID;
         
         ArrayList<HashMap<String, String>> telephoneNumberMap = new ArrayList<>();
@@ -73,6 +74,7 @@ public class Customer {
             
         }catch(InfException ex){
             System.out.println(ex.getMessage() + " in fetchTelephoneNumbers(), Customer.java");
+            System.out.println(sqlQuery);
         }
         
         for(HashMap<String, String> aTelephoneNumber : telephoneNumberMap){
@@ -83,7 +85,7 @@ public class Customer {
     
     private ArrayList<String> initEmailAdresses(){
         
-        String sqlQuery = "SELECT * FROM mail WHERE ID = " 
+        String sqlQuery = "SELECT * FROM mail WHERE customer_id = " 
             + customerID;
         
         ArrayList<HashMap<String, String>> EmailAdressesMap = new ArrayList<>();
@@ -94,7 +96,7 @@ public class Customer {
             EmailAdressesMap = idb.fetchRows(sqlQuery);
             
         }catch(InfException ex){
-            System.out.println(ex.getMessage() + " in fetchTelephoneNumbers(), Customer.java");
+            System.out.println(ex.getMessage() + " in fetchEmailAdresses(), Customer.java");
         }
         
         for(HashMap<String, String> anEmailAdress : EmailAdressesMap){
@@ -132,24 +134,24 @@ public class Customer {
     //Setters
     
     public void setFirstName(String newFirstName){
-      /*if(Validator.isLetters(newFirstName){
+        if(Validerare.validateName(newFirstName)){
             this.firstName = newFirstName; 
         }
-       */
+       
     }
     
     public void setLastName(String newLastName){
-      /*if(Validator.isLetters(newFirstName){
-            this.firstName = newFirstName;
+        if(Validerare.validateName(newLastName)){
+            this.firstName = newLastName;
         }
-       */
+       
     }
     
     public void addTelephoneNumber(String telephoneNumber){
-      /*if(Validator.isNumbers(telephoneNumber){
+        if(Validerare.validatePhoneNumber(telephoneNumber)){
             telephoneNumbers.add(telephoneNumber);
         }        
-        */
+        
     }
     
     public void removeTelephoneNumber(int indexPos){
@@ -158,11 +160,11 @@ public class Customer {
         }
     }
     
-    public void addEmailAdress(String emailAdress){
-        /*if(Validator.isEmailAdress(emailAdress){
+    public void addEmailAdress(String emailAdress){ 
+        if(Validerare.validateEmail(emailAdress)){
             emailAdresses.add(emailAdress);
         }        
-        */
+
     }
     
     public void removeEmailAdress(int indexPos){
@@ -172,10 +174,10 @@ public class Customer {
     }
     
     
-    //För att kolla ett objekts 'state' vid debug!
+    //För att kolla ett objekts 'state' vid debug. 
     public String toString(){
         String output = "[ID]: " + customerID + "\n[Name]: " + firstName + " "
-            + lastName + "[Adress]: " + adress + ", " + postalCode + ", " 
+            + lastName + "\n[Adress]: " + adress + ", " + postalCode + ", " 
             + country + "\n[Telephone Numbers]: ";
         
         Iterator it = telephoneNumbers.iterator();
@@ -196,6 +198,13 @@ public class Customer {
             }
         }
         return output;
+    }
+    
+    
+    //DB
+    
+    public void save(){
+        
     }
     
 }
