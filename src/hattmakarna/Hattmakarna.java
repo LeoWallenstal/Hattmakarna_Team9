@@ -4,7 +4,8 @@
  */
 package hattmakarna;
 
-import java.util.ArrayList;
+import javax.swing.JOptionPane;
+
 import oru.inf.InfDB;
 import oru.inf.InfException;
 
@@ -14,51 +15,26 @@ import oru.inf.InfException;
  */
 public class Hattmakarna {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        InfDB idb = null;
-        
-        try{
-            idb = new InfDB("hattmakaren", "3306", "dbHattAdmin", "dbHattAdminPW");
-        }catch(InfException ex){
-            System.out.println(ex.getMessage() + "i main");
-        }
-        
-        Customer c1 = new Customer("1", idb);
-        
-        c1.addTelephoneNumber("0722410155");
-        c1.addTelephoneNumber("1234567890");
-        
-        c1.addEmailAdress("enMailAdress@hej.se");
-        c1.addEmailAdress("enAnnanMailAdress@hej.se");
-        
-        c1.save();
-        c1.delete();
-        
-        /*Customer c2 = new Customer(idb);
-        c2.setFirstName("James");
-        c2.setLastName("Ellison");
-        c2.setAdress("Rudbecksgatan 38A");
-        c2.setPostalCode("70223");
-        c2.setCountry("Sverige");
-        
-        ArrayList<String> telephoneNumbers = new ArrayList<>();
-        ArrayList<String> emailAdresses = new ArrayList<>();
-        
-        telephoneNumbers.add("0722410155");
-        telephoneNumbers.add("1234567890");
-        
-        emailAdresses.add("Jamesellison95@gmail.com");
-        emailAdresses.add("EnAnnanMail@hej.se");
-        
-        c2.setTelephoneNumbers(telephoneNumbers);
-        c2.setEmailAdresses(emailAdresses);
-        
-        c2.insert(); */
-        
-        
-    }
-    
+  public static InfDB idb;
+	private static final String DB_PASSWORD = "dbHattAdminPW";
+	private static final String DB_USER = "dbHattAdmin";
+	private static final String DB_NAME = "hattmakaren";
+	private static final String DB_PORT = "3306";
+
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String[] args) {
+
+		// Koppla till databas
+		try {
+			idb = new InfDB(DB_NAME, DB_PORT, DB_USER, DB_PASSWORD);
+  new LogInWindow(idb).setVisible(true);
+		} catch (InfException e) {
+			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
+			e.printStackTrace();
+		}
+
+
+	}
 }
