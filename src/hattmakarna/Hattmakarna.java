@@ -15,7 +15,7 @@ import oru.inf.InfException;
  */
 public class Hattmakarna {
 
-	public static InfDB idb;
+  public static InfDB idb;
 	private static final String DB_PASSWORD = "dbHattAdminPW";
 	private static final String DB_USER = "dbHattAdmin";
 	private static final String DB_NAME = "hattmakaren";
@@ -29,13 +29,12 @@ public class Hattmakarna {
 		// Koppla till databas
 		try {
 			idb = new InfDB(DB_NAME, DB_PORT, DB_USER, DB_PASSWORD);
-
+  new LogInWindow(idb).setVisible(true);
 		} catch (InfException e) {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
 			e.printStackTrace();
 		}
 
-		// TODO code application logic here
-	}
 
+	}
 }
