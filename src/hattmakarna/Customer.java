@@ -29,6 +29,11 @@ public class Customer {
     
     private final InfDB idb;
     
+    
+    public Customer(InfDB idb){
+        this.idb = idb;
+    }
+    
     public Customer(HashMap<String, String> customerMap, InfDB idb){
         this.idb = idb;
         
@@ -38,29 +43,37 @@ public class Customer {
         this.adress = customerMap.get("address");
         this.postalCode = customerMap.get("postalcode");
         this.country = customerMap.get("country");
-        this.telephoneNumbers = initTelephoneNumbers();
-        this.emailAdresses = initEmailAdresses();
+        this.telephoneNumbers = fetchTelephoneNumbers();
+        this.emailAdresses = fetchEmailAdresses();
     }
     
     public Customer(String customerID, InfDB idb){
         this.idb = idb;
         
-        HashMap<String, String> aCustomer = new HashMap<>();
-        String sqlQuery = "SELECT * FROM Customer WHERE ID = " + customerID;
+        HashMap<String, String> customerMap = new HashMap<>();
+        String sqlQuery = "SELECT * FROM customer WHERE customer_id = " + customerID;
         
         try{
-            aCustomer = idb.fetchRow(customerID);
+            customerMap = idb.fetchRow(sqlQuery);
         }catch(InfException ex){
             System.out.println(ex.getMessage() + ", in Customer(), Customer.java");
+            System.out.println(sqlQuery);
         }
         
-        this.telephoneNumbers = initTelephoneNumbers();
-        this.emailAdresses = initEmailAdresses();
+        this.customerID = customerMap.get("customer_id");
+        this.firstName = customerMap.get("first_name");
+        this.lastName = customerMap.get("last_name");
+        this.adress = customerMap.get("address");
+        this.postalCode = customerMap.get("postalcode");
+        this.country = customerMap.get("country");
+        
+        this.telephoneNumbers = fetchTelephoneNumbers();
+        this.emailAdresses = fetchEmailAdresses();
     }
     
     //Initialisering
     
-    private ArrayList<String> initTelephoneNumbers(){
+    private ArrayList<String> fetchTelephoneNumbers(){
         
         String sqlQuery = "SELECT * FROM phone WHERE customer_id = " 
             + customerID;
@@ -83,7 +96,7 @@ public class Customer {
         return telephoneNumbers;
     }
     
-    private ArrayList<String> initEmailAdresses(){
+    private ArrayList<String> fetchEmailAdresses(){
         
         String sqlQuery = "SELECT * FROM mail WHERE customer_id = " 
             + customerID;
@@ -134,24 +147,38 @@ public class Customer {
     //Setters
     
     public void setFirstName(String newFirstName){
-        if(Validerare.validateName(newFirstName)){
-            this.firstName = newFirstName; 
-        }
-       
+        // TODO: Validering
+        this.firstName = newFirstName;  
     }
     
     public void setLastName(String newLastName){
-        if(Validerare.validateName(newLastName)){
-            this.firstName = newLastName;
-        }
-       
+        // TODO: Validering
+        this.lastName = newLastName;
+    }
+    
+    public void setAdress(String newAdress){
+        // TODO: Validering
+        this.adress = newAdress;
+    }
+    
+    public void setPostalCode(String newPostalCode){
+        // TODO: Validering
+        this.postalCode = newPostalCode;
+    }
+    
+    public void setCountry(String newCountry){
+        // TODO: Validering
+        this.country = newCountry;
     }
     
     public void addTelephoneNumber(String telephoneNumber){
-        if(Validerare.validatePhoneNumber(telephoneNumber)){
-            telephoneNumbers.add(telephoneNumber);
-        }        
-        
+        // TODO: Validering
+        telephoneNumbers.add(telephoneNumber);
+    }
+    
+    public void setTelephoneNumbers(ArrayList<String> telephoneNumbers){
+        // TODO -- Validering
+        this.telephoneNumbers = telephoneNumbers;
     }
     
     public void removeTelephoneNumber(int indexPos){
@@ -161,10 +188,13 @@ public class Customer {
     }
     
     public void addEmailAdress(String emailAdress){ 
-        if(Validerare.validateEmail(emailAdress)){
-            emailAdresses.add(emailAdress);
-        }        
-
+        // TODO -- Validering
+        emailAdresses.add(emailAdress);
+    }
+    
+    public void setEmailAdresses(ArrayList<String> emailAdresses){
+        // TODO -- Validering
+        this.emailAdresses = emailAdresses;
     }
     
     public void removeEmailAdress(int indexPos){
@@ -204,7 +234,147 @@ public class Customer {
     //DB
     
     public void save(){
+        String sqlQuery = "UPDATE customer SET " 
+            + "first_name = '" + firstName + "', "
+            + "last_name = '" + lastName + "', "
+            + "address = '" + adress + "', "
+            + "postalcode = '" + postalCode + "', "
+            + "country = '" + country + "' " 
+            + "WHERE customer_id = " + customerID; 
+        
+        try{
+            idb.update(sqlQuery);
+        }catch(InfException ex){
+            System.out.println(ex.getMessage() + "1st query in save(), Customer.java");
+            System.out.println(sqlQuery);
+        }
+        
+        //--------Telefonnummer--------
+        ArrayList<String> telephoneNumbersToAdd = fetchTelephoneNumbersToAdd();
+        
+        Iterator it = telephoneNumbersToAdd.iterator();
+        while(it.hasNext()){
+            sqlQuery = "INSERT INTO phone (customer_id, phone_number) "
+                    + "VALUES ('" + customerID + "', '" + it.next() + "');";
+            
+            try{
+                idb.insert(sqlQuery);
+                System.out.println("[SqlQuery]: " + sqlQuery);
+            }catch(InfException ex){
+                System.out.println(ex.getMessage() + " 1st sqlQuery, in save(), Customer.java");
+            }
+        }
+   
+        
+        //--------Email--------
+        ArrayList<String> emailAdressesToAdd = fetchEmailAdressesToAdd();   
+        it = emailAdressesToAdd.iterator();
+        while(it.hasNext()){
+            sqlQuery = "INSERT INTO mail (customer_id, mail) "
+                    + "VALUES ('" + customerID + "', '" + it.next() + "');";
+            
+            try{
+                idb.insert(sqlQuery);
+                System.out.println("[SqlQuery]: " + sqlQuery);
+            }catch(InfException ex){
+                System.out.println(ex.getMessage() + " 3rd sqlQuery, in save(), Customer.java");
+            }
+        }
         
     }
     
+    
+    //Funkar inte just nu pga constraints.
+    public void delete(){
+        try{
+            idb.delete("DELETE FROM phone WHERE customer_id = " + customerID);
+            idb.delete("DELETE FROM mail WHERE customer_id = " + customerID);
+            idb.update("UPDATE sales_order SET customer_ID = NULL WHERE customer_id = " + customerID);
+            idb.delete("DELETE FROM customer WHERE customer_id = " + customerID); 
+
+        } catch (InfException ex) {
+            System.out.println(ex.getMessage() + "in delete(), Customer.java");
+        }
+    }
+    
+    public void insert(){ 
+        int newID = 0;
+        
+        try{
+            newID = Integer.parseInt(idb.getAutoIncrement("customer", "customer_id"));
+        }catch(InfException ex){
+            System.out.println(ex.getMessage());
+        }
+        
+        String sqlQuery = "INSERT INTO customer (customer_id, first_name, last_name, "
+                + "address, postalcode, country) "
+                + "VALUES (" + newID + ", '" + firstName + "', '" + lastName
+                + "', '" + adress + "', '" + postalCode + "', '" + country + "');";
+        
+        try{
+            idb.insert(sqlQuery);
+        }catch(InfException ex){
+            System.out.println(ex.getMessage() + "1st sqlQuery, in insert(), Customer.java");
+        }
+        
+        //--------Telefonnummer--------
+        Iterator it = telephoneNumbers.iterator();
+        while(it.hasNext()){
+            sqlQuery = "INSERT INTO phone (customer_id, phone_number) "
+                    + "VALUES ('" + newID + "', '" + it.next() + "');";
+            
+            try{
+                idb.insert(sqlQuery);
+                System.out.println("[SqlQuery]: " + sqlQuery);
+            }catch(InfException ex){
+                System.out.println(ex.getMessage() + " 2nd sqlQuery, in insert(), Customer.java");
+            }
+        }
+        
+        //--------Email-------- 
+        it = emailAdresses.iterator();
+        while(it.hasNext()){
+            sqlQuery = "INSERT INTO mail (customer_id, mail) "
+                    + "VALUES ('" + newID + "', '" + it.next() + "');";
+            
+            try{
+                idb.insert(sqlQuery);
+                System.out.println("[SqlQuery]: " + sqlQuery);
+            }catch(InfException ex){
+                System.out.println(ex.getMessage() + " 3rd sqlQuery, in insert(), Customer.java");
+            }
+        }
+        
+        
+    }
+    
+    
+    
+    //helpers till DB-funktionen save()
+    private ArrayList<String> fetchTelephoneNumbersToAdd(){
+        ArrayList<String> telephoneNumbersDB = fetchTelephoneNumbers();
+        ArrayList<String> thisTelephoneNumbers = new ArrayList<String>(telephoneNumbers);
+        ArrayList<String> telephoneNumbersToAdd = new ArrayList<String>();
+        
+        for(String telephoneNumber : thisTelephoneNumbers){
+            if(!telephoneNumbersDB.contains(telephoneNumber)){
+                telephoneNumbersToAdd.add(telephoneNumber);
+            }
+        }
+        return telephoneNumbersToAdd;
+    }
+    
+    private ArrayList<String> fetchEmailAdressesToAdd(){
+        ArrayList<String> emailAdressesDB = fetchEmailAdresses();
+        ArrayList<String> thisEmailAdresses = new ArrayList<String>(emailAdresses);
+        ArrayList<String> emailAdressesToAdd = new ArrayList<String>();
+        
+        for(String emailAdress : thisEmailAdresses){
+            if(!emailAdressesDB.contains(emailAdress)){
+                emailAdressesToAdd.add(emailAdress);
+            }
+        }
+        
+        return emailAdressesToAdd;
+    }
 }
