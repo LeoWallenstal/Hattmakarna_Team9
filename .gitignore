@@ -52,4 +52,3 @@ hs_err_pid*
 # Allow lib folder to be tracked
 !lib/
 !lib/*.jar
-/bin/
