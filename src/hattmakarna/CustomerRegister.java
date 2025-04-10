@@ -6,6 +6,7 @@ package hattmakarna;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import oru.inf.InfDB;
 import oru.inf.InfException;
 
@@ -23,9 +24,9 @@ public class CustomerRegister {
     }
     
     private ArrayList<Customer> initAllCustomers(){
-        //<<COLUMNNAME>> och <<NAME OF TABLE>> är placeholders.
+
         
-        String sqlQuery = "SELECT * FROM <<NAME OF TABLE>>";
+        String sqlQuery = "SELECT * FROM customer";
         
         ArrayList<HashMap<String, String>> customerMaps = new ArrayList<>();
         ArrayList<Customer> customerList = new ArrayList<>();
@@ -92,4 +93,17 @@ public class CustomerRegister {
         return null;
     }
             
+    public String toString(){
+        String output = "";
+        Iterator it = allCustomers.iterator();
+        
+        while(it.hasNext()){
+            output += it.next().toString();
+            if(it.hasNext()){
+                output += "\n";
+            }
+        }
+        return output;
+    }
+    
 }
