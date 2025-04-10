@@ -93,6 +93,7 @@ public class CustomerRegister {
         return null;
     }
             
+    @Override
     public String toString(){
         String output = "";
         Iterator it = allCustomers.iterator();
