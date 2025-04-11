@@ -7,8 +7,11 @@ package hattmakarna;
  */
 public class CustomerWindow extends javax.swing.JFrame {
     
-    public CustomerWindow() {
+    User userLoggedIn;
+    
+    public CustomerWindow(User user) {
         initComponents();
+        userLoggedIn = user;
     }
 
     /**
@@ -158,7 +161,7 @@ public class CustomerWindow extends javax.swing.JFrame {
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
  
     this.setVisible(false);
-    new OrderWindow().setVisible(true);
+    new OrderWindow(userLoggedIn).setVisible(true);
     
     }//GEN-LAST:event_btnSaveActionPerformed
 

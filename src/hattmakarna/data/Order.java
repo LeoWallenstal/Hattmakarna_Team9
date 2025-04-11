@@ -2,18 +2,13 @@ package hattmakarna.data;
 
 import java.util.ArrayList;
 import java.util.Date;
-
-import org.junit.jupiter.api.Test;
+import java.util.Locale;
 
 import hattmakarna.Hattmakarna;
-import hattmakarna.util.Util;
 import oru.inf.InfException;
 
-enum Status {
-	PLACED, MAKING, PACKAGED, SHIPPED,
-}
 
-public class Order {
+public class Order extends DatabaseObject {
 
 	private String order_id;
 	private String customer_id;
@@ -23,20 +18,12 @@ public class Order {
 	private Date recived_data;
 	private boolean isFastProduction;
 
-	@Test
-	public void testCreateOrder() {
-		ArrayList<String> hattar = new ArrayList<>();
-		String id = Order.createOrder(1, hattar, 1000, false);
-	}
-
 	public Order(String orderId) {
-		try {
-			// Mappa objektet
-			Util.DatabaseObjectMapper(this,
-					Hattmakarna.idb.fetchRow("select * from orders where orderId = " + orderId));
+		super(orderId);
 
+		try {
 			// Mappa alla hatt id's
-			this.hattar = Hattmakarna.idb.fetchColumn("select hat_id from hat where order_id =" + orderId);
+			this.hattar = Hattmakarna.idb.fetchColumn("select hat_id from hat where order_id = " + orderId);
 
 		} catch (InfException e) {
 			e.printStackTrace();
@@ -52,10 +39,10 @@ public class Order {
 			String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
 
 			// Sql query för att skapa en ny order i sales_order tabellen
-			String sql = String.format(
-					"INSERT INTO sales_order (order_id,price, customer_id, status, recived_date) "
-							+ "VALUES (%d, %.2f, %d, '%s', '%s');",
-					1, totalPris, customer_id, // must be a valid customer_id integer string
+			String sql = String.format(Locale.US,
+					"INSERT INTO sales_order (price, customer_id, status, recived_date) "
+							+ "VALUES (%.2f, %d, '%s', '%s');",
+					totalPris, customer_id, // must be a valid customer_id integer string
 					Status.PLACED, date);
 
 			System.out.println(sql);
@@ -74,5 +61,71 @@ public class Order {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@Override
+	protected String getTabelName() {
+		return "sales_order";
+	}
+
+	@Override
+	protected String getIdAttributeName() {
+		return "order_id";
+	}
+
+	public String getOrder_id() {
+		return order_id;
+	}
+
+	public void setOrder_id(String order_id) {
+		this.order_id = order_id;
+	}
+
+	public String getCustomer_id() {
+		return customer_id;
+	}
+
+	public void setCustomer_id(String customer_id) {
+		this.customer_id = customer_id;
+	}
+
+	public ArrayList<String> getHattar() {
+		return hattar;
+	}
+
+	public void setHattar(ArrayList<String> hattar) {
+		this.hattar = hattar;
+	}
+
+	public int getTotalPris() {
+		return totalPris;
+	}
+
+	public void setTotalPris(int totalPris) {
+		this.totalPris = totalPris;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	public Date getRecived_data() {
+		return recived_data;
+	}
+
+	public void setRecived_data(Date recived_data) {
+		this.recived_data = recived_data;
+	}
+
+	public boolean isFastProduction() {
+		return isFastProduction;
+	}
+
+	public void setFastProduction(boolean isFastProduction) {
+		this.isFastProduction = isFastProduction;
 	}
 }
