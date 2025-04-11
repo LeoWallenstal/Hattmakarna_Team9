@@ -5,114 +5,89 @@
 package hattmakarna.data;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import oru.inf.InfDB;
-import oru.inf.InfException;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import hattmakarna.Hattmakarna;
+import hattmakarna.util.Util;
+import oru.inf.InfException;
 
 /**
  *
- * @author Användaren
+ * 
  */
 public class Specification {
 
-    private InfDB idb;
-    private String specificationID;
-    private String description;
-    private String size;
-    private String hatID;
-    private String skiss;
+	private int spec_id;
+	private String beskrivning;
+	private int hat_id;
+	private String img_path;
 
-    public Specification(HashMap<String, String> hat_SpecMap, InfDB idb) {
-        this.idb = idb;
+	public Specification(String specificationID) {
 
-        this.specificationID = hat_SpecMap.get("spec_id");
-        this.description = hat_SpecMap.get("beskrivning");
-        this.size = hat_SpecMap.get("size");
-        this.hatID = hat_SpecMap.get("hat_id");
-        this.skiss = hat_SpecMap.get("skiss");
-    }
+		try {
+			Util.DatabaseObjectMapper(this, Hattmakarna.idb.fetchRow("SELECT * FROM hat_spec WHERE ID = "));
+		} catch (InfException ex) {
+			ex.printStackTrace();
+		}
+	}
 
-    public Specification(String specificationID, InfDB idb) {
-        this.idb = idb;
+	public int getSpecID() {
+		return spec_id;
+	}
 
-        HashMap<String, String> aSpecification = new HashMap<>();
-        String sqlQuery = "SELECT * FROM hat_spec WHERE ID = " + specificationID;
+	public String getDescription() {
+		return beskrivning;
+	}
 
-        try {
-            aSpecification = idb.fetchRow(sqlQuery);
-        } catch (InfException ex) {
-            System.out.println(ex.getMessage() + ", in Specification(), Specification.java");
+	public int getHatID() {
+		return hat_id;
+	}
 
-        }
-    }
+	public String getImagePath() {
+		return img_path;
+	}
 
-    public String getSpecID() {
-        return specificationID;
-    }
+	public void setDesciption(String newDescription) {
+		this.beskrivning = newDescription;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public void setSkiss(String imgPath) {
+		this.img_path = imgPath;
+	}
 
-    public String getSize() {
-        return size;
-    }
+	/**
+	 * Promptar användaren med ett fönster för att välja en bild fil.
+	 * 
+	 * @return file-object till den bild fil som valts. Null om ingen bild valts
+	 */
+	public static File getFileFromUser() {
+		JFileChooser chooser = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
+		chooser.setFileFilter(filter);
 
-    public String getHatID() {
-        return hatID;
-    }
+		int returnVal = chooser.showOpenDialog(null);
 
-    public String getSkiss() {
-        return skiss;
-    }
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			return chooser.getSelectedFile();
+		}
 
-    public void setDesciption(String newDescription) {
-//    if (Validerare.){}
-        this.description = newDescription;
-    }
+		return null;
+	}
 
-    public void setSize(String newSize) {
-//    if (Validerare.){}
-        this.size = newSize;
-    }
+	public void save() {
+		/*
+		 * String sqlQuery = "UPDATE hat_spec SET " + "beskrivning = '" + description +
+		 * "', " + "size = '" + size + "', " + "skiss = '" + skiss + "', " +
+		 * "WHERE customer_id = " + hatID;
+		 * 
+		 * try { Hattmakarna.idb.update(sqlQuery); } catch (InfException ex) {
+		 * System.out.println(ex.getMessage() + " in save(), Specification.java"); }
+		 */
+	}
 
-    public void setSkiss(String newPathway) {
-//    if (Validerare.){}
-        this.skiss = newPathway;
-    }
+	public void delete() {
 
-    public void choosePath() {
-//    if (Validerare.)
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Välj en fil");
-        fileChooser.setFileFilter(new ExtensionFileFilter("JPG and JPEG", new String[] { "JPG", "JPEG" }));
-    }
-
-    public void save() {
-        String sqlQuery = "UPDATE hat_spec SET " + "beskrivning = '" + description + "', "
-                + "size = '" + size + "', "
-                + "skiss = '" + skiss + "', "
-                + "WHERE customer_id = " + hatID;
-
-        try {
-            idb.update(sqlQuery);
-        } catch (InfException ex) {
-            System.out.println(ex.getMessage() + " in save(), Specification.java");
-        }
-
-    }
-
-    public void delete() {
-
-    }
-
-    public void create() {
-
-    }
-
+	}
 }
