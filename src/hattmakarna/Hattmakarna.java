@@ -34,10 +34,26 @@ public class Hattmakarna {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
 			e.printStackTrace();
 		}
-
-            CustomerRegister cr = new CustomerRegister();
+                
+            User u1 = new User(); //JAMES
+            User u2 = new User("1"); //OTTO, ADMIN
+            u1.setFirstName("James");
+            u1.setLastName("Ellison");
+            u1.setEmail("Jamesellison95@gmail.com");
+            u1.setPWCandidate("hejhejhej");
+            u1.setAdmin(u2, true);
+            u1.create();
             
-            System.out.println(cr);
-            cr.getCustomer("1").delete();
+            User u1Copy = new User(u1);
+            
+            u1.setAdmin(u2, false);
+            
+            u1.save(u1Copy);
+            
+            
+            
+           // u1.sav
+            
+       
 	}
 }
