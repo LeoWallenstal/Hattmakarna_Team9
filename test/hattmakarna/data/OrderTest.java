@@ -4,14 +4,19 @@
  */
 package hattmakarna.data;
 
+import hattmakarna.Hattmakarna;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import oru.inf.InfException;
 
 /**
  *
@@ -24,6 +29,11 @@ public class OrderTest {
     
     @BeforeAll
     public static void setUpClass() {
+        try {
+            Hattmakarna.connectToDB();
+        } catch (InfException ex) {
+            Logger.getLogger(OrderTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     @AfterAll
@@ -42,17 +52,11 @@ public class OrderTest {
      * Test of createOrder method, of class Order.
      */
     @Test
+    @DisplayName("awdawljk alwdalk")
     public void testCreateOrder() {
-        System.out.println("createOrder");
-        int customer_id = 0;
-        ArrayList<String> hattar = null;
-        double totalPris = 0.0;
-        boolean isFastProduction = false;
-        String expResult = "";
-        String result = Order.createOrder(customer_id, hattar, totalPris, isFastProduction);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+      String id = Order.createOrder(0, null, 100000, true);
+      
+      System.out.println(id);
     }
 
     /**

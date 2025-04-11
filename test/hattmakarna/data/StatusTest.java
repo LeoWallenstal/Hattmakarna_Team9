@@ -22,6 +22,7 @@ public class StatusTest {
     
     @BeforeAll
     public static void setUpClass() {
+        
     }
     
     @AfterAll
@@ -33,7 +34,9 @@ public class StatusTest {
     }
     
     @AfterEach
-    public void tea    /**
+    public void tearDown() {
+    }
+        /**
      * Test of values method, of class Status.
      */
     @Test
@@ -59,8 +62,5 @@ public class StatusTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-
-rDown() {
-    }
-    
+ 
 }
