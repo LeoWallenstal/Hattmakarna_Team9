@@ -36,6 +36,7 @@ public class Hattmakarna {
 		}
 
 
+
 	}
 	
 	public static void connectToDB() throws InfException{
