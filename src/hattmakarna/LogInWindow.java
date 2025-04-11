@@ -4,19 +4,28 @@
  */
 package hattmakarna;
 
+import hattmakarna.UI.MainMenu;
+import oru.inf.InfDB;
+import oru.inf.InfException;
 /**
  *
- * @author eddes
+ * @author Edvard
  */
-public class Inloggning extends javax.swing.JFrame {
+public class LogInWindow extends javax.swing.JFrame {
 
+    private final InfDB idb;
     /**
-     * Creates new form Inloggning
+     * Creates new form LogInWindow
      */
-    public Inloggning() {
+    public LogInWindow(InfDB idb) {
+        this.idb = idb;
         initComponents();
+        getRootPane().setDefaultButton(btnLogIn);
         setLocationRelativeTo(null);
         lblError.setVisible(false);
+        
+        txtEmail.addActionListener(e -> btnLogIn.doClick());
+        pwdPassword.addActionListener(e -> btnLogIn.doClick());
     }
 
     /**
@@ -32,7 +41,7 @@ public class Inloggning extends javax.swing.JFrame {
         lblEmail = new javax.swing.JLabel();
         lblPassword = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
+        pwdPassword = new javax.swing.JPasswordField();
         btnLogIn = new javax.swing.JButton();
         lblError = new javax.swing.JLabel();
 
@@ -47,17 +56,9 @@ public class Inloggning extends javax.swing.JFrame {
         lblPassword.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblPassword.setText("Lösenord:");
 
-        txtEmail.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtEmailActionPerformed(evt);
-            }
-        });
+        txtEmail.setText("otto@hatt.se");
 
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
-            }
-        });
+        pwdPassword.setText("pass123");
 
         btnLogIn.setText("Logga In");
         btnLogIn.addActionListener(new java.awt.event.ActionListener() {
@@ -76,7 +77,7 @@ public class Inloggning extends javax.swing.JFrame {
                 .addGap(25, 25, 25)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblError, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
+                        .addComponent(lblError, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLogIn, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -86,9 +87,9 @@ public class Inloggning extends javax.swing.JFrame {
                             .addComponent(lblPassword, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(txtEmail)
-                            .addComponent(jPasswordField1, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE))))
-                .addContainerGap(25, Short.MAX_VALUE))
+                            .addComponent(pwdPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
+                            .addComponent(txtEmail))))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -102,29 +103,63 @@ public class Inloggning extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblPassword)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pwdPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLogIn)
                     .addComponent(lblError))
-                .addContainerGap(26, Short.MAX_VALUE))
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void txtEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtEmailActionPerformed
-
     private void btnLogInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogInActionPerformed
         // TODO add your handling code here:
+        String email = txtEmail.getText();
+        String password = new String(pwdPassword.getPassword());
+        
+        if (inputValidation()) {
+            try {
+                String query = "SELECT password FROM user WHERE email = '" + email + "'";
+                
+                String dbPassword = idb.fetchSingle(query);
+                if (password.equals(dbPassword)) {
+                    query = "SELECT user_id FROM user WHERE email = '" + email + "'";
+                    String id = idb.fetchSingle(query);
+                    User userLoggedIn = new User(id, idb);
+                    new MainMenu(userLoggedIn, idb).setVisible(true);
+                    this.setVisible(false);
+                }
+                else {
+                    lblError.setVisible(true);
+                    lblError.setText("Fel epost eller lösenord");
+                }
+                
+            }
+        catch (InfException ex) {
+                System.out.println(ex.getMessage());
+                }
+        }
     }//GEN-LAST:event_btnLogInActionPerformed
 
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jPasswordField1ActionPerformed
-
+    private boolean inputValidation() {
+        String email = txtEmail.getText();
+        String password = new String(pwdPassword.getPassword());
+        
+        if (email.isEmpty() || email.isBlank() || password.isEmpty() || password.isBlank()) {
+            lblError.setVisible(true);
+            lblError.setText("Fyll alla fält");
+            return false;
+        }
+        if (!Validerare.validateEmail(email)) {
+        lblError.setVisible(true);
+        lblError.setText("Ogiltig epost");
+        return false;
+        }
+        return true;
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -142,31 +177,34 @@ public class Inloggning extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Inloggning.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LogInWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Inloggning.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LogInWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Inloggning.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LogInWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Inloggning.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(LogInWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Inloggning().setVisible(true);
+                //new Inloggning().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLogIn;
-    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblError;
     private javax.swing.JLabel lblLogIn;
     private javax.swing.JLabel lblPassword;
+    private javax.swing.JPasswordField pwdPassword;
     private javax.swing.JTextField txtEmail;
     // End of variables declaration//GEN-END:variables
 }
