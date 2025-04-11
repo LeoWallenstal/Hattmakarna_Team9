@@ -2,9 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hattmakarna;
+package hattmakarna.UI;
+import hattmakarna.Customer;
+import hattmakarna.CustomerRegister;
+import hattmakarna.CustomerWindow;
 import static hattmakarna.Hattmakarna.idb;
 import hattmakarna.UI.MainMenu;
+import hattmakarna.User;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +25,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class OrderWindow extends javax.swing.JFrame {
 
+    private String totalPrice;
+    private boolean isExpress;
     CustomerRegister customerRegister;
     private User userLoggedIn;
     /**
@@ -33,6 +39,9 @@ public class OrderWindow extends javax.swing.JFrame {
         customerRegister = new CustomerRegister();
         fillSearchResults();
         this.userLoggedIn = userLoggedIn;
+        
+        totalPrice = "";
+        isExpress = false;
         
     }
 
@@ -135,13 +144,12 @@ public class OrderWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnNewCustomer))
                             .addComponent(jScrollPane2)
-                            .addGroup(pnlSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel2)
-                                .addComponent(jLabel4)
-                                .addGroup(pnlSidebarLayout.createSequentialGroup()
-                                    .addGap(4, 4, 4)
-                                    .addComponent(btnChooseCustomer))
-                                .addComponent(btnReturn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel4)
+                            .addGroup(pnlSidebarLayout.createSequentialGroup()
+                                .addGap(4, 4, 4)
+                                .addComponent(btnChooseCustomer))
+                            .addComponent(btnReturn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 96, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -237,8 +245,11 @@ public class OrderWindow extends javax.swing.JFrame {
         btnAddSpecialToOrder.setText("Lägg till i order");
 
         checkFastDelivery.setText("Snabbleverans");
-
-        lblPicture.setText("jLabel5");
+        checkFastDelivery.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkFastDeliveryActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout paneSpecialLayout = new javax.swing.GroupLayout(paneSpecial);
         paneSpecial.setLayout(paneSpecialLayout);
@@ -274,21 +285,20 @@ public class OrderWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblDescriptiom)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(paneSpecialLayout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblSize)
-                            .addComponent(cbxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblPictureText)
-                            .addComponent(btnAddFile))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(checkFastDelivery))
-                    .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lblPicture, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSize)
+                    .addComponent(cbxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPictureText)
+                    .addComponent(btnAddFile))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(checkFastDelivery)
+                .addGap(24, 24, 24)
                 .addComponent(btnAddSpecialToOrder)
                 .addContainerGap(170, Short.MAX_VALUE))
         );
@@ -352,8 +362,9 @@ public class OrderWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewCustomerActionPerformed
-        this.setVisible(false);
-        new CustomerWindow(userLoggedIn).setVisible(true);
+        //this.setVisible(false);
+        new CustomerWindow(userLoggedIn, this).setVisible(true);
+        
     }//GEN-LAST:event_btnNewCustomerActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
@@ -380,6 +391,15 @@ public class OrderWindow extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_btnReturnActionPerformed
 
+    private void checkFastDeliveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkFastDeliveryActionPerformed
+        // TODO add your handling code here:
+        isExpress = checkFastDelivery.isSelected();
+    }//GEN-LAST:event_checkFastDeliveryActionPerformed
+
+    public void refreshCustomers(){
+        customerRegister = new CustomerRegister();
+        fillSearchResults();
+    }
     
     private void fillSearchResults() {
                 DefaultListModel<String> listModel = new DefaultListModel<>();
