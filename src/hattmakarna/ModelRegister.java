@@ -6,6 +6,7 @@ package hattmakarna;
 import oru.inf.InfDB;
 import java.util.*;
 import oru.inf.InfException;
+
 /**
  *
  * @author sebas
@@ -50,5 +51,6 @@ public ArrayList<Model> getAllHats(){
         }
         return modelList;
     }
+
     
 }
