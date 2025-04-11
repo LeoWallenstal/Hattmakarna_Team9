@@ -2,7 +2,7 @@ package tests;
 
 import java.util.ArrayList;
 
-import org.junit.jupiter.api.Test;
+import org.junit.gen5.api.Test;
 
 import hattmakarna.Hattmakarna;
 import hattmakarna.data.Order;

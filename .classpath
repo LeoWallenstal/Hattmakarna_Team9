@@ -8,6 +8,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="DB/junit5-api-5.0.0-ALPHA.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
