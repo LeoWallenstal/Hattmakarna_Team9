@@ -4,6 +4,12 @@
  */
 package hattmakarna;
 
+import hattmakarna.data.Order;
+import hattmakarna.data.Specification;
+import hattmakarna.data.Status;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 import oru.inf.InfDB;
@@ -29,6 +35,7 @@ public class Hattmakarna {
 		// Koppla till databas
 		try {
 			connectToDB();
+                        
 			new LogInWindow(idb).setVisible(true);
 		} catch (InfException e) {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");

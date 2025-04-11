@@ -15,79 +15,92 @@ import oru.inf.InfException;
 
 /**
  *
- * 
+ *
  */
-public class Specification {
+public class Specification extends DatabaseObject {
 
-	private int spec_id;
-	private String beskrivning;
-	private int hat_id;
-	private String img_path;
+    private int spec_id;
+    private String beskrivning;
+    private int hat_id;
+    private String img_path;
+    private boolean hasId = false;
 
-	public Specification(String specificationID) {
+    public Specification(String specificationID) {
+        super(specificationID);
+        hasId = true;
+    }
 
-		try {
-			Util.DatabaseObjectMapper(this, Hattmakarna.idb.fetchRow("SELECT * FROM hat_spec WHERE ID = "));
-		} catch (InfException ex) {
-			ex.printStackTrace();
-		}
-	}
+    public Specification() {
 
-	public int getSpecID() {
-		return spec_id;
-	}
+    }
 
-	public String getDescription() {
-		return beskrivning;
-	}
+    public int getSpecID() {
+        return spec_id;
+    }
 
-	public int getHatID() {
-		return hat_id;
-	}
+    public String getDescription() {
+        return beskrivning;
+    }
 
-	public String getImagePath() {
-		return img_path;
-	}
+    public int getHatID() {
+        return hat_id;
+    }
 
-	public void setDesciption(String newDescription) {
-		this.beskrivning = newDescription;
-	}
+    public String getImagePath() {
+        return img_path;
+    }
 
-	public void setSkiss(String imgPath) {
-		this.img_path = imgPath;
-	}
+    public void setDesciption(String newDescription) {
+        this.beskrivning = newDescription;
+    }
 
-	/**
-	 * Promptar användaren med ett fönster för att välja en bild fil.
-	 * 
-	 * @return file-object till den bild fil som valts. Null om ingen bild valts
-	 */
-	public static File getFileFromUser() {
-		JFileChooser chooser = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
-		chooser.setFileFilter(filter);
+    public void setSkiss(String imgPath) {
+        this.img_path = imgPath;
+    }
 
-		int returnVal = chooser.showOpenDialog(null);
+    public void setHatId(int id) {
+        this.hat_id = id;
+    }
 
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			return chooser.getSelectedFile();
-		}
+    /**
+     * Promptar användaren med ett fönster för att välja en bild fil.
+     *
+     * @return file-object till den bild fil som valts. Null om ingen bild valts
+     */
+    public static File getFileFromUser() {
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
+        chooser.setFileFilter(filter);
 
-		return null;
-	}
+        int returnVal = chooser.showOpenDialog(null);
 
-	public void save() {
-		/*
-		 * String sqlQuery = "UPDATE hat_spec SET " + "beskrivning = '" + description +
-		 * "', " + "size = '" + size + "', " + "skiss = '" + skiss + "', " +
-		 * "WHERE customer_id = " + hatID;
-		 * 
-		 * try { Hattmakarna.idb.update(sqlQuery); } catch (InfException ex) {
-		 * System.out.println(ex.getMessage() + " in save(), Specification.java"); }
-		 */
-	}
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile();
+        }
 
-	public void delete() {
+        return null;
+    }
 
-	}
+    public void delete() {
+
+    }
+
+    @Override
+    protected String getTabelName() {
+        return "hat_spec";
+    }
+
+    @Override
+    protected String getIdAttributeName() {
+        return "spec_id";
+    }
+
+    @Override
+    protected String getIdString() {
+        if (!hasId) {
+            return null;
+        }
+
+        return Integer.toString(spec_id);
+    }
 }

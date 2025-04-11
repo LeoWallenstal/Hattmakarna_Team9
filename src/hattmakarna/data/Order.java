@@ -7,125 +7,166 @@ import java.util.Locale;
 import hattmakarna.Hattmakarna;
 import oru.inf.InfException;
 
-
+/**
+ * Representerar en beställning i systemet och hanterar kopplingar mellan
+ * kund, datum, hattar och beställningsstatus.
+ */
 public class Order extends DatabaseObject {
 
-	private String order_id;
-	private String customer_id;
-	private ArrayList<String> hattar;
-	private int totalPris;
-	private Status status;
-	private Date recived_data;
-	private boolean isFastProduction;
+    // Fält motsvarande kolumner i tabellen sales_order
+    private int order_id;
+    private int customer_id;
+    private ArrayList<String> hattar;
+    private int totalPris;
+    private Status status;
+    private Date recived_date;
+    private boolean isFastProduction;
 
-	public Order(String orderId) {
-		super(orderId);
+    /**
+     * Tom standardkonstruktor.
+     */
+    public Order() {
+    }
 
-		try {
-			// Mappa alla hatt id's
-			this.hattar = Hattmakarna.idb.fetchColumn("select hat_id from hat where order_id = " + orderId);
+    /**
+     * Konstruktor som laddar en order utifrån dess ID, och hämtar relaterade hattar.
+     *
+     * @param orderId Orderns ID som sträng
+     */
+    public Order(String orderId) {
+        super(orderId);
 
-		} catch (InfException e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            // Hämta alla hatt-id:n kopplade till denna order
+            this.hattar = Hattmakarna.idb.fetchColumn(
+                "SELECT hat_id FROM hat WHERE order_id = " + orderId);
+        } catch (InfException e) {
+            e.printStackTrace();
+        }
+    }
 
-	public static String createOrder(int customer_id, ArrayList<String> hattar, double totalPris,
-			boolean isFastProduction) {
+    /**
+     * Skapar en ny order i databasen med kopplade hattar och returnerar det nya order-ID:t.
+     *
+     * @param customer_id        ID för kunden som gör beställningen
+     * @param hattar             Lista med hatt-ID:n som ska kopplas till ordern
+     * @param totalPris          Totala priset för ordern
+     * @param isFastProduction   Om produktionen ska gå snabbare än normalt
+     * @return Det genererade order-ID:t som en sträng, eller null vid fel
+     */
+    public static String createOrder(int customer_id, ArrayList<String> hattar,
+                                     double totalPris, boolean isFastProduction) {
+        try {
+            // Skapa dagens datum i SQL-format (yyyy-MM-dd)
+            String date = new java.text.SimpleDateFormat("yyyy-MM-dd")
+                .format(new java.util.Date());
 
-		try {
+            // Skapa INSERT-sats för att lägga in en ny order i sales_order-tabellen
+            String sql = String.format(Locale.US,
+                    "INSERT INTO sales_order (price, customer_id, status, recived_date) " +
+                    "VALUES (%.2f, %d, '%s', '%s');",
+                    totalPris, customer_id, Status.PLACED, date);
 
-			// Ta dagens datum, konvertera till sql format
-			String date = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+            System.out.println(sql);
 
-			// Sql query för att skapa en ny order i sales_order tabellen
-			String sql = String.format(Locale.US,
-					"INSERT INTO sales_order (price, customer_id, status, recived_date) "
-							+ "VALUES (%.2f, %d, '%s', '%s');",
-					totalPris, customer_id, // must be a valid customer_id integer string
-					Status.PLACED, date);
+            // Kör INSERT
+            hattmakarna.Hattmakarna.idb.insert(sql);
 
-			System.out.println(sql);
-			// Skappa ordern
-			hattmakarna.Hattmakarna.idb.insert(sql);
+            // Hämta det senast skapade order-ID:t för den kunden
+            String getOrderIdQuery = String.format(
+                    "SELECT order_id FROM sales_order " +
+                    "WHERE customer_id = %s ORDER BY order_id DESC LIMIT 1;",
+                    customer_id);
 
-			String getOrderIdQuery = String.format(
-					"SELECT order_id FROM sales_order WHERE customer_id = %s ORDER BY order_id DESC LIMIT 1;",
-					customer_id);
+            String id = Hattmakarna.idb.fetchSingle(getOrderIdQuery);
 
-			String id = Hattmakarna.idb.fetchSingle(getOrderIdQuery);
+            return id;
 
-			return id;
+        } catch (InfException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-		} catch (InfException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+    /**
+     * @return Namnet på tabellen i databasen som motsvarar detta objekt.
+     */
+    @Override
+    protected String getTabelName() {
+        return "sales_order";
+    }
 
-	@Override
-	protected String getTabelName() {
-		return "sales_order";
-	}
+    /**
+     * @return Namnet på ID-kolumnen i databasen.
+     */
+    @Override
+    protected String getIdAttributeName() {
+        return "order_id";
+    }
 
-	@Override
-	protected String getIdAttributeName() {
-		return "order_id";
-	}
+    // Getters och setters för alla fält
 
-	public String getOrder_id() {
-		return order_id;
-	}
+    public int getOrder_id() {
+        return order_id;
+    }
 
-	public void setOrder_id(String order_id) {
-		this.order_id = order_id;
-	}
+    public void setOrder_id(int order_id) {
+        this.order_id = order_id;
+    }
 
-	public String getCustomer_id() {
-		return customer_id;
-	}
+    public int getCustomer_id() {
+        return customer_id;
+    }
 
-	public void setCustomer_id(String customer_id) {
-		this.customer_id = customer_id;
-	}
+    public void setCustomer_id(int customer_id) {
+        this.customer_id = customer_id;
+    }
 
-	public ArrayList<String> getHattar() {
-		return hattar;
-	}
+    public ArrayList<String> getHattar() {
+        return hattar;
+    }
 
-	public void setHattar(ArrayList<String> hattar) {
-		this.hattar = hattar;
-	}
+    public void setHattar(ArrayList<String> hattar) {
+        this.hattar = hattar;
+    }
 
-	public int getTotalPris() {
-		return totalPris;
-	}
+    public int getTotalPris() {
+        return totalPris;
+    }
 
-	public void setTotalPris(int totalPris) {
-		this.totalPris = totalPris;
-	}
+    public void setTotalPris(int totalPris) {
+        this.totalPris = totalPris;
+    }
 
-	public Status getStatus() {
-		return status;
-	}
+    public Status getStatus() {
+        return status;
+    }
 
-	public void setStatus(Status status) {
-		this.status = status;
-	}
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 
-	public Date getRecived_data() {
-		return recived_data;
-	}
+    public Date getRecived_data() {
+        return recived_date;
+    }
 
-	public void setRecived_data(Date recived_data) {
-		this.recived_data = recived_data;
-	}
+    public void setRecived_data(Date recived_data) {
+        this.recived_date = recived_data;
+    }
 
-	public boolean isFastProduction() {
-		return isFastProduction;
-	}
+    public boolean isFastProduction() {
+        return isFastProduction;
+    }
 
-	public void setFastProduction(boolean isFastProduction) {
-		this.isFastProduction = isFastProduction;
-	}
+    public void setFastProduction(boolean isFastProduction) {
+        this.isFastProduction = isFastProduction;
+    }
+
+    /**
+     * @return ID:t som sträng, används av basklassen för att avgöra om INSERT eller UPDATE ska göras.
+     */
+    @Override
+    protected String getIdString() {
+        return Integer.toString(order_id);
+    }
 }
