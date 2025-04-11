@@ -6,12 +6,12 @@
 package hattmakarna;
 
 import java.util.*;
-import oru.inf.InfDB;
 import oru.inf.InfException;
-
+import hattmakarna.util.Util;
+import static hattmakarna.Hattmakarna.idb;
+import static hattmakarna.Validerare.*;
 
 /**
- *
  * @author james
  */
 public class Customer {
@@ -21,22 +21,16 @@ public class Customer {
     private String adress;
     private String postalCode;
     private String country;
-    private ArrayList<String>telephoneNumbers;
-    private ArrayList<String>emailAdresses;
+    private ArrayList<String> telephoneNumbers;
+    private ArrayList<String> emailAdresses;
+       
+    //---------- Constructors ----------
     
-    /*private ArrayList<String>nuvarandeOrder; kanske? Där ett (eller flera) orderID 
-    sparas, och kan instansieras vid behov, via ID på liknande sätt som denna klassen. */
-    
-    private final InfDB idb;
-    
-    
-    public Customer(InfDB idb){
-        this.idb = idb;
+    //För testning, skapa en blank kund.
+    public Customer(){
     }
     
-    public Customer(HashMap<String, String> customerMap, InfDB idb){
-        this.idb = idb;
-        
+    public Customer(HashMap<String, String> customerMap){
         this.customerID = customerMap.get("customer_id");
         this.firstName = customerMap.get("first_name");
         this.lastName = customerMap.get("last_name");
@@ -47,8 +41,12 @@ public class Customer {
         this.emailAdresses = fetchEmailAdresses();
     }
     
-    public Customer(String customerID, InfDB idb){
-        this.idb = idb;
+    
+    /**
+     * Skapar ett 'Customer'-objekt via ett ID.
+     * @param customerID The customerID with which to create a 'Customer'-object.
+     */
+    public Customer(String customerID){
         
         HashMap<String, String> customerMap = new HashMap<>();
         String sqlQuery = "SELECT * FROM customer WHERE customer_id = " + customerID;
@@ -71,8 +69,20 @@ public class Customer {
         this.emailAdresses = fetchEmailAdresses();
     }
     
-    //Initialisering
+    // -------------------- COPY CONSTRUCTOR --------------------
+    public Customer(Customer that){
+        this.customerID = that.getCustomerID();
+        this.firstName = that.getFirstName();
+        this.lastName = that.getLastName();
+        this.adress = that.getAdress();
+        this.postalCode = that.getPostalCode();
+        this.country = that.getCountry();
+       
+        this.telephoneNumbers = new ArrayList<>(that.getTelephoneNumbers());
+        this.emailAdresses = new ArrayList<>(that.getEmailAdresses());
+    }
     
+    // -------------------- Initialisering --------------------
     private ArrayList<String> fetchTelephoneNumbers(){
         
         String sqlQuery = "SELECT * FROM phone WHERE customer_id = " 
@@ -118,8 +128,7 @@ public class Customer {
         return EmailAdresses;
     }
     
-    //Getters
-    
+    // -------------------- Getters --------------------
     public String getFirstName(){
         return firstName;
     }
@@ -144,40 +153,52 @@ public class Customer {
         return adress;
     }
     
-    //Setters
+    public String getPostalCode(){
+        return postalCode;
+    }
     
+    public String getCountry(){
+        return country;
+    }
+    
+    //-------------------- Setters --------------------
     public void setFirstName(String newFirstName){
-        // TODO: Validering
-        this.firstName = newFirstName;  
+        if(validateName(newFirstName)){
+            this.firstName = newFirstName;  
+        }
     }
     
     public void setLastName(String newLastName){
-        // TODO: Validering
-        this.lastName = newLastName;
+        if(validateName(newLastName)){
+            this.lastName = newLastName;  
+        }
     }
     
     public void setAdress(String newAdress){
-        // TODO: Validering
-        this.adress = newAdress;
+        if(validateAdress(newAdress)){
+            this.adress = newAdress;
+        }
     }
     
     public void setPostalCode(String newPostalCode){
-        // TODO: Validering
-        this.postalCode = newPostalCode;
+        if(validatePostalCode(newPostalCode)){
+            this.postalCode = newPostalCode;
+        }
     }
     
     public void setCountry(String newCountry){
-        // TODO: Validering
-        this.country = newCountry;
+        if(validateCountry(newCountry)){
+            this.country = newCountry;
+        }
     }
     
     public void addTelephoneNumber(String telephoneNumber){
-        // TODO: Validering
-        telephoneNumbers.add(telephoneNumber);
+        if(validatePhoneNumber(telephoneNumber)){
+            telephoneNumbers.add(telephoneNumber);
+        }
     }
     
     public void setTelephoneNumbers(ArrayList<String> telephoneNumbers){
-        // TODO -- Validering
         this.telephoneNumbers = telephoneNumbers;
     }
     
@@ -188,12 +209,12 @@ public class Customer {
     }
     
     public void addEmailAdress(String emailAdress){ 
-        // TODO -- Validering
-        emailAdresses.add(emailAdress);
+        if(validateEmail(emailAdress)){
+            emailAdresses.add(emailAdress);
+        }
     }
     
     public void setEmailAdresses(ArrayList<String> emailAdresses){
-        // TODO -- Validering
         this.emailAdresses = emailAdresses;
     }
     
@@ -205,6 +226,7 @@ public class Customer {
     
     
     //För att kolla ett objekts 'state' vid debug. 
+    @Override
     public String toString(){
         String output = "[ID]: " + customerID + "\n[Name]: " + firstName + " "
             + lastName + "\n[Adress]: " + adress + ", " + postalCode + ", " 
@@ -230,17 +252,17 @@ public class Customer {
         return output;
     }
     
+    //-------------------- DB --------------------
     
-    //DB
-    
-    public void save(){
+    /*Här skickas en oförändrad kopia av kunden in, för att jämföra
+    vart eventuell modifiering har skett, och updaterar sedan databasen
+    med endast de förändringarna!*/
+    public void save(Customer unmodified){
+        ArrayList<String> updates = fetchUpdates(unmodified);
+        
         String sqlQuery = "UPDATE customer SET " 
-            + "first_name = '" + firstName + "', "
-            + "last_name = '" + lastName + "', "
-            + "address = '" + adress + "', "
-            + "postalcode = '" + postalCode + "', "
-            + "country = '" + country + "' " 
-            + "WHERE customer_id = " + customerID; 
+            + String.join(",", updates) + " WHERE customer_id  = " 
+            + customerID + ";";
         
         try{
             idb.update(sqlQuery);
@@ -249,40 +271,16 @@ public class Customer {
             System.out.println(sqlQuery);
         }
         
-        //--------Telefonnummer--------
-        ArrayList<String> telephoneNumbersToAdd = fetchTelephoneNumbersToAdd();
-        
-        Iterator it = telephoneNumbersToAdd.iterator();
-        while(it.hasNext()){
-            sqlQuery = "INSERT INTO phone (customer_id, phone_number) "
-                    + "VALUES ('" + customerID + "', '" + it.next() + "');";
-            
-            try{
-                idb.insert(sqlQuery);
-                System.out.println("[SqlQuery]: " + sqlQuery);
-            }catch(InfException ex){
-                System.out.println(ex.getMessage() + " 1st sqlQuery, in save(), Customer.java");
-            }
-        }
-   
-        
-        //--------Email--------
-        ArrayList<String> emailAdressesToAdd = fetchEmailAdressesToAdd();   
-        it = emailAdressesToAdd.iterator();
-        while(it.hasNext()){
-            sqlQuery = "INSERT INTO mail (customer_id, mail) "
-                    + "VALUES ('" + customerID + "', '" + it.next() + "');";
-            
-            try{
-                idb.insert(sqlQuery);
-                System.out.println("[SqlQuery]: " + sqlQuery);
-            }catch(InfException ex){
-                System.out.println(ex.getMessage() + " 3rd sqlQuery, in save(), Customer.java");
-            }
+        //DEBUG
+        System.out.print("UPDATES: ");
+        for(String anUpdate : updates){
+            System.out.println(anUpdate);
         }
         
+        updateTelephoneNumbers(unmodified);
+        
+        updateEmailAdresses(unmodified);
     }
-    
     
     //Funkar inte just nu pga constraints.
     public void delete(){
@@ -347,10 +345,8 @@ public class Customer {
         
         
     }
-    
-    
-    
-    //helpers till DB-funktionen save()
+        
+    //----------Helpers till DB-funktionen save()----------
     private ArrayList<String> fetchTelephoneNumbersToAdd(){
         ArrayList<String> telephoneNumbersDB = fetchTelephoneNumbers();
         ArrayList<String> thisTelephoneNumbers = new ArrayList<String>(telephoneNumbers);
@@ -374,7 +370,75 @@ public class Customer {
                 emailAdressesToAdd.add(emailAdress);
             }
         }
-        
         return emailAdressesToAdd;
+    }
+    
+    private ArrayList<String> fetchUpdates(Customer unmodified){
+        ArrayList<String> updates = new ArrayList<>();
+        
+        if(!this.getFirstName().equals(unmodified.getFirstName())){
+            updates.add("first_name = '" + this.getFirstName() + "'");
+        }
+        if(!this.getLastName().equals(unmodified.getLastName())){
+            updates.add("last_name = '" + this.getLastName() + "'");
+        }
+        if(!this.getAdress().equals(unmodified.getAdress())){
+            updates.add("address = '" + this.getAdress() + "'");
+        }
+        if(!this.getPostalCode().equals(unmodified.getPostalCode())){
+            updates.add("postalcode = '" + this.getPostalCode() + "'");
+        }
+        if(!this.getCountry().equals(unmodified.getCountry())){
+            updates.add("country = '" + this.getCountry() + "'");
+        }
+        if(updates.isEmpty()){
+            System.out.println("fetchUpdates() returned empty, no updates!");
+        }
+        return updates;
+    }
+    
+    private void updateTelephoneNumbers(Customer unmodified){
+        if(!Util.contentEquals(telephoneNumbers, unmodified.getTelephoneNumbers())){
+            String sqlQuery = "";
+            ArrayList<String> telephoneNumbersToAdd = fetchTelephoneNumbersToAdd();
+
+            Iterator it = telephoneNumbersToAdd.iterator();
+            while(it.hasNext()){
+                sqlQuery = "INSERT INTO phone (customer_id, phone_number) "
+                        + "VALUES ('" + customerID + "', '" + it.next() + "');";
+
+                try{
+                    idb.insert(sqlQuery);
+                    System.out.println("[SqlQuery]: " + sqlQuery);
+                }catch(InfException ex){
+                    System.out.println(ex.getMessage() + " 1st sqlQuery, in save(), Customer.java");
+                }
+            }
+        }
+        else{
+            System.out.println("updateTelephoneNumbers(): No update! :) ");
+        }
+    }
+    
+    private void updateEmailAdresses(Customer unmodified){
+        if(!Util.contentEquals(emailAdresses, unmodified.getEmailAdresses())){
+            String sqlQuery = "";
+            ArrayList<String> emailAdressesToAdd = fetchEmailAdressesToAdd();   
+            Iterator it = emailAdressesToAdd.iterator();
+            while(it.hasNext()){
+                sqlQuery = "INSERT INTO mail (customer_id, mail) "
+                        + "VALUES ('" + customerID + "', '" + it.next() + "');";
+
+                try{
+                    idb.insert(sqlQuery);
+                    System.out.println("[SqlQuery]: " + sqlQuery);
+                }catch(InfException ex){
+                    System.out.println(ex.getMessage() + " 3rd sqlQuery, in save(), Customer.java");
+                }
+            }
+        }
+        else{
+            System.out.println("updateEmailAdresses(): No update! :) ");
+        }
     }
 }

@@ -4,7 +4,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,5 +139,27 @@ public class Util {
 
 		return result;
 	}
+        
+        //Jämför två listor och ser om de är likadana, sett till innehållet. 
+        //Tar inte ordning i beaktning!
+        public static <T> boolean contentEquals(List<T> list1, List<T> list2) {
+            //Är de inte lika stora kan de inte vara likadana.
+            if (list1.size() != list2.size()) {
+                return false;
+            }
+
+            Map<T, Integer> freq1 = new HashMap<>();
+            Map<T, Integer> freq2 = new HashMap<>();
+
+            for (T item : list1) {
+                freq1.put(item, freq1.getOrDefault(item, 0) + 1);
+            }
+            for (T item : list2) {
+                freq2.put(item, freq2.getOrDefault(item, 0) + 1);
+            }
+            //Om elementen har samma frekvens, har listorna samma innehåll.
+            return freq1.equals(freq2);
+        }
+
 
 }
