@@ -7,19 +7,17 @@ package hattmakarna;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import oru.inf.InfDB;
 import oru.inf.InfException;
+import static hattmakarna.Hattmakarna.idb;
 
 /**
  *
  * @author james
  */
 public class CustomerRegister {
-    private final InfDB idb;
     private final ArrayList<Customer> allCustomers;
     
-    public CustomerRegister(InfDB idb){
-        this.idb = idb;
+    public CustomerRegister(){
         allCustomers = initAllCustomers();
     }
     
@@ -38,7 +36,7 @@ public class CustomerRegister {
         }
         
         for(HashMap<String, String> aCustomerMap : customerMaps){
-            customerList.add(new Customer(aCustomerMap, idb));
+            customerList.add(new Customer(aCustomerMap));
         }
         
         return customerList;
@@ -89,7 +87,15 @@ public class CustomerRegister {
                 return aCustomer;
             }
         }
-        System.out.println("getCustomer(), in CustomerRegister.java returned NULL!");
+        System.out.println("getCustomer(), in CustomerRegister.java returned NULL! :(");
+        return null;
+    }
+    
+    public Customer getCustomer(int indexPos){
+        if(indexPos >= 0 && indexPos < allCustomers.size()){
+            return allCustomers.get(indexPos);
+        }
+        System.out.println("getCustomer(int), in CustomerRegister.java returned NULL! :(");
         return null;
     }
             

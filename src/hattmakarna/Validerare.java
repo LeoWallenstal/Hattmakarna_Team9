@@ -11,18 +11,35 @@ package hattmakarna;
 public class Validerare {
     
     
-    
+    //tom String inte tillåtet.
     public static boolean validateEmail(String email){
         return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
     
+    //'-' tillåtet, mellanslag inte tillåtet, inte heller tom String.
     public static boolean validatePhoneNumber(String number){
         return number.matches("^\\+?[0-9\\-]+$");
     }
     
+    //'-' tillåtet, mellanslag inte tillåtet, inte heller tom String.
     public static boolean validateName(String name){
         return name.matches("^[A-Za-zÅÄÖåäö\\-]+$");
     }
+    
+    /*Endast fem siffor tillåtet, whitespace mellan tredje och fjärde siffran
+    tillåtet. 55534 och 555 34 godkänt. */
+    public static boolean validatePostalCode(String postalCode){
+        return postalCode.matches("^[0-9]{3}\\\\s?[0-9]{2}$");
+    }
+    
+    public static boolean validateCountry(String country){
+        return country.matches("^[a-zA-Z\\s\\-]+$");
+    }
+    
+    public static boolean validateAdress(String adress){
+        return adress.matches("^[a-zA-Z0-9][a-zA-Z0-9\\s,.-]*[a-zA-Z0-9]$");
+    }
+    
     
     
 }
