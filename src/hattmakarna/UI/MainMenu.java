@@ -4,7 +4,10 @@
  */
 package hattmakarna.UI;
 
+import hattmakarna.CustomerWindow;
+import hattmakarna.HattWindow;
 import hattmakarna.LogInWindow;
+import hattmakarna.OrderWindow;
 import hattmakarna.User;
 import oru.inf.InfDB;
 /**
@@ -23,6 +26,7 @@ public class MainMenu extends javax.swing.JFrame {
         this.idb = idb;
         initComponents();
         setLocationRelativeTo(null);
+        lblUserName.setText("Inloggad: " + userLoggedIn.getFirstName());
     }
 
     /**
@@ -39,7 +43,7 @@ public class MainMenu extends javax.swing.JFrame {
         btnCustomer = new javax.swing.JButton();
         btnOrder = new javax.swing.JButton();
         btnMaterial = new javax.swing.JButton();
-        btnHats = new javax.swing.JButton();
+        btnHat = new javax.swing.JButton();
         lblUserName = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -55,6 +59,11 @@ public class MainMenu extends javax.swing.JFrame {
         lblCompanyName.setText("Otto & Judith's Hattmakeri");
 
         btnCustomer.setText("Kunder");
+        btnCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCustomerActionPerformed(evt);
+            }
+        });
 
         btnOrder.setText("Order");
         btnOrder.addActionListener(new java.awt.event.ActionListener() {
@@ -64,8 +73,18 @@ public class MainMenu extends javax.swing.JFrame {
         });
 
         btnMaterial.setText("Material");
+        btnMaterial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMaterialActionPerformed(evt);
+            }
+        });
 
-        btnHats.setText("Hattar");
+        btnHat.setText("Hattar");
+        btnHat.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHatActionPerformed(evt);
+            }
+        });
 
         lblUserName.setText("Inloggad: ");
 
@@ -73,24 +92,26 @@ public class MainMenu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(159, Short.MAX_VALUE)
-                .addComponent(lblCompanyName)
-                .addGap(159, 159, 159))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnSignOut)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnCustomer)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnOrder)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnMaterial)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnHats))
-                    .addComponent(lblUserName))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnSignOut)
+                            .addComponent(lblUserName))
+                        .addGap(0, 511, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblCompanyName))
+                        .addGap(33, 33, 33)
+                        .addComponent(btnHat, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,11 +122,11 @@ public class MainMenu extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCustomer)
                     .addComponent(btnOrder)
-                    .addComponent(btnMaterial)
-                    .addComponent(btnHats))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(btnHat)
+                    .addComponent(btnMaterial))
+                .addGap(14, 14, 14)
                 .addComponent(lblUserName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 249, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 247, Short.MAX_VALUE)
                 .addComponent(btnSignOut)
                 .addContainerGap())
         );
@@ -121,7 +142,27 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrderActionPerformed
         // TODO add your handling code here:
+        new OrderWindow().setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_btnOrderActionPerformed
+
+    private void btnCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomerActionPerformed
+        // TODO add your handling code here:
+        new CustomerWindow().setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnCustomerActionPerformed
+
+    private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
+        // TODO add your handling code here:
+        new MaterialOrderWindow(idb).setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnMaterialActionPerformed
+
+    private void btnHatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHatActionPerformed
+        // TODO add your handling code here:
+        new HattWindow().setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnHatActionPerformed
 
     /**
      * @param args the command line arguments
@@ -160,7 +201,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCustomer;
-    private javax.swing.JButton btnHats;
+    private javax.swing.JButton btnHat;
     private javax.swing.JButton btnMaterial;
     private javax.swing.JButton btnOrder;
     private javax.swing.JButton btnSignOut;
