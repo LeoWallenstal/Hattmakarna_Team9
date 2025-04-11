@@ -8,6 +8,9 @@ import oru.inf.InfException;
  */
 import static hattmakarna.Hattmakarna.idb;
 import java.util.HashMap;
+import oru.inf.InfDB;
+import java.util.*;
+import oru.inf.InfException;
 
 /**
  *
@@ -18,11 +21,19 @@ public class Model {
     private String name;
     private String price;
     private String modelId;
+    private InfDB idb;
 
     public Model(HashMap<String, String> modelMap) {
         modelId = modelMap.get("model_id");
         name = modelMap.get("name");
         price = modelMap.get("price");
+    }
+    
+    public Model(HashMap<String, String> modelMap, InfDB idb) {
+    this.idb = idb;
+    this.modelId = modelMap.get("model_id");
+    this.name = modelMap.get("name");
+    
     }
 
     public void addMaterial(String name, double price) {
