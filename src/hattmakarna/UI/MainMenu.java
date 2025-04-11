@@ -8,7 +8,6 @@ import hattmakarna.CustomerWindow;
 import static hattmakarna.Hattmakarna.idb;
 import hattmakarna.HattWindow;
 import hattmakarna.LogInWindow;
-import hattmakarna.OrderWindow;
 import hattmakarna.User;
 import oru.inf.InfDB;
 /**
