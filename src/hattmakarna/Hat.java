@@ -58,7 +58,13 @@ public class Hat {
         this.materialList = materials;
         
     }
-    
+    public Hat(InfDB idb, String hatId, String modelId, String orderId){
+        this.idb = idb;
+        this.hatId = hatId;
+        this.modelId = modelId;
+        this.orderId = orderId;
+        
+    }
     public String gethatId(){
         return hatId;
     }
