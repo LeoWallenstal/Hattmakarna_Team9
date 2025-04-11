@@ -47,7 +47,7 @@ public class CustomerRegister {
         
         for(Customer aCustomer : allCustomers){
             for(String anEmailAdress : aCustomer.getEmailAdresses()){
-                if(anEmailAdress.startsWith(emailSearch)){
+                if(anEmailAdress.toLowerCase().startsWith(emailSearch.toLowerCase())){
                     searchResult.add(aCustomer);
                 }
             }
@@ -61,7 +61,7 @@ public class CustomerRegister {
         for(Customer aCustomer : allCustomers){
             String fullName = aCustomer.getFirstName() + " " 
                 + aCustomer.getLastName();
-            if(fullName.startsWith(nameSearch)){
+            if(fullName.toLowerCase().startsWith(nameSearch.toLowerCase())){
                 searchResult.add(aCustomer);
             }
         }
