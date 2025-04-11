@@ -34,5 +34,7 @@ public class Hattmakarna {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
 			e.printStackTrace();
 		}
+
+
 	}
 }

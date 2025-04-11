@@ -128,7 +128,7 @@ public class LogInWindow extends javax.swing.JFrame {
                     query = "SELECT user_id FROM user WHERE email = '" + email + "'";
                     String id = idb.fetchSingle(query);
                     User userLoggedIn = new User(id, idb);
-                    new MainMenu(userLoggedIn, idb).setVisible(true);
+                    new MainMenu(userLoggedIn).setVisible(true);
                     this.setVisible(false);
                 }
                 else {

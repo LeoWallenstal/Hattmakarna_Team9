@@ -5,6 +5,7 @@
 package hattmakarna.UI;
 
 import hattmakarna.CustomerWindow;
+import static hattmakarna.Hattmakarna.idb;
 import hattmakarna.HattWindow;
 import hattmakarna.LogInWindow;
 import hattmakarna.OrderWindow;
@@ -16,14 +17,13 @@ import oru.inf.InfDB;
  */
 public class MainMenu extends javax.swing.JFrame {
 
-    private final InfDB idb;
+
     private final User userLoggedIn;
     /**
      * Creates new form MainMenu
      */
-    public MainMenu(User userLoggedIn, InfDB idb) {
+    public MainMenu(User userLoggedIn) {
         this.userLoggedIn = userLoggedIn;
-        this.idb = idb;
         initComponents();
         setLocationRelativeTo(null);
         lblUserName.setText("Inloggad: " + userLoggedIn.getFirstName());
@@ -142,14 +142,13 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrderActionPerformed
         // TODO add your handling code here:
-        new OrderWindow().setVisible(true);
+        new OrderWindow(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnOrderActionPerformed
 
     private void btnCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomerActionPerformed
         // TODO add your handling code here:
-        new CustomerWindow().setVisible(true);
-        this.setVisible(false);
+        System.out.println("Ett nytt window ska komma här");
     }//GEN-LAST:event_btnCustomerActionPerformed
 
     private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
