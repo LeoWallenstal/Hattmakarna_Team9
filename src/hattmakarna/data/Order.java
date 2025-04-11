@@ -7,9 +7,6 @@ import java.util.Locale;
 import hattmakarna.Hattmakarna;
 import oru.inf.InfException;
 
-enum Status {
-	PLACED, MAKING, PACKAGED, SHIPPED,
-}
 
 public class Order extends DatabaseObject {
 
