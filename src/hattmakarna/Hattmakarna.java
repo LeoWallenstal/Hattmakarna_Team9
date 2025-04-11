@@ -35,9 +35,6 @@ public class Hattmakarna {
 			e.printStackTrace();
 		}
 
-            CustomerRegister cr = new CustomerRegister();
             
-            System.out.println(cr);
-            cr.getCustomer("1").delete();
 	}
 }
