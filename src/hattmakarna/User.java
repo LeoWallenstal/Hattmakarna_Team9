@@ -137,11 +137,17 @@ public class User {
         }
     }
     
+    /*Tänker med denna att om en användare skulle vilja byta lösneord sätts då
+    detta fältet först, med någon lämplig validering kanske. (att det inte är
+    samma lösneord igen, att det inte är tomt, osv). Sen när lösneordet uppdaterats
+    i databasen, så rensar man detta fält. I princip samma om man gör en ny 
+    användare. */ 
     public void setPWCandidate(String pw){
         this.pwCandidate = pw;
     }
     
-    public void setID(String ID){
+    //Används i princip bara i create()
+    private void setID(String ID){
         if(userID == null || userID.isEmpty()){
             userID = ID;
         }
@@ -270,7 +276,7 @@ public class User {
         if(!this.getEmail().equals(unmodified.getEmail())){
             updates.add("email = '" + this.getEmail() + "'"); 
         }
-        if(pwCandidate.isEmpty() || !pwMatchesDB(pwCandidate)){
+        if(pwCandidate.isEmpty() || !pwMatchesDB()){
             updates.add("password = '" + this.getPwCandidate() + "'");
             pwCandidate = "";
         }
@@ -280,11 +286,12 @@ public class User {
         return updates;
     }
     
+    /*Jämför this.'Usern' mot en omodifierad för att se om de har samma admintillhörighet.*/
     private boolean updateAdmin(User unmodified){
         return this.isAdmin == unmodified.isAdmin();
     }
     
-    private boolean pwMatchesDB(String pwCandidate){
+    private boolean pwMatchesDB(){
         String currentPW = "";
         try{
             currentPW = idb.fetchSingle("SELECT password FROM user"
