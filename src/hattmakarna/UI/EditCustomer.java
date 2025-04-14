@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
+import javax.swing.*;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import hattmakarna.data.EmailOrPhone;
+import javax.swing.JButton;
 
 /**
  *
@@ -28,15 +30,19 @@ public class EditCustomer extends javax.swing.JFrame {
      * Creates new form EditCustomer
      */
     
-    private final Customer aCustomer;
+    private final Customer copy;
+    private Customer aCustomer;
     private final ArrayList<String> countries;
     private User userLoggedIn;
     private DefaultListModel<String> dlPhoneModel;
     private DefaultListModel<String> dlEmailModel;
+    private boolean editOK = true;
+
     
     
     public EditCustomer(Customer aCustomer) {
         this.aCustomer = aCustomer;
+        copy = new Customer(aCustomer);
         
         countries = new ArrayList<>(Arrays.asList(
     "Afghanistan", "Albanien", "Algeriet", "Andorra", "Angola", "Antigua och Barbuda", "Argentina",
@@ -66,9 +72,10 @@ public class EditCustomer extends javax.swing.JFrame {
     "Ukraina", "Ungern", "Uruguay", "USA", "Uzbekistan", "Vanuatu", "Vatikanstaten", "Venezuela",
     "Vietnam", "Vitryssland", "Zambia", "Zimbabwe"
 ));
-
+ 
         
         initComponents();
+        this.setTitle("Hattmakarna - Redigera kund");
         btnDeletePhone.setEnabled(false);
         btnDeleteEmail.setEnabled(false);
         setLocationRelativeTo(null);
@@ -87,11 +94,30 @@ public class EditCustomer extends javax.swing.JFrame {
         dlEmailModel = (DefaultListModel<String>) jlEmail.getModel();
     }
     
+    private void resetErrors(){
+        lblFirstNameError.setVisible(false);
+        lblLastNameError.setVisible(false);
+        lblAdressError.setVisible(false);
+        lblPostalCodeError.setVisible(false);
+        lblCountryError.setVisible(false);
+    }
+    
     private void initCBCountry(){
         cbCountry.addItem("Välj land...");
         for(String aCountry : countries){
             cbCountry.addItem(aCountry);
         }
+    }
+    
+    public DefaultListModel<String> getModel(EmailOrPhone which){
+        return switch(which){
+            case PHONE -> dlPhoneModel;
+            case EMAIL -> dlEmailModel;
+        };
+    }
+    
+    public JButton getSaveButton(){
+        return btnSave;
     }
     
     private void setCustomerInfoText(){
@@ -202,8 +228,14 @@ public class EditCustomer extends javax.swing.JFrame {
         lblAdressError = new javax.swing.JLabel();
         lblPostalCodeError = new javax.swing.JLabel();
         lblCountryError = new javax.swing.JLabel();
+        lblSaved = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
 
         lblCustomer.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lblCustomer.setText("Redigera kund");
@@ -219,11 +251,6 @@ public class EditCustomer extends javax.swing.JFrame {
         lblAdress.setText("Adress:");
 
         tfFirstName.setText("jTextField1");
-        tfFirstName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfFirstNameActionPerformed(evt);
-            }
-        });
         tfFirstName.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 tfFirstNameKeyTyped(evt);
@@ -231,11 +258,6 @@ public class EditCustomer extends javax.swing.JFrame {
         });
 
         tfLastName.setText("jTextField2");
-        tfLastName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfLastNameActionPerformed(evt);
-            }
-        });
         tfLastName.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 tfLastNameKeyTyped(evt);
@@ -243,11 +265,6 @@ public class EditCustomer extends javax.swing.JFrame {
         });
 
         tfAdress.setText("jTextField5");
-        tfAdress.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfAdressActionPerformed(evt);
-            }
-        });
         tfAdress.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 tfAdressKeyTyped(evt);
@@ -299,6 +316,11 @@ public class EditCustomer extends javax.swing.JFrame {
         });
 
         btnAddEmail.setText("Lägg till");
+        btnAddEmail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddEmailActionPerformed(evt);
+            }
+        });
 
         btnDeleteEmail.setText("Ta bort");
         btnDeleteEmail.addActionListener(new java.awt.event.ActionListener() {
@@ -323,11 +345,6 @@ public class EditCustomer extends javax.swing.JFrame {
                 cbCountryItemStateChanged(evt);
             }
         });
-        cbCountry.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                cbCountryKeyTyped(evt);
-            }
-        });
 
         lblFirstNameError.setText("jLabel1");
 
@@ -339,6 +356,8 @@ public class EditCustomer extends javax.swing.JFrame {
 
         lblCountryError.setText("jLabel1");
 
+        lblSaved.setText("jLabel1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -349,7 +368,9 @@ public class EditCustomer extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(btnBack)
                         .addGap(18, 18, 18)
-                        .addComponent(btnSave))
+                        .addComponent(btnSave)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblSaved, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(20, 20, 20)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -400,7 +421,7 @@ public class EditCustomer extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btnDeletePhone, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnAddPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(185, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -445,7 +466,8 @@ public class EditCustomer extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnBack)
-                            .addComponent(btnSave))
+                            .addComponent(btnSave)
+                            .addComponent(lblSaved))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnAddPhone)
@@ -461,13 +483,8 @@ public class EditCustomer extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tfLastNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfLastNameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfLastNameActionPerformed
-
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         
-        boolean editOK = true;
         
         if(!validateName(tfFirstName.getText()) || tfFirstName.getText().isEmpty()){
             editOK = false;
@@ -478,6 +495,9 @@ public class EditCustomer extends javax.swing.JFrame {
                 lblFirstNameError.setText("Får inte vara tomt!");
             }
             lblFirstNameError.setVisible(true);
+        }
+        else{
+            aCustomer.setFirstName(tfFirstName.getText());
         }
         
         if(!validateName(tfLastName.getText()) || tfLastName.getText().isEmpty()){
@@ -490,6 +510,9 @@ public class EditCustomer extends javax.swing.JFrame {
             }
             lblLastNameError.setVisible(true);
         }
+        else{
+            aCustomer.setLastName(tfLastName.getText());
+        }
         
         if(!validateAdress(tfAdress.getText()) || tfAdress.getText().isEmpty()){
             editOK = false;
@@ -500,6 +523,9 @@ public class EditCustomer extends javax.swing.JFrame {
                 lblAdressError.setText("Får inte vara tomt!");
             }
             lblAdressError.setVisible(true);
+        }
+        else{
+            aCustomer.setAdress(tfAdress.getText());
         }
         
         if(!validatePostalCode(tfPostalCode.getText()) || tfPostalCode.getText().isEmpty()){
@@ -512,38 +538,47 @@ public class EditCustomer extends javax.swing.JFrame {
             }
             lblPostalCodeError.setVisible(true);
         }
+        else{
+            aCustomer.setPostalCode(tfPostalCode.getText());
+        }
         
         if(cbCountry.getSelectedItem().equals("Välj land...")){
             editOK = false;
             lblCountryError.setText("Inget land valt!");
             lblCountryError.setVisible(true);
         }
+        else{
+            aCustomer.setCountry((String)cbCountry.getSelectedItem());
+        }
         
-        if(editOK){
-            //Här sparas objektet sen
+        if(editOK){            
+            aCustomer.save(copy);
+            lblSaved.setText("Kunduppgifter uppdaterade!");
+            lblSaved.setVisible(true);
         }
         
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void tfFirstNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfFirstNameKeyTyped
         btnSave.setEnabled(true);
+        editOK = true;
+        lblFirstNameError.setVisible(false);
+        lblSaved.setVisible(false);
     }//GEN-LAST:event_tfFirstNameKeyTyped
 
     private void tfLastNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfLastNameKeyTyped
         btnSave.setEnabled(true);
+        editOK = true;
+        lblLastNameError.setVisible(false);
+        lblSaved.setVisible(false);
     }//GEN-LAST:event_tfLastNameKeyTyped
 
     private void tfAdressKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfAdressKeyTyped
         btnSave.setEnabled(true);
+        editOK = true;
+        lblAdressError.setVisible(false);
+        lblSaved.setVisible(false);
     }//GEN-LAST:event_tfAdressKeyTyped
-
-    private void tfAdressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfAdressActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfAdressActionPerformed
-
-    private void tfFirstNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfFirstNameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfFirstNameActionPerformed
 
     private void btnDeletePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeletePhoneActionPerformed
         aCustomer.removeTelephoneNumber(jlPhone.getSelectedIndex());
@@ -555,7 +590,7 @@ public class EditCustomer extends javax.swing.JFrame {
     }//GEN-LAST:event_btnDeletePhoneActionPerformed
 
     private void btnAddPhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPhoneActionPerformed
-        
+        new AddPhoneEmailWindow(aCustomer, EmailOrPhone.PHONE, this).setVisible(true);
     }//GEN-LAST:event_btnAddPhoneActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
@@ -569,14 +604,16 @@ public class EditCustomer extends javax.swing.JFrame {
 
     private void tfPostalCodeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfPostalCodeKeyTyped
         btnSave.setEnabled(true);
+        editOK = true;
+        lblPostalCode.setVisible(false);
+        lblSaved.setVisible(false);
     }//GEN-LAST:event_tfPostalCodeKeyTyped
-
-    private void cbCountryKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cbCountryKeyTyped
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbCountryKeyTyped
 
     private void cbCountryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbCountryItemStateChanged
         btnSave.setEnabled(true);
+        editOK = true;
+        lblCountryError.setVisible(false);
+        lblSaved.setVisible(false);
     }//GEN-LAST:event_cbCountryItemStateChanged
 
     private void jlPhoneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlPhoneMouseClicked
@@ -599,6 +636,15 @@ public class EditCustomer extends javax.swing.JFrame {
             btnDeleteEmail.setEnabled(false);
         }
     }//GEN-LAST:event_btnDeleteEmailActionPerformed
+
+    private void btnAddEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmailActionPerformed
+        new AddPhoneEmailWindow(aCustomer, EmailOrPhone.EMAIL, this).setVisible(true);
+    }//GEN-LAST:event_btnAddEmailActionPerformed
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        jlPhone.clearSelection();
+        jlEmail.clearSelection();
+    }//GEN-LAST:event_formMouseClicked
 
     /**
      * @param args the command line arguments
@@ -660,6 +706,7 @@ public class EditCustomer extends javax.swing.JFrame {
     private javax.swing.JLabel lblPhone;
     private javax.swing.JLabel lblPostalCode;
     private javax.swing.JLabel lblPostalCodeError;
+    private javax.swing.JLabel lblSaved;
     private javax.swing.JTextField tfAdress;
     private javax.swing.JTextField tfFirstName;
     private javax.swing.JTextField tfLastName;

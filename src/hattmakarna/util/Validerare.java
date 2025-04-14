@@ -18,7 +18,7 @@ public class Validerare {
     
     //'-' tillåtet, mellanslag inte tillåtet, inte heller tom String.
     public static boolean validatePhoneNumber(String number){
-        return number.matches("^\\+?[0-9\\-]+$");
+        return number.matches("^\\d{10}$");
     }
     
     //'-' tillåtet, mellanslag inte tillåtet, inte heller tom String.
@@ -37,7 +37,7 @@ public class Validerare {
     }
     
     public static boolean validateAdress(String adress){
-        return adress.matches("^[a-zA-Z0-9][a-zA-Z0-9\\s,.-]*[a-zA-Z0-9]$");
+        return adress.matches("^[a-zA-Z0-9](?!.*[ ,\\-]{2})[a-zA-Z0-9 ,\\-]*[a-zA-Z0-9]$");
     }
     
     
