@@ -2,14 +2,22 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hattmakarna.UI; 
+package hattmakarna.UI;
 
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import oru.inf.InfDB;
 import oru.inf.InfException;
 import hattmakarna.*;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 /**
  *
@@ -19,35 +27,51 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
 
     private InfDB idb;
     private DefaultTableModel table;
-    private ArrayList<String> orderNr;
-    
+    private ArrayList<HashMap<String, String>> orderAndHats;
+    private HatRegister hatRegister;
+
     /**
      * Creates new form MaterialOrderWindow
      */
     public MaterialOrderWindow(InfDB idb) {
         initComponents();
-        
+
         this.idb = idb;
-        this.table = (DefaultTableModel)tblOrders.getModel();
-        
+        this.table = (DefaultTableModel) tblOrders.getModel();
+        this.hatRegister = new HatRegister(idb);
+        this.orderAndHats = null;
+
         fillTable();
-        
+
+    }
+
+    public void fillTable() {
+
+        try {
+            String sqlFraga = "SELECT sales_order.order_id, count(hat.hat_id) as hats FROM sales_order"
+                    + " JOIN hat on sales_order.order_id = hat.order_id "
+                    + "GROUP BY sales_order.order_id";
+
+            orderAndHats = idb.fetchRows(sqlFraga);
+
+            for (HashMap<String, String> row : orderAndHats) {
+                table.addRow(new Object[]{row.get("order_id"), row.get("hats")});
+            }
+        } catch (InfException ex) {
+            System.out.println(ex.getMessage() + "???");
+        }
     }
     
-    public void fillTable(){
-        
-        
-        try{
-            String sqlFraga = "SELECT order_id FROM sales_order";
+    public void fillTable2(){
+        HashMap<String, Integer> orderHatCount = new HashMap<>();
+        for(Hat aHat: hatRegister.getAllHats()){
+            String orderId = aHat.getOrderId();
+            orderHatCount.put(orderId, orderHatCount.getOrDefault(orderId, 0) + 1);
             
-            orderNr = idb.fetchColumn(sqlFraga);
-            
-            for(String order: orderNr){
-                table.addRow(new Object [] {order, ""});
-            }
         }
-        catch(InfException ex){
-            System.out.println(ex.getMessage() + "???");
+        
+        for(String orderId: orderHatCount.keySet()){
+            table.addRow(new Object[] {orderId, orderHatCount.get(orderId)});
         }
     }
 
@@ -63,6 +87,8 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblOrders = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,7 +97,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Ordernummer"
+                "Ordernummer", "Antal hattar"
             }
         ));
         jScrollPane1.setViewportView(tblOrders);
@@ -79,64 +105,184 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             tblOrders.getColumnModel().getColumn(0).setResizable(false);
         }
 
-        jButton1.setText("skriv ut");
+        jButton1.setText("Skriv ut lista");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
+        jLabel1.setText("Materialbeställning");
+
+        jLabel2.setText("Redo för materialbeställning:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(59, 59, 59)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(279, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jButton1)
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addGap(44, 44, 44))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(29, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jButton1)
-                .addGap(17, 17, 17))
+                .addGap(19, 19, 19))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-        for(String order: orderNr){
-            
-            try{
-            
-            String sqlQuery = "SELECT hat_id FROM hat WHERE order_id = " + order;
-            ArrayList<String> hattar = idb.fetchColumn(sqlQuery);
-            
-            for(String hat: hattar){
-                ArrayList<HashMap<String,String>> materialList = new MaterialOrder(idb, hat).getMaterialList();
-                System.out.println("Hatt");
-                for(HashMap<String, String> row : materialList){
-                    
-                System.out.println("Material: " + row.get("material_id") +
-                    ", färg: " + row.get("color") + ", " + row.get("amount"));
-            
-                }
-            }
-            }
-            catch(InfException ex){
-                
-            }
-    }       
+        exportToPDF();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void exportToPDF() {
+
+        try {
+            //skapar ett PDF dokument och lägger till en sida
+            PDDocument document = new PDDocument();
+            PDPage page = new PDPage();
+            document.addPage(page);
+            
+            //kodrad 169 möjliggör att text och grafik genereras på sidan
+            //teckensnitt, srtl och radavstånd sätts samt startposition anges
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+            contentStream.beginText();
+            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+            contentStream.setLeading(14.5f);
+            contentStream.newLineAtOffset(50, 700);
+
+            // Huvudrubrik
+            contentStream.showText("MATERIALÖVERSIKT FÖR ORDRAR");
+            contentStream.newLine();
+            contentStream.newLine();
+            
+            //lista som sammanställer ordrarnas material
+            HashMap<String, Double> totalMaterial = new HashMap<>();
+            
+            writeOrdersInPDF(contentStream, totalMaterial);
+            writeTotalSummaryPDF(contentStream, totalMaterial);
+            
+            //textskrivning avslutas och stängs
+            contentStream.endText();
+            contentStream.close();
+            
+            //PDF sparas och stängs för att sedan öppnas
+            document.save("materialorder.pdf");
+            document.close();
+            openPDF("materialorder.pdf");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+    }
+
+    private void openPDF(String fileName) {
+        try {
+            File pdfFile = new File(fileName);
+            if (pdfFile.exists()) {
+                Desktop.getDesktop().open(pdfFile);
+            } else {
+                System.out.println("PDF filen hittades inte");
+            }
+        } catch (IOException e) {
+            System.out.println("Kunde inte öppna PDF: " + e.getMessage());
+        }
+    }
+
+    private void writeOrdersInPDF(PDPageContentStream contentStream, HashMap<String, Double> totalMaterial) {
+        try {
+            //hämtar alla ordrar, SKA ANVÄNDA ORDERREGISTER NÄR DE ÄR PÅ PLATS
+            for (HashMap<String, String> order : orderAndHats) {
+                String orderId = order.get("order_id");
+
+                contentStream.showText("Order: " + orderId);
+                contentStream.newLine();
+
+                HashMap<String, Double> orderMaterial = new HashMap<>();
+
+                ArrayList<Hat> hats = new ArrayList<>();
+
+                for (Hat aHat : hatRegister.getAllHats()) {
+                    if (aHat.getOrderId().equals(orderId)) {
+                        hats.add(aHat);
+                    }
+
+                }
+                for (Hat hat : hats) {
+                    MaterialOrder mo = new MaterialOrder(idb, hat.gethatId());
+
+                    for (HashMap<String, String> row : mo.getMaterialList()) {
+                        String materialId = row.get("material_id");
+                        String color = row.get("color");
+                        double amount = safeParseDouble(row.get("amount"));
+
+                        String key = materialId + " | " + color;
+
+                        orderMaterial.merge(key, amount, Double::sum);
+                        totalMaterial.merge(key, amount, Double::sum);
+                    }
+                }
+
+                for (String key : orderMaterial.keySet()) {
+                    double amount = orderMaterial.get(key);
+                    contentStream.showText("Material:  " + key + ", Mängd: " + amount);
+                    contentStream.newLine();
+                }
+
+                contentStream.newLine(); // mellan ordrar
+            }
+        } catch (IOException e) {
+            System.out.println("Fel vid utskrift av ordrar");
+        }
+    }
+
+    private void writeTotalSummaryPDF(PDPageContentStream contentStream, HashMap<String, Double> totalMaterial) {
+
+        try {
+            contentStream.showText("TOTAL MATERIALSUMMERING:");
+            contentStream.newLine();
+
+            for (String key : totalMaterial.keySet()) {
+                double amount = totalMaterial.get(key);
+                contentStream.showText("Material: " + key + ", Mängd : " + amount);
+                contentStream.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("Fel vid totalsummering");
+        }
+    }
+
+    private double safeParseDouble(String s) {
+        try {
+            return (s != null && !s.isEmpty()) ? Double.parseDouble(s) : 0.0;
+        } catch (NumberFormatException e) {
+            System.out.println("⚠️ Ogiltig mängd: " + s + " – behandlas som 0.0");
+            return 0.0;
+        }
+    }
 
     /**
      * @param args the command line arguments
@@ -152,16 +298,24 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(MaterialOrderWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MaterialOrderWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(MaterialOrderWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MaterialOrderWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(MaterialOrderWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MaterialOrderWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MaterialOrderWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MaterialOrderWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -175,6 +329,8 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable tblOrders;
     // End of variables declaration//GEN-END:variables
