@@ -22,7 +22,8 @@ public class MaterialOrder {
         materialList = new ArrayList<>();
        
         try{
-            String sqlQuery = "SELECT material_id, amount, color FROM hat_material WHERE hat_id = " + hatID;
+            String sqlQuery = "SELECT material_id, amount, color FROM hat_material WHERE hat_id = " + hatID 
+                    + " AND hat_id IN ( SELECT hat_id FROM hat WHERE order_id IN (SELECT order_id FROM sales_order WHERE material_ordered = 0))";
             ArrayList<HashMap<String, String>> result = idb.fetchRows(sqlQuery);
             
             materialList.addAll(result);
