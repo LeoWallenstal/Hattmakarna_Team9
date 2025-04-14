@@ -15,12 +15,12 @@ public class Order extends DatabaseObject {
     // Fält motsvarande kolumner i tabellen sales_order
     private int order_id;
     private int customer_id;
-    private ArrayList<String> hattar;
     private int totalPris;
     private Status status;
     private Date recived_date;
+    private boolean  material_ordered;
     private boolean isFastProduction;
-
+    
     /**
      * Tom standardkonstruktor.
      */
@@ -35,13 +35,6 @@ public class Order extends DatabaseObject {
     public Order(String orderId) {
         super(orderId);
 
-        try {
-            // Hämta alla hatt-id:n kopplade till denna order
-            this.hattar = Hattmakarna.idb.fetchColumn(
-                "SELECT hat_id FROM hat WHERE order_id = " + orderId);
-        } catch (InfException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -53,6 +46,7 @@ public class Order extends DatabaseObject {
      * @param isFastProduction   Om produktionen ska gå snabbare än normalt
      * @return Det genererade order-ID:t som en sträng, eller null vid fel
      */
+    @Deprecated
     public static String createOrder(int customer_id, ArrayList<String> hattar,
                                      double totalPris, boolean isFastProduction) {
         try {
@@ -122,11 +116,17 @@ public class Order extends DatabaseObject {
     }
 
     public ArrayList<String> getHattar() {
-        return hattar;
-    }
-
-    public void setHattar(ArrayList<String> hattar) {
-        this.hattar = hattar;
+        
+        ArrayList<String> hattIds = new ArrayList<>();
+           try {
+            // Hämta alla hatt-id:n kopplade till denna order
+            hattIds = Hattmakarna.idb.fetchColumn(
+                "SELECT hat_id FROM hat WHERE order_id = " + order_id);
+        } catch (InfException e) {
+            e.printStackTrace();
+        }
+           
+           return hattIds;
     }
 
     public int getTotalPris() {
@@ -161,6 +161,13 @@ public class Order extends DatabaseObject {
         this.isFastProduction = isFastProduction;
     }
 
+    public void setMaterialOrdered(boolean status){
+        this.material_ordered = status;
+    }
+    
+    public boolean getMaterialOrdered(){
+        return material_ordered;
+    }
     /**
      * @return ID:t som sträng, används av basklassen för att avgöra om INSERT eller UPDATE ska göras.
      */

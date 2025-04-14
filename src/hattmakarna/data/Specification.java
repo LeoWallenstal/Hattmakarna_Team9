@@ -9,7 +9,12 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import hattmakarna.util.Util;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.UIManager;
 import oru.inf.InfException;
 
 /**
@@ -22,11 +27,11 @@ public class Specification extends DatabaseObject {
     private String beskrivning;
     private int hat_id;
     private String img_path;
-    private boolean hasId = false;
+    private BufferedImage skissImage = null;
+    public static String SAVE_TO_PATH = "Images/";
 
     public Specification(String specificationID) {
         super(specificationID);
-        hasId = true;
     }
 
     public Specification() {
@@ -53,8 +58,8 @@ public class Specification extends DatabaseObject {
         this.beskrivning = newDescription;
     }
 
-    public void setSkiss(String imgPath) {
-        this.img_path = imgPath;
+    public void setSkiss(BufferedImage image) {
+        this.skissImage = image;
     }
 
     public void setHatId(int id) {
@@ -66,18 +71,29 @@ public class Specification extends DatabaseObject {
      *
      * @return file-object till den bild fil som valts. Null om ingen bild valts
      */
-    public static File getFileFromUser() {
+    public void setFileFromUser() {
+
+        try {
+            // Set native look and feel
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
         chooser.setFileFilter(filter);
-
         int returnVal = chooser.showOpenDialog(null);
 
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            return chooser.getSelectedFile();
-        }
+            try {
+                File file = chooser.getSelectedFile();
 
-        return null;
+                this.skissImage = ImageIO.read(file);
+            } catch (IOException ex) {
+                Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @Override
@@ -97,5 +113,26 @@ public class Specification extends DatabaseObject {
         }
 
         return Integer.toString(spec_id);
+    }
+
+    @Override
+    public boolean save() {
+
+        // Spara bild vald till fil
+        String fileName = "SpecBild-hat-" + hat_id + ".png";
+        File fileToSave = new File(SAVE_TO_PATH);
+
+        fileToSave.getParentFile().mkdir();
+        if (!fileToSave.canWrite()) {
+            return false;
+        }
+
+        try {
+            ImageIO.write(skissImage, "png", fileToSave);
+            return super.save();
+        } catch (IOException ex) {
+            Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
     }
 }

@@ -44,6 +44,8 @@ import oru.inf.InfException;
  */
 public abstract class DatabaseObject {
 
+    protected boolean hasId = false;
+
     public DatabaseObject() {
     }
 
@@ -59,6 +61,7 @@ public abstract class DatabaseObject {
             DatabaseObjectMapper(this, Hattmakarna.idb
                     .fetchRow("select * from " + getTabelName() + " where " + getIdAttributeName() + " = " + id));
 
+            hasId = true;
         } catch (InfException e) {
             e.printStackTrace();
         }
@@ -134,7 +137,10 @@ public abstract class DatabaseObject {
         } else if (type == float.class || type == Float.class) {
             return Float.parseFloat(value);
         } else if (type == boolean.class || type == Boolean.class) {
-            return Boolean.parseBoolean(value);
+            if(value.equals("1") || value.equals("true"))
+                return true;
+            else 
+                return false;
         } else if (type == short.class || type == Short.class) {
             return Short.parseShort(value);
         } else if (type == byte.class || type == Byte.class) {
@@ -327,7 +333,6 @@ public abstract class DatabaseObject {
         if (getIdString() == null || getTabelName() == null || getIdAttributeName() == null) {
             return false;
         }
-
 
         try {
             Hattmakarna.idb.delete("delete from " + getTabelName() + " where " + getIdAttributeName() + " = " + getIdString());
