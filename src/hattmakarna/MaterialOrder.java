@@ -48,4 +48,22 @@ public class MaterialOrder {
         }
     }
     
+    public HashMap<String, Double> getTotalMaterialAmount() {
+        HashMap<String, Double> total = new HashMap<>();
+        
+        for(HashMap<String, String> row: materialList) {
+            String materialId = row.get("material_id");
+            String amountRow = row.get("amount");
+            double amount = 0.0;
+            
+            if(amountRow != null){
+                amount = Double.parseDouble(amountRow);
+            }
+            
+            total.put(materialId, total.getOrDefault(materialId, 0.0) + amount);
+        }
+        
+        return total;
+    }
+    
 }
