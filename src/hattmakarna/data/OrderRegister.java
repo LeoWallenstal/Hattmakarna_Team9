@@ -17,7 +17,7 @@ public class OrderRegister {
     private ArrayList<Order> allOrders;
 
     public OrderRegister() {
-        //allOrders = initAllOrders();
+        initAllOrders();
     }
 
     private void initAllOrders() {
@@ -32,5 +32,9 @@ public class OrderRegister {
             System.out.println(" in initAllOrders()");
         }
 
+    }
+    
+    public ArrayList<Order> getOrders(){
+        return allOrders;
     }
 }
