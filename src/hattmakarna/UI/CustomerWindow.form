@@ -41,10 +41,31 @@
                           <Component id="tfAdress" alignment="0" pref="245" max="32767" attributes="0"/>
                           <Component id="lblTelnumber" alignment="0" min="-2" pref="155" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lblLastname" min="-2" max="-2" attributes="0"/>
-                          <Component id="tfLastname" min="-2" pref="209" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" attributes="0">
+                              <EmptySpace type="separate" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblLastname" min="-2" max="-2" attributes="0"/>
+                                  <Component id="tfLastname" min="-2" pref="209" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="tfPostnummer" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
+                                      <Component id="lblPostnummer" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblCountry" min="-2" max="-2" attributes="0"/>
+                                  <Component id="tfCountry" max="32767" attributes="0"/>
+                              </Group>
+                          </Group>
                       </Group>
                   </Group>
                   <Component id="lblRegistreraKund" min="-2" pref="237" max="-2" attributes="0"/>
@@ -88,10 +109,18 @@
                   <Component id="cbAlternatives" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="lblAdress" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lblAdress" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblPostnummer" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblCountry" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="tfAdress" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="225" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="tfAdress" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="tfPostnummer" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="tfCountry" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="219" max="32767" attributes="0"/>
               <Component id="btnSave" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="42" max="-2" attributes="0"/>
           </Group>
@@ -173,6 +202,20 @@
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblPostnummer">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Postnummmer"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfPostnummer">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblCountry">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Land"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfCountry">
     </Component>
   </SubComponents>
 </Form>
