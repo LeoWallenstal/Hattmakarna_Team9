@@ -60,7 +60,7 @@ public class Order extends DatabaseObject {
             String sql = String.format(Locale.US,
                     "INSERT INTO sales_order (price, customer_id, status, recived_date) "
                     + "VALUES (%.2f, %d, '%s', '%s');",
-                    totalPris, customer_id, Status.PLACED, date);
+                    totalPris, customer_id, Status.MOTTAGEN, date);
 
             System.out.println(sql);
 
