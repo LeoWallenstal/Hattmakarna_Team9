@@ -115,4 +115,8 @@ public class CustomerRegister {
         return output;
     }
     
+    public ArrayList<Customer> getAllCustomers() {
+        return allCustomers;
+    }
+    
 }

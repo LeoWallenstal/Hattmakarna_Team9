@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package hattmakarna.data;
-import oru.inf.InfDB;
 import java.util.*;
 import oru.inf.InfException;
 import static hattmakarna.data.Hattmakarna.idb;
@@ -17,7 +16,7 @@ public class ModelRegister {
     
     private final ArrayList<Model> allModels;
    
-    public ModelRegister(InfDB idb){
+    public ModelRegister(){
         allModels = initAllModels();
 
     }
