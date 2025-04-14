@@ -81,10 +81,6 @@ public class Specification extends DatabaseObject {
         return null;
     }
 
-    public void delete() {
-
-    }
-
     @Override
     protected String getTabelName() {
         return "hat_spec";

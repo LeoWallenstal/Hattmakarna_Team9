@@ -318,4 +318,24 @@ public abstract class DatabaseObject {
         return false;
     }
 
+    /**
+     * Tar bort entiteten från databas.
+     *
+     * @return True om delete lyckades. False vid fel.
+     */
+    public boolean delete() {
+
+        if (getIdString() == null || getTabelName() == null || getIdAttributeName() == null) {
+            return false;
+        }
+
+
+        try {
+            Hattmakarna.idb.delete("delete from " + getTabelName() + " where " + getIdAttributeName() + " = " + getIdString());
+            return true;
+        } catch (InfException ex) {
+            Logger.getLogger(DatabaseObject.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
 }

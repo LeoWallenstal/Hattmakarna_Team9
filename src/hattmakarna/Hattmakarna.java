@@ -49,8 +49,4 @@ public class Hattmakarna {
 	public static void connectToDB() throws InfException{
 		idb = new InfDB(DB_NAME,DB_PORT,DB_USER,DB_PASSWORD);
 	}
-	
-	public static void connectToDB() throws InfException{
-		idb = new InfDB(DB_NAME,DB_PORT,DB_USER,DB_PASSWORD);
-	}
 }

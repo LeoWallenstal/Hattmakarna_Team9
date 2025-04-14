@@ -23,10 +23,10 @@ import oru.inf.InfException;
  * @author leonb
  */
 public class OrderTest {
-    
+
     public OrderTest() {
     }
-    
+
     @BeforeAll
     public static void setUpClass() {
         try {
@@ -35,15 +35,15 @@ public class OrderTest {
             Logger.getLogger(OrderTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     @AfterAll
     public static void tearDownClass() {
     }
-    
+
     @BeforeEach
     public void setUp() {
     }
-    
+
     @AfterEach
     public void tearDown() {
     }
@@ -54,9 +54,9 @@ public class OrderTest {
     @Test
     @DisplayName("awdawljk alwdalk")
     public void testCreateOrder() {
-      String id = Order.createOrder(0, null, 100000, true);
-      
-      System.out.println(id);
+        String id = Order.createOrder(0, null, 100000, true);
+
+        System.out.println(id);
     }
 
     /**
@@ -95,7 +95,7 @@ public class OrderTest {
         System.out.println("getOrder_id");
         Order instance = null;
         String expResult = "";
-        String result = instance.getOrder_id();
+        String result = Integer.toString(instance.getOrder_id());
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -107,7 +107,7 @@ public class OrderTest {
     @Test
     public void testSetOrder_id() {
         System.out.println("setOrder_id");
-        String order_id = "";
+        int order_id = 1;
         Order instance = null;
         instance.setOrder_id(order_id);
         // TODO review the generated test code and remove the default call to fail.
@@ -122,7 +122,7 @@ public class OrderTest {
         System.out.println("getCustomer_id");
         Order instance = null;
         String expResult = "";
-        String result = instance.getCustomer_id();
+        String result = Integer.toString(instance.getOrder_id());
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
@@ -134,7 +134,7 @@ public class OrderTest {
     @Test
     public void testSetCustomer_id() {
         System.out.println("setCustomer_id");
-        String customer_id = "";
+        int customer_id = 1;
         Order instance = null;
         instance.setCustomer_id(customer_id);
         // TODO review the generated test code and remove the default call to fail.
@@ -275,5 +275,5 @@ public class OrderTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-    
+
 }
