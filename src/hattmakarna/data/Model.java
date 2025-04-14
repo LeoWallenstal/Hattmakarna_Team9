@@ -22,6 +22,7 @@ public class Model {
     private String price;
     private String modelID;
 
+    
     public Model(HashMap<String, String> modelMap) {
         modelID = modelMap.get("model_id");
         name = modelMap.get("name");
