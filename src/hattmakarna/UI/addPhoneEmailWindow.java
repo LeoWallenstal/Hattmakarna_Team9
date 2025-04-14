@@ -6,29 +6,35 @@ package hattmakarna.UI;
 import hattmakarna.data.Customer;
 import hattmakarna.data.EmailOrPhone;
 import static hattmakarna.util.Validerare.*;
+import java.awt.event.KeyEvent;
 
 /**
  *
  * @author james
  */
 
-public class addPhoneEmailWindow extends javax.swing.JFrame {
+public class AddPhoneEmailWindow extends javax.swing.JFrame {
 
     private EmailOrPhone emailOrPhone;
     private Customer aCustomer;
+    private EditCustomer previousWindow;
     
     
     
     /**
      * Creates new form addPhoneEmailWindow
      */
-    public addPhoneEmailWindow(Customer aCustomer, EmailOrPhone value) {
+    public AddPhoneEmailWindow(Customer aCustomer, EmailOrPhone value, 
+            EditCustomer previousWindow) {
         initComponents();
         emailOrPhone = value;
         this.aCustomer = aCustomer;
+        this.previousWindow = previousWindow;
         
         lblAddError.setVisible(false);
         btnAdd.setEnabled(false);
+        
+        setLocationRelativeTo(null);
         
         if(emailOrPhone == emailOrPhone.EMAIL){
             this.setTitle(aCustomer.getFullName() + " - Lägg till email");
@@ -53,8 +59,6 @@ public class addPhoneEmailWindow extends javax.swing.JFrame {
         tfAdd = new javax.swing.JTextField();
         btnAdd = new javax.swing.JButton();
         lblAddError = new javax.swing.JLabel();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lblAdd.setText("jLabel1");
 
@@ -115,19 +119,24 @@ public class addPhoneEmailWindow extends javax.swing.JFrame {
                 }
                 else{
                     aCustomer.addEmailAdress(tfAdd.getText());
-                    this.setVisible(true);
+                    previousWindow.getModel(EmailOrPhone.EMAIL).addElement(tfAdd.getText());
+                    previousWindow.getSaveButton().setEnabled(true);
+                    this.setVisible(false);
                 }
                 break;
             }
             case PHONE:
             {
                 if(!validatePhoneNumber(tfAdd.getText())){
+                    //Valideraren släpper igenom nummer med fler siffror än 10
                     lblAddError.setText("Telefonnummer ogilitigt!");
                     lblAddError.setVisible(true);
                 }
                 else{
                     aCustomer.addTelephoneNumber(tfAdd.getText());
-                    this.setVisible(true);
+                    previousWindow.getModel(EmailOrPhone.PHONE).addElement(tfAdd.getText());
+                    previousWindow.getSaveButton().setEnabled(true);
+                    this.setVisible(false);
                 }
             }
             break;
@@ -135,6 +144,10 @@ public class addPhoneEmailWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void tfAddKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfAddKeyReleased
+        if(!tfAdd.getText().isEmpty() && evt.getKeyCode() == KeyEvent.VK_ENTER){
+            btnAdd.doClick();
+        }
+        
         if(tfAdd.getText().isEmpty()){
             btnAdd.setEnabled(false);
         }
@@ -161,14 +174,15 @@ public class addPhoneEmailWindow extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(addPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(addPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(addPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(addPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */

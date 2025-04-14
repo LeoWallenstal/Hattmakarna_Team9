@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import hattmakarna.UI.EditCustomer;
 
 import oru.inf.InfDB;
 import oru.inf.InfException;
@@ -37,7 +38,8 @@ public class Hattmakarna {
 		try {
 			connectToDB();
                         
-			new LogInWindow(idb).setVisible(true);
+			//new LogInWindow(idb).setVisible(true);
+                        new EditCustomer(new Customer("1")).setVisible(true);
 		} catch (InfException e) {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
 			e.printStackTrace();
