@@ -264,16 +264,19 @@ public class Customer {
     public void save(Customer unmodified){
         ArrayList<String> updates = fetchUpdates(unmodified);
         
-        String sqlQuery = "UPDATE customer SET " 
+        if(!updates.isEmpty()){
+            String sqlQuery = "UPDATE customer SET " 
             + String.join(",", updates) + " WHERE customer_id  = " 
             + customerID + ";";
         
-        try{
-            idb.update(sqlQuery);
-        }catch(InfException ex){
-            System.out.println(ex.getMessage() + "1st query in save(), Customer.java");
-            System.out.println(sqlQuery);
+            try{
+                idb.update(sqlQuery);
+            }catch(InfException ex){
+                System.out.println(ex.getMessage() + "1st query in save(), Customer.java");
+                System.out.println(sqlQuery);
+            }
         }
+        
         
         //DEBUG
         System.out.print("UPDATES: ");
@@ -364,6 +367,19 @@ public class Customer {
         return telephoneNumbersToAdd;
     }
     
+    private ArrayList<String> fetchTelephoneNumbersToRemove(){
+        ArrayList<String> telephoneNumbersDB = fetchTelephoneNumbers();
+        ArrayList<String> thisTelephoneNumbers = new ArrayList<String>(telephoneNumbers);
+        ArrayList<String> telephoneNumbersToRemove = new ArrayList<String>();
+        
+        for(String telephoneNumber : telephoneNumbersDB){
+            if(!thisTelephoneNumbers.contains(telephoneNumber)){
+                telephoneNumbersToRemove.add(telephoneNumber);
+            }
+        }
+        return telephoneNumbersToRemove;
+    }
+    
     private ArrayList<String> fetchEmailAdressesToAdd(){
         ArrayList<String> emailAdressesDB = fetchEmailAdresses();
         ArrayList<String> thisEmailAdresses = new ArrayList<String>(emailAdresses);
@@ -376,6 +392,22 @@ public class Customer {
         }
         return emailAdressesToAdd;
     }
+    
+    private ArrayList<String> fetchEmailAdressesToRemove(){
+        ArrayList<String> emailAdressesDB = fetchEmailAdresses();
+        ArrayList<String> thisEmailAdresses = new ArrayList<String>(emailAdresses);
+        ArrayList<String> emailAdressesToRemove = new ArrayList<String>();
+        
+        for(String emailAdress : emailAdressesDB){
+            if(!thisEmailAdresses.contains(emailAdress)){
+                emailAdressesToRemove.add(emailAdress);
+            }
+        }
+        return emailAdressesToRemove;
+    }
+    
+    
+    
     
     private ArrayList<String> fetchUpdates(Customer unmodified){
         ArrayList<String> updates = new ArrayList<>();
@@ -402,7 +434,8 @@ public class Customer {
     }
     
     private void updateTelephoneNumbers(Customer unmodified){
-        if(!Util.contentEquals(telephoneNumbers, unmodified.getTelephoneNumbers())){
+        if(telephoneNumbers.size() > unmodified.getTelephoneNumbers().size()){
+            System.out.println("TN IF!!!!!!!!!");
             String sqlQuery = "";
             ArrayList<String> telephoneNumbersToAdd = fetchTelephoneNumbersToAdd();
 
@@ -415,17 +448,31 @@ public class Customer {
                     idb.insert(sqlQuery);
                     System.out.println("[SqlQuery]: " + sqlQuery);
                 }catch(InfException ex){
-                    System.out.println(ex.getMessage() + " 1st sqlQuery, in save(), Customer.java");
+                    System.out.println(ex.getMessage() + "if() sqlQuery, in updateTelephoneNumbers(), Customer.java");
                 }
             }
         }
-        else{
-            System.out.println("updateTelephoneNumbers(): No update! :) ");
+        else if(telephoneNumbers.size() < unmodified.getTelephoneNumbers().size()){
+            System.out.println("TN ELSE IF!!!!!!!!!");
+            String sqlQuery = "";
+            ArrayList<String> telephoneNumbersToRemove = fetchTelephoneNumbersToRemove();
+
+            Iterator it = telephoneNumbersToRemove.iterator();
+            while(it.hasNext()){
+                sqlQuery = "DELETE FROM phone WHERE phone_number = '" + it.next() + "';";
+
+                try{
+                    idb.delete(sqlQuery);
+                    System.out.println("[SqlQuery]: " + sqlQuery);
+                }catch(InfException ex){
+                    System.out.println(ex.getMessage() + "else if() sqlQuery, in updateTelephoneNumbers(), Customer.java");
+                }
+            }
         }
     }
     
     private void updateEmailAdresses(Customer unmodified){
-        if(!Util.contentEquals(emailAdresses, unmodified.getEmailAdresses())){
+        if(emailAdresses.size() > unmodified.getEmailAdresses().size()){
             String sqlQuery = "";
             ArrayList<String> emailAdressesToAdd = fetchEmailAdressesToAdd();   
             Iterator it = emailAdressesToAdd.iterator();
@@ -437,12 +484,26 @@ public class Customer {
                     idb.insert(sqlQuery);
                     System.out.println("[SqlQuery]: " + sqlQuery);
                 }catch(InfException ex){
-                    System.out.println(ex.getMessage() + " 3rd sqlQuery, in save(), Customer.java");
+                    System.out.println(ex.getMessage() + " if() sqlQuery, in updateEmailAdresses(), Customer.java");
                 }
             }
         }
-        else{
-            System.out.println("updateEmailAdresses(): No update! :) ");
+        else if(emailAdresses.size() < unmodified.getEmailAdresses().size()){
+            System.out.println("TN ELSE IF!!!!!!!!!");
+            String sqlQuery = "";
+            ArrayList<String> emailAdressesToRemove = fetchEmailAdressesToRemove();
+
+            Iterator it = emailAdressesToRemove.iterator();
+            while(it.hasNext()){
+                sqlQuery = "DELETE FROM mail WHERE mail = '" + it.next() + "';";
+
+                try{
+                    idb.delete(sqlQuery);
+                    System.out.println("[SqlQuery]: " + sqlQuery);
+                }catch(InfException ex){
+                    System.out.println(ex.getMessage() + "else if() sqlQuery, in updateEmailAdresses(), Customer.java");
+                }
+            }
         }
     }
 }

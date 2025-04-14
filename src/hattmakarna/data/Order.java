@@ -20,7 +20,7 @@ public class Order extends DatabaseObject {
     private Date recived_date;
     private boolean material_ordered;
     private boolean isFastProduction;
-
+    
     /**
      * Tom standardkonstruktor.
      */
@@ -117,7 +117,6 @@ public class Order extends DatabaseObject {
     }
 
     public ArrayList<String> getHattar() {
-
         ArrayList<String> hattIds = new ArrayList<>();
         try {
             // Hämta alla hatt-id:n kopplade till denna order

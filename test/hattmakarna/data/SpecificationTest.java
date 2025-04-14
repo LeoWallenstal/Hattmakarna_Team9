@@ -76,6 +76,7 @@ public class SpecificationTest {
         instance = new Specification(Integer.toString(id));
         String result = instance.getDescription();
         System.out.println(result);
+
         assertEquals(expResult, result);
 
     }
@@ -88,6 +89,7 @@ public class SpecificationTest {
         System.out.println("getHatID");
         Specification instance = new Specification();
         int expResult = 1;
+
         int result = instance.getHatID();
         assertEquals(expResult, result);
 
@@ -110,6 +112,7 @@ public class SpecificationTest {
             String result = instance.getImagePath();
             
             System.out.println(instance.getImagePath());
+
             assertEquals(expResult, result);
         } catch (MalformedURLException ex) {
             fail("Bild sparning misslyckades");
@@ -210,4 +213,5 @@ public class SpecificationTest {
         assertEquals(expResult, result);
         System.out.println(instance.getSpecID());
     }
+
 }

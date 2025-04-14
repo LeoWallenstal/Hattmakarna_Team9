@@ -129,7 +129,6 @@ public class Specification extends DatabaseObject {
                 
                 img_path = fileToSave.getPath().replace("\\", "\\\\");
             }
-
             return super.save();
         } catch (IOException ex) {
             Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
@@ -137,8 +136,11 @@ public class Specification extends DatabaseObject {
         }
     }
 
+      
+      
     @Override
     protected void setIdString(String id) {
         this.spec_id = Integer.parseInt(id);
     }
+
 }

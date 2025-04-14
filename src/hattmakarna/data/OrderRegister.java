@@ -4,6 +4,7 @@
  */
 package hattmakarna.data;
 
+import static hattmakarna.data.Hattmakarna.idb;
 import java.util.*;
 import oru.inf.InfException;
 
@@ -12,7 +13,28 @@ import oru.inf.InfException;
  * @author Gastinlogg
  */
 public class OrderRegister {
+
+    private ArrayList<Order> allOrders;
+
+    public OrderRegister() {
+        initAllOrders();
+    }
+
+    private void initAllOrders() {
+        String sqlQuery = "SELECT order_id FROM sales_order";
+
+        try {
+            ArrayList<String> orders = idb.fetchColumn(sqlQuery);
+            for (String id : orders) {
+                allOrders.add(new Order(id));
+            }
+        } catch (InfException ex) {
+            System.out.println(" in initAllOrders()");
+        }
+
+    }
     
-    //private ArrayList<Order> allOrders;
-    
+    public ArrayList<Order> getOrders(){
+        return allOrders;
+    }
 }

@@ -4,9 +4,7 @@
  */
 package hattmakarna.UI;
 
-import hattmakarna.data.HatRegister;
-import hattmakarna.data.Hat;
-import hattmakarna.data.MaterialOrder;
+import hattmakarna.data.*;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import oru.inf.InfDB;
@@ -62,17 +60,16 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             System.out.println(ex.getMessage() + "???");
         }
     }
-    
-    public void fillTable2(){
-        HashMap<String, Integer> orderHatCount = new HashMap<>();
-        for(Hat aHat: hatRegister.getAllHats()){
-            String orderId = aHat.getOrderId();
-            orderHatCount.put(orderId, orderHatCount.getOrDefault(orderId, 0) + 1);
-            
-        }
+
+    public void fillTable2() {
+        ArrayList<Order> orders = new OrderRegister().getOrders();
         
-        for(String orderId: orderHatCount.keySet()){
-            table.addRow(new Object[] {orderId, orderHatCount.get(orderId)});
+        for(Order order: orders){
+            if(order.getMaterialOrdered()){
+                continue;
+            }
+            
+            
         }
     }
 
@@ -165,7 +162,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             PDDocument document = new PDDocument();
             PDPage page = new PDPage();
             document.addPage(page);
-            
+
             //kodrad 169 möjliggör att text och grafik genereras på sidan
             //teckensnitt, srtl och radavstånd sätts samt startposition anges
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
@@ -178,17 +175,17 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             contentStream.showText("MATERIALÖVERSIKT FÖR ORDRAR");
             contentStream.newLine();
             contentStream.newLine();
-            
+
             //lista som sammanställer ordrarnas material
             HashMap<String, Double> totalMaterial = new HashMap<>();
-            
+
             writeOrdersInPDF(contentStream, totalMaterial);
             writeTotalSummaryPDF(contentStream, totalMaterial);
-            
+
             //textskrivning avslutas och stängs
             contentStream.endText();
             contentStream.close();
-            
+
             //PDF sparas och stängs för att sedan öppnas
             document.save("materialorder.pdf");
             document.close();
@@ -197,7 +194,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
     }
 
     private void openPDF(String fileName) {
@@ -218,6 +215,12 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             //hämtar alla ordrar, SKA ANVÄNDA ORDERREGISTER NÄR DE ÄR PÅ PLATS
             for (HashMap<String, String> order : orderAndHats) {
                 String orderId = order.get("order_id");
+                Order aOrder = new Order(orderId);
+                
+                if(aOrder.getMaterialOrdered()){
+                    continue;
+                }
+                
 
                 contentStream.showText("Order: " + orderId);
                 contentStream.newLine();
@@ -240,7 +243,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                         String color = row.get("color");
                         double amount = safeParseDouble(row.get("amount"));
 
-                        String key = materialId + " | " + color;
+                        String key = materialId + " " + color;
 
                         orderMaterial.merge(key, amount, Double::sum);
                         totalMaterial.merge(key, amount, Double::sum);
@@ -248,8 +251,14 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                 }
 
                 for (String key : orderMaterial.keySet()) {
+                    String id = key.replaceAll("[^0-9]", "");
+                    String color = key.replaceAll("[0-9]", "");
+                    Material material = new Material(id);
+                    String unit = material.getUnit();
+                    String name = material.getName();
+
                     double amount = orderMaterial.get(key);
-                    contentStream.showText("Material:  " + key + ", Mängd: " + amount);
+                    contentStream.showText("Material: " + name + "," + color + ", " + amount + " " + unit);
                     contentStream.newLine();
                 }
 
@@ -267,8 +276,14 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             contentStream.newLine();
 
             for (String key : totalMaterial.keySet()) {
+                String id = key.replaceAll("[^0-9]", "");
+                String color = key.replaceAll("[0-9]", "");
+                Material material = new Material(id);
+                String unit = material.getUnit();
+                String name = material.getName();
+
                 double amount = totalMaterial.get(key);
-                contentStream.showText("Material: " + key + ", Mängd : " + amount);
+                contentStream.showText("Material: " + name + "," + color + ", " + amount + " " + unit);
                 contentStream.newLine();
             }
         } catch (IOException e) {
@@ -280,7 +295,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         try {
             return (s != null && !s.isEmpty()) ? Double.parseDouble(s) : 0.0;
         } catch (NumberFormatException e) {
-            System.out.println("⚠️ Ogiltig mängd: " + s + " – behandlas som 0.0");
+            System.out.println("Ogiltig mängd: " + s + " – behandlas som 0.0");
             return 0.0;
         }
     }
