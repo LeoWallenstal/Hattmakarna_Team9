@@ -21,13 +21,13 @@ public class Hat {
     private String modelId;
     private String orderId;
     
-    public Hat(InfDB idb){
+    public Hat(){
         
     
     
     }
     
-    public Hat(InfDB idb, String hatId){
+    public Hat(String hatId){
         
  
         HashMap<String, String> aHat = new HashMap<>();

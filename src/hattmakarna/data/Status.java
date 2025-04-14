@@ -10,6 +10,6 @@ package hattmakarna.data;
  * @author leonb
  */
 public enum Status {
-	PLACED, MAKING, PACKAGED, SHIPPED,
+	MOTTAGEN,BEKRÄFTAD,PÅGÅENDE,PACKAD,SKICKAD,
 }
 
