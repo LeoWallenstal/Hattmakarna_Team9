@@ -7,8 +7,8 @@ import java.util.Locale;
 import oru.inf.InfException;
 
 /**
- * Representerar en beställning i systemet och hanterar kopplingar mellan
- * kund, datum, hattar och beställningsstatus.
+ * Representerar en beställning i systemet och hanterar kopplingar mellan kund,
+ * datum, hattar och beställningsstatus.
  */
 public class Order extends DatabaseObject {
 
@@ -18,9 +18,9 @@ public class Order extends DatabaseObject {
     private int totalPris;
     private Status status;
     private Date recived_date;
-    private boolean  material_ordered;
+    private boolean material_ordered;
     private boolean isFastProduction;
-    
+
     /**
      * Tom standardkonstruktor.
      */
@@ -28,7 +28,8 @@ public class Order extends DatabaseObject {
     }
 
     /**
-     * Konstruktor som laddar en order utifrån dess ID, och hämtar relaterade hattar.
+     * Konstruktor som laddar en order utifrån dess ID, och hämtar relaterade
+     * hattar.
      *
      * @param orderId Orderns ID som sträng
      */
@@ -38,26 +39,27 @@ public class Order extends DatabaseObject {
     }
 
     /**
-     * Skapar en ny order i databasen med kopplade hattar och returnerar det nya order-ID:t.
+     * Skapar en ny order i databasen med kopplade hattar och returnerar det nya
+     * order-ID:t.
      *
-     * @param customer_id        ID för kunden som gör beställningen
-     * @param hattar             Lista med hatt-ID:n som ska kopplas till ordern
-     * @param totalPris          Totala priset för ordern
-     * @param isFastProduction   Om produktionen ska gå snabbare än normalt
+     * @param customer_id ID för kunden som gör beställningen
+     * @param hattar Lista med hatt-ID:n som ska kopplas till ordern
+     * @param totalPris Totala priset för ordern
+     * @param isFastProduction Om produktionen ska gå snabbare än normalt
      * @return Det genererade order-ID:t som en sträng, eller null vid fel
      */
     @Deprecated
     public static String createOrder(int customer_id, ArrayList<String> hattar,
-                                     double totalPris, boolean isFastProduction) {
+            double totalPris, boolean isFastProduction) {
         try {
             // Skapa dagens datum i SQL-format (yyyy-MM-dd)
             String date = new java.text.SimpleDateFormat("yyyy-MM-dd")
-                .format(new java.util.Date());
+                    .format(new java.util.Date());
 
             // Skapa INSERT-sats för att lägga in en ny order i sales_order-tabellen
             String sql = String.format(Locale.US,
-                    "INSERT INTO sales_order (price, customer_id, status, recived_date) " +
-                    "VALUES (%.2f, %d, '%s', '%s');",
+                    "INSERT INTO sales_order (price, customer_id, status, recived_date) "
+                    + "VALUES (%.2f, %d, '%s', '%s');",
                     totalPris, customer_id, Status.PLACED, date);
 
             System.out.println(sql);
@@ -67,8 +69,8 @@ public class Order extends DatabaseObject {
 
             // Hämta det senast skapade order-ID:t för den kunden
             String getOrderIdQuery = String.format(
-                    "SELECT order_id FROM sales_order " +
-                    "WHERE customer_id = %s ORDER BY order_id DESC LIMIT 1;",
+                    "SELECT order_id FROM sales_order "
+                    + "WHERE customer_id = %s ORDER BY order_id DESC LIMIT 1;",
                     customer_id);
 
             String id = Hattmakarna.idb.fetchSingle(getOrderIdQuery);
@@ -98,7 +100,6 @@ public class Order extends DatabaseObject {
     }
 
     // Getters och setters för alla fält
-
     public int getOrder_id() {
         return order_id;
     }
@@ -116,17 +117,17 @@ public class Order extends DatabaseObject {
     }
 
     public ArrayList<String> getHattar() {
-        
+
         ArrayList<String> hattIds = new ArrayList<>();
-           try {
+        try {
             // Hämta alla hatt-id:n kopplade till denna order
             hattIds = Hattmakarna.idb.fetchColumn(
-                "SELECT hat_id FROM hat WHERE order_id = " + order_id);
+                    "SELECT hat_id FROM hat WHERE order_id = " + order_id);
         } catch (InfException e) {
             e.printStackTrace();
         }
-           
-           return hattIds;
+
+        return hattIds;
     }
 
     public int getTotalPris() {
@@ -161,18 +162,25 @@ public class Order extends DatabaseObject {
         this.isFastProduction = isFastProduction;
     }
 
-    public void setMaterialOrdered(boolean status){
+    public void setMaterialOrdered(boolean status) {
         this.material_ordered = status;
     }
-    
-    public boolean getMaterialOrdered(){
+
+    public boolean getMaterialOrdered() {
         return material_ordered;
     }
+
     /**
-     * @return ID:t som sträng, används av basklassen för att avgöra om INSERT eller UPDATE ska göras.
+     * @return ID:t som sträng, används av basklassen för att avgöra om INSERT
+     * eller UPDATE ska göras.
      */
     @Override
     protected String getIdString() {
         return Integer.toString(order_id);
+    }
+
+    @Override
+    protected void setIdString(String id) {
+        this.order_id = Integer.parseInt(id);
     }
 }
