@@ -329,6 +329,7 @@ public abstract class DatabaseObject {
             return false;
         }
 
+
         try {
             Hattmakarna.idb.delete("delete from " + getTabelName() + " where " + getIdAttributeName() + " = " + getIdString());
             return true;

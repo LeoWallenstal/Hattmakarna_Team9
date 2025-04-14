@@ -34,23 +34,17 @@ public ArrayList<Model> getAllHats(){
     }
 
 
-    private ArrayList<Model> initAllModels(){
-        String sqlQuery = "SELECT hat_id,model_id, price,name FROM hat_model";
+    private ArrayList<Model> initAllModels() {
+        String sqlQuery = "SELECT model_id, price, name FROM hat_model";
         ArrayList<Model> modelList = new ArrayList<>();
-        try{
-           ArrayList<HashMap<String, String>> rows = idb.fetchRows(sqlQuery);
-           for(HashMap<String, String> row : rows) {
-               String price = row.get("price");
-               String modelId = row.get("model_id");
-               String name = row.get("name");
-
-                modelList.add(new Model(idb, modelId, price, name));
-           }
-        }catch(InfException ex){
-            System.out.println(ex.getMessage());
+        try {
+            ArrayList<HashMap<String, String>> rows = idb.fetchRows(sqlQuery);
+            for (HashMap<String, String> row : rows) {
+                modelList.add(new Model(row, idb)); // 💡 Här använder vi rätt konstruktor
+            }
+        } catch (InfException ex) {
+            System.out.println("Fel vid hämtning av modeller: " + ex.getMessage());
         }
         return modelList;
     }
-
-    
 }
