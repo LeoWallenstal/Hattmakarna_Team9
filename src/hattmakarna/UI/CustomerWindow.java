@@ -1,8 +1,9 @@
 
-package hattmakarna;
+package hattmakarna.UI;
 
 import hattmakarna.UI.OrderWindow;
-import static hattmakarna.Hattmakarna.idb;
+import hattmakarna.data.User;
+import static hattmakarna.data.Hattmakarna.idb;
 import oru.inf.InfException;
 
 /**

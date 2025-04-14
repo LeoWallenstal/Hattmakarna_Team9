@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import hattmakarna.Hattmakarna;
 import hattmakarna.util.Util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -240,7 +239,7 @@ public abstract class DatabaseObject {
     public boolean save() {
         try {
             // Hämta alla kolumnnamn från databasen
-            ArrayList<String> dbColumns = hattmakarna.Hattmakarna.idb.fetchColumn(
+            ArrayList<String> dbColumns = hattmakarna.data.Hattmakarna.idb.fetchColumn(
                     "SELECT column_name FROM information_schema.columns WHERE table_name = '" + getTabelName() + "'"
             );
 
@@ -293,7 +292,7 @@ public abstract class DatabaseObject {
                         + String.join(", ", attributeValues) + ");";
 
                 System.out.println("Genererad SQL: " + sql);
-                hattmakarna.Hattmakarna.idb.insert(sql);
+                hattmakarna.data.Hattmakarna.idb.insert(sql);
             } // Befintlig post → UPDATE
             else {
                 List<String> setClauses = new ArrayList<>();
@@ -306,7 +305,7 @@ public abstract class DatabaseObject {
                         + " WHERE " + getIdAttributeName() + " = " + getIdString() + ";";
 
                 System.out.println("Genererad SQL: " + sql);
-                hattmakarna.Hattmakarna.idb.update(sql);
+                hattmakarna.data.Hattmakarna.idb.update(sql);
             }
 
             return true;
