@@ -20,12 +20,14 @@ public class Model {
 
     private String name;
     private String price;
+    private double price;
     private String modelID;
 
     public Model(HashMap<String, String> modelMap) {
         modelID = modelMap.get("model_id");
         name = modelMap.get("name");
         price = modelMap.get("price");
+        price = Double.parseDouble(modelMap.get("price"));
     }
     
 
@@ -58,6 +60,7 @@ public class Model {
     }
 
     public String getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -70,6 +73,7 @@ public class Model {
     }
 
     public void updatePrice(String newPrice) {
+    public void updatePrice(double newPrice) {
         String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelID + "'";
 
         try {

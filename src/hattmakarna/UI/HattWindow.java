@@ -8,6 +8,7 @@ import hattmakarna.data.User;
 import static hattmakarna.data.Hattmakarna.idb;
 import oru.inf.InfException;
 import hattmakarna.data.CustomerRegister;
+import hattmakarna.data.Model;
 /**
  *
  * @author joelf
@@ -30,6 +31,7 @@ public class HattWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDialog1 = new javax.swing.JDialog();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
@@ -37,6 +39,17 @@ public class HattWindow extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         btnRedigering = new javax.swing.JButton();
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -65,7 +78,12 @@ public class HattWindow extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(jTable1);
 
-        btnRedigering.setText("Redigering");
+        btnRedigering.setText("Redigera lagerförda hattar");
+        btnRedigering.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRedigeringActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -104,6 +122,10 @@ public class HattWindow extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnRedigeringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedigeringActionPerformed
+        new EditHat().setVisible(true);
+    }//GEN-LAST:event_btnRedigeringActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -141,6 +163,7 @@ public class HattWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRedigering;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;
