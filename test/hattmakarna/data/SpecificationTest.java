@@ -73,8 +73,10 @@ public class SpecificationTest {
         String expResult = "Skibidi";
         instance.save();
         int id = instance.getSpecID();
-        //instance = new Specification()
+        instance = new Specification(Integer.toString(id));
         String result = instance.getDescription();
+        System.out.println(result);
+
         assertEquals(expResult, result);
 
     }
@@ -86,7 +88,8 @@ public class SpecificationTest {
     public void testGetHatID() {
         System.out.println("getHatID");
         Specification instance = new Specification();
-        int expResult = 0;
+        int expResult = 1;
+
         int result = instance.getHatID();
         assertEquals(expResult, result);
 
@@ -102,8 +105,14 @@ public class SpecificationTest {
             Specification instance = new Specification();
             instance.setDesciption("test");
             instance.setSkiss(ImageIO.read(new URL("https://upload.wikimedia.org/wikipedia/en/4/4d/Shrek_%28character%29.png")));
-            String expResult = null;
+            assertEquals(instance.save(),true);
+
+            instance = new Specification(String.valueOf(instance.getSpecID()));            
+            String expResult = "images\\specBild-hat-1.png";
             String result = instance.getImagePath();
+            
+            System.out.println(instance.getImagePath());
+
             assertEquals(expResult, result);
         } catch (MalformedURLException ex) {
             fail("Bild sparning misslyckades");
@@ -199,9 +208,10 @@ public class SpecificationTest {
     public void testSave() {
         System.out.println("save");
         Specification instance = new Specification();
-        boolean expResult = false;
+        boolean expResult = true;
         boolean result = instance.save();
         assertEquals(expResult, result);
+        System.out.println(instance.getSpecID());
     }
 
 }
