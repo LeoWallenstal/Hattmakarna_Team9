@@ -2,9 +2,13 @@
 package hattmakarna.UI;
 
 import hattmakarna.UI.OrderWindow;
+import hattmakarna.data.Customer;
 import hattmakarna.data.User;
 import static hattmakarna.data.Hattmakarna.idb;
+import java.util.ArrayList;
 import oru.inf.InfException;
+import hattmakarna.util.Validerare;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -21,17 +25,80 @@ public class CustomerWindow extends javax.swing.JFrame {
         this.lastWindow = lastWindow;
     }
     
-    private void addCustomer() {
-        String query = "INSERT INTO customer (first_name, last_name, address, postalcode, country) " +
-        "VALUES " +
-        "('Jamed', 'Nilsson', 'Storgatan 11', '12345', 'Sverige')";
-        try{
-            idb.insert(query);
-            
-        }catch(InfException ex){
-            System.out.println(ex.getMessage());
+    private boolean addCustomer() {
+        
+        Customer customer = new Customer();
+        
+        String email = tfEmail.getText();
+        String firstName = tfFirstname.getText();
+        String lastName = tfLastname.getText();
+        String number = tfTelnumber.getText();
+        String adress = tfAdress.getText();
+        String country = tfCountry.getText();
+        String postalCode = tfPostnummer.getText();
+        
+        if(!inputValidation()) {
+            return false;
         }
+        
+        ArrayList<String> phoneNumbers = new ArrayList<>();
+        ArrayList<String> emailAdresses = new ArrayList<>();
+        
+        phoneNumbers.add(number);
+        emailAdresses.add(email);
+        
+        // Setters
+        customer.setFirstName(firstName);
+        customer.setLastName(lastName);
+        customer.setTelephoneNumbers(phoneNumbers);
+        customer.setAdress(adress);
+        customer.setCountry(country);
+        customer.setPostalCode(postalCode);
+        customer.setEmailAdresses(emailAdresses);
+        
+        customer.insert();
+        return true;
+    }
+    
+    private boolean inputValidation() {
+    String email = tfEmail.getText();
+    String firstName = tfFirstname.getText();
+    String lastName = tfLastname.getText();
+    String number = tfTelnumber.getText();
+    String adress = tfAdress.getText();
+    String country = tfCountry.getText();
+    String postalCode = tfPostnummer.getText();
+
+    String[] fields = {email, firstName, lastName, number, adress, country, postalCode};
+
+    for (String field : fields) {
+        if (field.isBlank() || field.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Var god fyll i alla fält.");
+            return false;
+        }
+    }
+
+    ArrayList<String> errors = new ArrayList<>();
+    if (!Validerare.validateName(firstName)) errors.add("Ogiltigt Förnamn");
+    if (!Validerare.validateName(lastName)) errors.add("Ogitligt Efternamn");
+    if (!Validerare.validateEmail(email)) errors.add("Ogiltig E-post");
+    if (!Validerare.validatePhoneNumber(number)) errors.add("Ogiltigt Telefonnummer");
+    if (!Validerare.validatePostalCode(postalCode)) errors.add("Ogiltigt Postnummer");
+    if (!Validerare.validateAdress(adress)) errors.add("Ogiltig Adress");
+    if (!Validerare.validateCountry(country)) errors.add("Ogiltigt Land");
+
+    if (!errors.isEmpty()) {
+        JOptionPane.showMessageDialog(null, String.join("\n", errors + 
+                "\n Var god försök igen."));
+        return false;
+    }
+
+    return true; // Alla fält är giltiga
 }
+
+    
+    
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -55,6 +122,10 @@ public class CustomerWindow extends javax.swing.JFrame {
         tfLastname = new javax.swing.JTextField();
         btnSave = new javax.swing.JButton();
         cbAlternatives = new javax.swing.JComboBox<>();
+        lblPostnummer = new javax.swing.JLabel();
+        tfPostnummer = new javax.swing.JTextField();
+        lblCountry = new javax.swing.JLabel();
+        tfCountry = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -97,6 +168,10 @@ public class CustomerWindow extends javax.swing.JFrame {
             }
         });
 
+        lblPostnummer.setText("Postnummmer");
+
+        lblCountry.setText("Land");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -117,10 +192,24 @@ public class CustomerWindow extends javax.swing.JFrame {
                             .addComponent(tfFirstname)
                             .addComponent(tfAdress, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
                             .addComponent(lblTelnumber, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblLastname)
-                            .addComponent(tfLastname, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblLastname)
+                                    .addComponent(tfLastname, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(tfPostnummer))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addGap(4, 4, 4)
+                                        .addComponent(lblPostnummer)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblCountry)
+                                    .addComponent(tfCountry)))))
                     .addComponent(lblRegistreraKund, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(tfTelnumber, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -154,10 +243,16 @@ public class CustomerWindow extends javax.swing.JFrame {
                     .addComponent(tfTelnumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbAlternatives, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(lblAdress)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblAdress)
+                    .addComponent(lblPostnummer)
+                    .addComponent(lblCountry))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tfAdress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 225, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfAdress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfPostnummer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 219, Short.MAX_VALUE)
                 .addComponent(btnSave)
                 .addGap(42, 42, 42))
         );
@@ -178,10 +273,12 @@ public class CustomerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_cbAlternativesActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        addCustomer();
-        this.setVisible(false);
-    lastWindow.refreshCustomers();
-    lastWindow.setVisible(true);
+        if (addCustomer()) {
+            this.setVisible(false);
+            lastWindow.refreshCustomers();
+            lastWindow.setVisible(true);
+        }
+
     
     }//GEN-LAST:event_btnSaveActionPerformed
 
@@ -193,15 +290,19 @@ public class CustomerWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnSave;
     private javax.swing.JComboBox<String> cbAlternatives;
     private javax.swing.JLabel lblAdress;
+    private javax.swing.JLabel lblCountry;
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblFirstname;
     private javax.swing.JLabel lblLastname;
+    private javax.swing.JLabel lblPostnummer;
     private javax.swing.JLabel lblRegistreraKund;
     private javax.swing.JLabel lblTelnumber;
     private javax.swing.JTextField tfAdress;
+    private javax.swing.JTextField tfCountry;
     private javax.swing.JTextField tfEmail;
     private javax.swing.JTextField tfFirstname;
     private javax.swing.JTextField tfLastname;
+    private javax.swing.JTextField tfPostnummer;
     private javax.swing.JTextField tfTelnumber;
     // End of variables declaration//GEN-END:variables
 }

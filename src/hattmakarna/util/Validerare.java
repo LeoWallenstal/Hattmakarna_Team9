@@ -28,8 +28,8 @@ public class Validerare {
     
     /*Endast fem siffor tillåtet, whitespace mellan tredje och fjärde siffran
     tillåtet. 55534 och 555 34 godkänt. */
-    public static boolean validatePostalCode(String postalCode){
-        return postalCode.matches("^[0-9]{3}\\\\s?[0-9]{2}$");
+    public static boolean validatePostalCode(String postalCode) {
+        return postalCode.matches("^[0-9]{3}\\s?[0-9]{2}$");
     }
     
     public static boolean validateCountry(String country){
