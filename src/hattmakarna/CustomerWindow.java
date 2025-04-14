@@ -1,15 +1,36 @@
 
 package hattmakarna;
 
+import hattmakarna.UI.OrderWindow;
+import static hattmakarna.Hattmakarna.idb;
+import oru.inf.InfException;
+
 /**
  *
  * @author Användaren
  */
+
 public class CustomerWindow extends javax.swing.JFrame {
     
-    public CustomerWindow() {
+    private User userLoggedIn;
+    private OrderWindow lastWindow;
+    public CustomerWindow(User user, OrderWindow lastWindow) {
         initComponents();
+        userLoggedIn = user;
+        this.lastWindow = lastWindow;
     }
+    
+    private void addCustomer() {
+        String query = "INSERT INTO customer (first_name, last_name, address, postalcode, country) " +
+        "VALUES " +
+        "('Jamed', 'Nilsson', 'Storgatan 11', '12345', 'Sverige')";
+        try{
+            idb.insert(query);
+            
+        }catch(InfException ex){
+            System.out.println(ex.getMessage());
+        }
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -156,9 +177,10 @@ public class CustomerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_cbAlternativesActionPerformed
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
- 
-    this.setVisible(false);
-    new OrderWindow().setVisible(true);
+        addCustomer();
+        this.setVisible(false);
+    lastWindow.refreshCustomers();
+    lastWindow.setVisible(true);
     
     }//GEN-LAST:event_btnSaveActionPerformed
 

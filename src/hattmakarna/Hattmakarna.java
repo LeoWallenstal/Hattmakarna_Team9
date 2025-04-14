@@ -41,6 +41,13 @@ public class Hattmakarna {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
 			e.printStackTrace();
 		}
+
+
+
+	}
+	
+	public static void connectToDB() throws InfException{
+		idb = new InfDB(DB_NAME,DB_PORT,DB_USER,DB_PASSWORD);
 	}
 	
 	public static void connectToDB() throws InfException{
