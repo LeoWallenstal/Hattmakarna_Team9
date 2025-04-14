@@ -1,6 +1,6 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
+ * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit4TestClass.java to edit this template
  */
 package hattmakarna.data;
 
@@ -8,13 +8,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
 import oru.inf.InfException;
 
 /**
@@ -26,8 +25,17 @@ public class OrderTest {
     public OrderTest() {
     }
 
-    @BeforeAll
+    @BeforeClass
     public static void setUpClass() {
+    }
+
+    @AfterClass
+    public static void tearDownClass() {
+    }
+
+    @Before
+    public void setUp() {
+
         try {
             Hattmakarna.connectToDB();
         } catch (InfException ex) {
@@ -35,15 +43,7 @@ public class OrderTest {
         }
     }
 
-    @AfterAll
-    public static void tearDownClass() {
-    }
-
-    @BeforeEach
-    public void setUp() {
-    }
-
-    @AfterEach
+    @After
     public void tearDown() {
     }
 
@@ -51,11 +51,18 @@ public class OrderTest {
      * Test of createOrder method, of class Order.
      */
     @Test
-    @DisplayName("awdawljk alwdalk")
     public void testCreateOrder() {
-        String id = Order.createOrder(0, null, 100000, true);
+        System.out.println("createOrder");
+        int customer_id = 1;
+        ArrayList<String> hattar = null;
+        double totalPris = 999.99;
+        boolean isFastProduction = false;
+        String result = Order.createOrder(customer_id, hattar, totalPris, isFastProduction);
+        Order order = new Order(result);
 
-        System.out.println(id);
+        assertEquals(order.getCustomer_id(), customer_id);
+        assertEquals(order.getStatus(), Status.PLACED);
+
     }
 
     /**
@@ -64,12 +71,11 @@ public class OrderTest {
     @Test
     public void testGetTabelName() {
         System.out.println("getTabelName");
-        Order instance = null;
+        Order instance = new Order("1");
         String expResult = "";
         String result = instance.getTabelName();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals("sales_order", result);
+
     }
 
     /**
@@ -78,12 +84,11 @@ public class OrderTest {
     @Test
     public void testGetIdAttributeName() {
         System.out.println("getIdAttributeName");
-        Order instance = null;
-        String expResult = "";
+        Order instance = new Order("1");
+        String expResult = "order_id";
         String result = instance.getIdAttributeName();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -92,12 +97,11 @@ public class OrderTest {
     @Test
     public void testGetOrder_id() {
         System.out.println("getOrder_id");
-        Order instance = null;
-        String expResult = "";
-        String result = Integer.toString(instance.getOrder_id());
+        Order instance = new Order("1");
+        int expResult = 1;
+        int result = instance.getOrder_id();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -106,11 +110,10 @@ public class OrderTest {
     @Test
     public void testSetOrder_id() {
         System.out.println("setOrder_id");
-        int order_id = 1;
-        Order instance = null;
+        int order_id = 0;
+        Order instance = new Order("1");
         instance.setOrder_id(order_id);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -119,12 +122,11 @@ public class OrderTest {
     @Test
     public void testGetCustomer_id() {
         System.out.println("getCustomer_id");
-        Order instance = null;
-        String expResult = "";
-        String result = Integer.toString(instance.getOrder_id());
+        Order instance = new Order("1");
+        int expResult = 1;
+        int result = instance.getCustomer_id();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -133,11 +135,10 @@ public class OrderTest {
     @Test
     public void testSetCustomer_id() {
         System.out.println("setCustomer_id");
-        int customer_id = 1;
-        Order instance = null;
+        int customer_id = 0;
+        Order instance = new Order("1");
         instance.setCustomer_id(customer_id);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -146,25 +147,9 @@ public class OrderTest {
     @Test
     public void testGetHattar() {
         System.out.println("getHattar");
-        Order instance = null;
-        ArrayList<String> expResult = null;
+        Order instance = new Order("1");
         ArrayList<String> result = instance.getHattar();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of setHattar method, of class Order.
-     */
-    @Test
-    public void testSetHattar() {
-        System.out.println("setHattar");
-        ArrayList<String> hattar = null;
-        Order instance = null;
-        instance.setHattar(hattar);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(1, result.size());
     }
 
     /**
@@ -173,12 +158,11 @@ public class OrderTest {
     @Test
     public void testGetTotalPris() {
         System.out.println("getTotalPris");
-        Order instance = null;
+        Order instance = new Order("1");
         int expResult = 0;
         int result = instance.getTotalPris();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -188,10 +172,9 @@ public class OrderTest {
     public void testSetTotalPris() {
         System.out.println("setTotalPris");
         int totalPris = 0;
-        Order instance = null;
+        Order instance = new Order("1");
         instance.setTotalPris(totalPris);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -200,12 +183,11 @@ public class OrderTest {
     @Test
     public void testGetStatus() {
         System.out.println("getStatus");
-        Order instance = null;
+        Order instance = new Order("1");
         Status expResult = null;
         Status result = instance.getStatus();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -215,24 +197,9 @@ public class OrderTest {
     public void testSetStatus() {
         System.out.println("setStatus");
         Status status = null;
-        Order instance = null;
+        Order instance = new Order("1");
         instance.setStatus(status);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
 
-    /**
-     * Test of getRecived_data method, of class Order.
-     */
-    @Test
-    public void testGetRecived_data() {
-        System.out.println("getRecived_data");
-        Order instance = null;
-        Date expResult = null;
-        Date result = instance.getRecived_data();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -242,10 +209,9 @@ public class OrderTest {
     public void testSetRecived_data() {
         System.out.println("setRecived_data");
         Date recived_data = null;
-        Order instance = null;
+        Order instance = new Order("1");
         instance.setRecived_data(recived_data);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
     }
 
     /**
@@ -254,12 +220,10 @@ public class OrderTest {
     @Test
     public void testIsFastProduction() {
         System.out.println("isFastProduction");
-        Order instance = null;
+        Order instance = new Order("1");
         boolean expResult = false;
         boolean result = instance.isFastProduction();
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -269,10 +233,22 @@ public class OrderTest {
     public void testSetFastProduction() {
         System.out.println("setFastProduction");
         boolean isFastProduction = false;
-        Order instance = null;
+        Order instance = new Order("1");
         instance.setFastProduction(isFastProduction);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
+    }
+
+    /**
+     * Test of getIdString method, of class Order.
+     */
+    @Test
+    public void testGetIdString() {
+        System.out.println("getIdString");
+        Order instance = new Order("1");
+        String expResult = "1";
+        String result = instance.getIdString();
+        assertEquals(expResult, result);
+
     }
 
 }
