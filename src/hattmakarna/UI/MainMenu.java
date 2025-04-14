@@ -149,7 +149,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
         // TODO add your handling code here:
-        new MaterialOrderWindow().setVisible(true);
+        new MaterialOrderWindow(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnMaterialActionPerformed
 
