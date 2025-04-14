@@ -4,11 +4,13 @@
  */
 package hattmakarna.UI;
 
+import hattmakarna.data.HatRegister;
+import hattmakarna.data.Hat;
+import hattmakarna.data.MaterialOrder;
 import java.util.ArrayList;
 import javax.swing.table.DefaultTableModel;
 import oru.inf.InfDB;
 import oru.inf.InfException;
-import hattmakarna.*;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import static hattmakarna.data.Hattmakarna.idb;
 
 /**
  *
@@ -25,7 +28,6 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
  */
 public class MaterialOrderWindow extends javax.swing.JFrame {
 
-    private InfDB idb;
     private DefaultTableModel table;
     private ArrayList<HashMap<String, String>> orderAndHats;
     private HatRegister hatRegister;
@@ -33,10 +35,9 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
     /**
      * Creates new form MaterialOrderWindow
      */
-    public MaterialOrderWindow(InfDB idb) {
+    public MaterialOrderWindow() {
         initComponents();
 
-        this.idb = idb;
         this.table = (DefaultTableModel) tblOrders.getModel();
         this.hatRegister = new HatRegister(idb);
         this.orderAndHats = null;
@@ -232,7 +233,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
 
                 }
                 for (Hat hat : hats) {
-                    MaterialOrder mo = new MaterialOrder(idb, hat.gethatId());
+                    MaterialOrder mo = new MaterialOrder(hat.gethatId());
 
                     for (HashMap<String, String> row : mo.getMaterialList()) {
                         String materialId = row.get("material_id");

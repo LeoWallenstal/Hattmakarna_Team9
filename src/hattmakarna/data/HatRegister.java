@@ -2,21 +2,22 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package hattmakarna;
+package hattmakarna.data;
 
 import oru.inf.InfDB;
 import java.util.*;
 import oru.inf.InfException;
+import static hattmakarna.data.Hattmakarna.idb;
 
 /**
  *
  * @author sebas
  */
 public class HatRegister {
-       private final InfDB idb;
     private final ArrayList<Hat> allHats;
+    
+    
     public HatRegister(InfDB idb){
-        this.idb = idb;
         allHats = initAllHats();
     }
     

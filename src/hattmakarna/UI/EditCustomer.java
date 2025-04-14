@@ -4,7 +4,7 @@
  */
 package hattmakarna.UI;
 
-import hattmakarna.Customer;
+import hattmakarna.data.Customer;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import javax.swing.DefaultComboBoxModel;

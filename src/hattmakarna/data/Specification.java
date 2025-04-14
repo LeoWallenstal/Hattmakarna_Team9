@@ -9,7 +9,6 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import hattmakarna.Hattmakarna;
 import hattmakarna.util.Util;
 import oru.inf.InfException;
 

@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package hattmakarna;
+package hattmakarna.data;
 
+import hattmakarna.UI.LogInWindow;
 import hattmakarna.data.Order;
 import hattmakarna.data.Specification;
 import hattmakarna.data.Status;

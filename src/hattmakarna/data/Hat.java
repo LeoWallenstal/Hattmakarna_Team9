@@ -2,11 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package hattmakarna;
+package hattmakarna.data;
 
 import oru.inf.InfDB;
 import oru.inf.InfException;
 import java.util.*;
+import static hattmakarna.data.Hattmakarna.idb;
 
 /**
  *
@@ -14,7 +15,6 @@ import java.util.*;
  */
 public class Hat {
     
-    private InfDB idb;
     private String hatId;
     private ArrayList<String> materialList;
     private ArrayList<MaterialOrder> materialBehov;
@@ -23,15 +23,13 @@ public class Hat {
     
     public Hat(InfDB idb){
         
-    this.idb = idb;
     
     
     }
     
     public Hat(InfDB idb, String hatId){
         
-        this.idb = idb;
-        
+ 
         HashMap<String, String> aHat = new HashMap<>();
         String sqlQuery = "SELECT * FROM hat WHERE hat_id = " + hatId;
         
@@ -59,7 +57,6 @@ public class Hat {
         
     }
     public Hat(InfDB idb, String hatId, String modelId, String orderId){
-        this.idb = idb;
         this.hatId = hatId;
         this.modelId = modelId;
         this.orderId = orderId;
