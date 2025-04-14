@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-import hattmakarna.Hattmakarna;
 import oru.inf.InfException;
 
 /**
@@ -70,7 +69,7 @@ public class Order extends DatabaseObject {
             System.out.println(sql);
 
             // Kör INSERT
-            hattmakarna.Hattmakarna.idb.insert(sql);
+            hattmakarna.data.Hattmakarna.idb.insert(sql);
 
             // Hämta det senast skapade order-ID:t för den kunden
             String getOrderIdQuery = String.format(

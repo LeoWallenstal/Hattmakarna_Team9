@@ -2,9 +2,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package hattmakarna;
+package hattmakarna.UI;
 
 import hattmakarna.UI.MainMenu;
+import hattmakarna.data.User;
+import hattmakarna.util.Validerare;
 import oru.inf.InfDB;
 import oru.inf.InfException;
 /**
@@ -127,7 +129,7 @@ public class LogInWindow extends javax.swing.JFrame {
                 if (password.equals(dbPassword)) {
                     query = "SELECT user_id FROM user WHERE email = '" + email + "'";
                     String id = idb.fetchSingle(query);
-                    User userLoggedIn = new User(id, idb);
+                    User userLoggedIn = new User(id);
                     new MainMenu(userLoggedIn).setVisible(true);
                     this.setVisible(false);
                 }

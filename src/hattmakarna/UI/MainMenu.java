@@ -4,12 +4,9 @@
  */
 package hattmakarna.UI;
 
-import hattmakarna.CustomerWindow;
-import static hattmakarna.Hattmakarna.idb;
-import hattmakarna.HattWindow;
-import hattmakarna.LogInWindow;
-import hattmakarna.User;
-import oru.inf.InfDB;
+import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.data.User;
+
 /**
  *
  * @author walle
@@ -152,7 +149,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
         // TODO add your handling code here:
-        new MaterialOrderWindow(idb).setVisible(true);
+        new MaterialOrderWindow().setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnMaterialActionPerformed
 

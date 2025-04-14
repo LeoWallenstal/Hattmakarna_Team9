@@ -3,12 +3,11 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
-import hattmakarna.Customer;
-import hattmakarna.CustomerRegister;
-import hattmakarna.CustomerWindow;
-import static hattmakarna.Hattmakarna.idb;
+import hattmakarna.data.Customer;
+import hattmakarna.data.CustomerRegister;
+import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.UI.MainMenu;
-import hattmakarna.User;
+import hattmakarna.data.User;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;

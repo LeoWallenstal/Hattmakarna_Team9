@@ -1,4 +1,4 @@
-package hattmakarna;
+package hattmakarna.data;
 
 import oru.inf.InfException;
 
@@ -6,7 +6,7 @@ import oru.inf.InfException;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-import static hattmakarna.Hattmakarna.idb;
+import static hattmakarna.data.Hattmakarna.idb;
 import java.util.HashMap;
 import oru.inf.InfDB;
 import java.util.*;
@@ -20,21 +20,14 @@ public class Model {
 
     private String name;
     private String price;
-    private String modelId;
-    private InfDB idb;
+    private String modelID;
 
     public Model(HashMap<String, String> modelMap) {
-        modelId = modelMap.get("model_id");
+        modelID = modelMap.get("model_id");
         name = modelMap.get("name");
         price = modelMap.get("price");
     }
     
-    public Model(HashMap<String, String> modelMap, InfDB idb) {
-    this.idb = idb;
-    this.modelId = modelMap.get("model_id");
-    this.name = modelMap.get("name");
-    
-    }
 
     public void addMaterial(String name, double price) {
         String sqlAddQuery = "INSERT INTO hat_model VALUES ('" + name + "', " + price + ")";
@@ -68,16 +61,16 @@ public class Model {
         return price;
     }
 
-    public String getModelId() {
-        return modelId;
+    public String getModelID() {
+        return modelID;
     }
 
     public void setModelId(String modelId) {
-        this.modelId = modelId;
+        this.modelID = modelId;
     }
 
     public void updatePrice(String newPrice) {
-        String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelId + "'";
+        String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelID + "'";
 
         try {
             idb.update(sql);
@@ -88,7 +81,7 @@ public class Model {
     }
 
     public void updateName(String newName) {
-        String sql = "UPDATE hat_model SET name = '" + newName + "' WHERE model_id = '" + modelId + "'";
+        String sql = "UPDATE hat_model SET name = '" + newName + "' WHERE model_id = '" + modelID + "'";
 
         try {
             idb.update(sql);

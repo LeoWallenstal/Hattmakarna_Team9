@@ -4,7 +4,6 @@
  */
 package hattmakarna.data;
 
-import hattmakarna.Hattmakarna;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;

@@ -2,21 +2,22 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package hattmakarna;
+package hattmakarna.data;
 
 import oru.inf.InfDB;
 import java.util.*;
 import oru.inf.InfException;
+import static hattmakarna.data.Hattmakarna.idb;
+
 /**
  *
  * @author walle
  */
 public class UserRegister {
     
-    private final InfDB idb;
     private final ArrayList<User> allUsers;
+    
     public UserRegister(InfDB idb){
-        this.idb = idb;
         allUsers = initAllUsers();
     }
     
@@ -26,7 +27,7 @@ public class UserRegister {
     
     public User getUser(String userId){
         for(User aUser : allUsers){
-            if(aUser.getId().equals(userId)){
+            if(aUser.getID().equals(userId)){
                 return aUser;
             }
         }
@@ -41,7 +42,7 @@ public class UserRegister {
         try{
            ArrayList<HashMap<String, String>> userMaps = idb.fetchRows(sqlQuery);  
            for(HashMap<String, String> userMap : userMaps ) {
-               userList.add(new User(userMap, idb));
+               userList.add(new User(userMap));
            }            
         }catch(InfException ex){
             System.out.println(ex.getMessage());
