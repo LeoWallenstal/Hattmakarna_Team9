@@ -38,8 +38,7 @@ public class Hattmakarna {
 		try {
 			connectToDB();
                         
-			//new LogInWindow(idb).setVisible(true);
-                        new EditCustomer(new Customer("1")).setVisible(true);
+			new LogInWindow(idb).setVisible(true);
 		} catch (InfException e) {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
 			e.printStackTrace();
