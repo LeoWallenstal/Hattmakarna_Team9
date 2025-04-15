@@ -6,6 +6,8 @@ package hattmakarna.data;
 import java.util.*;
 import oru.inf.InfException;
 import static hattmakarna.data.Hattmakarna.idb;
+import oru.inf.InfDB;
+
 
 /**
  *
@@ -16,10 +18,17 @@ public class ModelRegister {
     
     private final ArrayList<Model> allModels;
    
-    public ModelRegister(){
-        allModels = initAllModels();
-
+ public ModelRegister(InfDB idb) {
+    this.allModels = initAllModels(idb);
+}
+ /**
+ * Används i klasser där vi inte vill skicka in idb manuellt.
+ * Hämtar idb från Hattmakarna.idb
+ */
+public ModelRegister() {
+        this.allModels = initAllModels(Hattmakarna.idb); // använder redan er globala idb
     }
+  
     
     public ArrayList<Model> getAllHats(){
         return allModels;
@@ -36,7 +45,7 @@ public class ModelRegister {
     }
 
 
-    private ArrayList<Model> initAllModels() {
+    private ArrayList<Model> initAllModels(InfDB idb) {
         String sqlQuery = "SELECT model_id, price, name FROM hat_model";
         ArrayList<Model> modelList = new ArrayList<>();
         try {
