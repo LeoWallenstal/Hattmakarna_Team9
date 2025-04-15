@@ -23,10 +23,9 @@ public class Hat {
     private String modelId;
     private String orderId;
     private double price;
-
-    public Hat() {
-
-    }
+    private boolean isSpecial;
+    
+    public Hat(){}
    
     public Hat(String hatId){
         
@@ -63,7 +62,17 @@ public class Hat {
         
     }
 
-    public String gethatId() {
+    private void setSpecial(){
+        String query = "SELECT model_id FROM hat_model WHERE name = 'Special'";
+        try {
+            idb.fetchSingle(query);
+        } catch (InfException ex) {
+            Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public String gethatId(){
+
         return hatId;
     }
     
