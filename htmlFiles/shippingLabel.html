@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>🔥 SHIPPIN' LABEL 🔥</title>
+  <style type="text/css">
+    body {
+      background-color: #fff8dc;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      color: #000000;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 24px;
+      color: red;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: #000080;
+      margin-bottom: 6px;
+    }
+
+    .label {
+      border: 5px double #000000;
+      padding: 20px;
+      width: 500px;
+      margin: 30px auto;
+      background-color: #fdf5e6;
+    }
+
+    .section {
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #ffffff;
+    }
+
+    td {
+      padding: 8px;
+      border: 1px solid #000000;
+      font-size: 14px;
+    }
+
+    b {
+      color: #8b0000;
+    }
+
+    i {
+      color: #696969;
+    }
+
+    img {
+      width: 100%;
+      border: 2px solid #000000;
+      margin-top: 10px;
+      display: block;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 18px;
+      color: #800080;
+    }
+
+    br {
+      line-height: 150%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>SHIPPIN' OUT, BABY!</h1>
+
+  <div class="label">
+    <div class="section">
+      <h2>FROM:</h2>
+      <p>
+        <b>Hattmakarna AB</b><br></br>
+        Sigma gatan 24b<br></br>
+        Örebro: 70281<br></br>
+        <i>Email: Hattbackaren69@gmail.com</i>
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>TO:</h2>
+      <p>
+        <b>{name}</b><br></br>
+        {address}<br></br>
+        {email}<br></br>
+        <i>Phone: {telephone}</i>
+      </p>
+    </div>
+
+    <div class="section">
+      <table>
+        <tr>
+          <td><b>Shipping number</b></td>
+          <td>{shippingCode}</td>
+        </tr>
+        <tr>
+          <td><b>Order #</b></td>
+          <td>{orderId}</td>
+        </tr>
+        <tr>
+          <td><b>Weight</b></td>
+          <td>{weight} kg</td>
+        </tr>
+        <tr>
+          <td><b>Contents Value</b></td>
+          <td>{value} kr</td>
+        </tr>
+        <tr>
+          <td><b>Shipping</b></td>
+          <td>{shipping}</td>
+        </tr>
+        <tr>
+          <td><b>Fragile?</b></td>
+          <td>YES (handle like grandma's cookies)</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2>Contents</h2>
+    <div class="section">
+      <table>
+        {orderContent}
+      </table>
+    </div>
+
+    <center>
+      <img src="https://hatshop.se/images/zoom/hatt_garda_chieri_top_hat_wool_hat_black_02.jpg" alt="Hat Image"></img>
+    </center>
+  </div>
+
+  <div class="footer">
+    THANK YOU FOR YOUR ORDER
+  </div>
+
+</body>
+
+</html>
