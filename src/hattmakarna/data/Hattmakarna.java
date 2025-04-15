@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import hattmakarna.UI.EditCustomer;
 
 import oru.inf.InfDB;
 import oru.inf.InfException;

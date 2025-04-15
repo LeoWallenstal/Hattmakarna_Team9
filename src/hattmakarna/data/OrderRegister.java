@@ -17,6 +17,7 @@ public class OrderRegister {
     private ArrayList<Order> allOrders;
 
     public OrderRegister() {
+        allOrders = new ArrayList<>();
         initAllOrders();
     }
 

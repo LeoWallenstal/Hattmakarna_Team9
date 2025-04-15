@@ -22,12 +22,13 @@ public class Hat {
     private ArrayList<MaterialOrder> materialBehov;
     private String modelId;
     private String orderId;
-    
+    private double price;
+
     public Hat() {
-        
+
     }
-    
-    public Hat(String hatId) {
+   
+    public Hat(String hatId){
         
         HashMap<String, String> aHat = new HashMap<>();
         String sqlQuery = "SELECT * FROM hat WHERE hat_id = " + hatId;
@@ -51,6 +52,7 @@ public class Hat {
         this.modelId = aHat.get("model_id");
         this.orderId = aHat.get("order_id");
         this.materialList = materials;
+        this.price = Double.parseDouble(aHat.get("price"));
         
     }
 
@@ -81,4 +83,13 @@ public class Hat {
     public String getOrderId() {
         return orderId;
     }
+    
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+    
 }

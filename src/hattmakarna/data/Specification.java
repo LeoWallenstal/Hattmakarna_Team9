@@ -28,7 +28,7 @@ public class Specification extends DatabaseObject {
     private int hat_id;
     private String img_path;
     private BufferedImage skissImage = null;
-    public static String SAVE_TO_PATH = "images/";
+    public static final String SAVE_TO_PATH = "images/";
 
     public Specification(String specificationID) {
         super(specificationID);
@@ -117,22 +117,30 @@ public class Specification extends DatabaseObject {
 
     @Override
     public boolean save() {
-
-        // Spara bild vald till fil
-        String fileName = "SpecBild-hat-" + hat_id + ".png";
-        File fileToSave = new File(SAVE_TO_PATH+fileName);
-
-        fileToSave.getParentFile().mkdir();
-        if (!fileToSave.canWrite()) {
-            return false;
-        }
-
         try {
-            ImageIO.write(skissImage, "png", fileToSave);
+            // Spara bild vald till fil 
+            if (skissImage != null) {
+
+                String fileName = "specBild-hat-" + hat_id + ".png";
+                File fileToSave = new File(SAVE_TO_PATH + fileName);
+                fileToSave.getParentFile().mkdirs();
+                
+                ImageIO.write(skissImage, "png", fileToSave);
+                
+                img_path = fileToSave.getPath().replace("\\", "\\\\");
+            }
             return super.save();
         } catch (IOException ex) {
             Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
     }
+
+      
+      
+    @Override
+    protected void setIdString(String id) {
+        this.spec_id = Integer.parseInt(id);
+    }
+
 }

@@ -75,6 +75,8 @@ public abstract class DatabaseObject {
 
     protected abstract String getIdString();
 
+    protected abstract void setIdString(String id);
+
     /**
      * Mapper fälten av det angivna object från hashmapen. Notera att fältens
      * namn måste matcha exakt resultatens attribute namn. Attribut som ej
@@ -137,10 +139,11 @@ public abstract class DatabaseObject {
         } else if (type == float.class || type == Float.class) {
             return Float.parseFloat(value);
         } else if (type == boolean.class || type == Boolean.class) {
-            if(value.equals("1") || value.equals("true"))
+            if (value.equals("1") || value.equals("true")) {
                 return true;
-            else 
+            } else {
                 return false;
+            }
         } else if (type == short.class || type == Short.class) {
             return Short.parseShort(value);
         } else if (type == byte.class || type == Byte.class) {
@@ -293,12 +296,19 @@ public abstract class DatabaseObject {
 
             // Ny post → INSERT
             if (getIdString() == null || getIdString().isEmpty()) {
+                String id = Hattmakarna.idb.getAutoIncrement(getTabelName(), getIdAttributeName());
+                attributeNames.add(getIdAttributeName());
+                attributeValues.add(id);
+                
                 sql = "INSERT INTO " + getTabelName()
                         + " (" + String.join(", ", attributeNames) + ") VALUES ("
                         + String.join(", ", attributeValues) + ");";
 
                 System.out.println("Genererad SQL: " + sql);
                 hattmakarna.data.Hattmakarna.idb.insert(sql);
+                setIdString(id);
+                
+
             } // Befintlig post → UPDATE
             else {
                 List<String> setClauses = new ArrayList<>();
