@@ -7,24 +7,34 @@ import hattmakarna.UI.OrderWindow;
 import hattmakarna.data.User;
 import static hattmakarna.data.Hattmakarna.idb;
 import oru.inf.InfException;
-import hattmakarna.data.CustomerRegister;
 import hattmakarna.data.Model;
+import hattmakarna.data.HatRegister;
+import hattmakarna.data.ModelRegister;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+import oru.inf.InfDB;
 /**
  *
  * @author joelf
  */
 public class HattWindow extends javax.swing.JFrame {
 private Model model;
+private HatRegister hatRegister;
+private ModelRegister modelRegister;
     /**
      * Creates new form HattWindow
      */
-    public HattWindow(Model model) {
-        this.model = model;
+    public HattWindow( Model model) {
+        this.model = null;
+        this.modelRegister = new ModelRegister();
         initComponents();
+        fillTable();
+       
     }
     public HattWindow(){
         this.model = null;
         initComponents();
+        this.hatRegister = new HatRegister(idb);
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -132,9 +142,25 @@ private Model model;
         EditHat editHat = new EditHat(model);
         editHat.setVisible(true);
     }//GEN-LAST:event_btnRedigeringActionPerformed
-private void fillList() {
-   jTable1.set(); 
-}
+    private void fillTable() {
+        ArrayList <Model> models = modelRegister.getAllHats();
+        
+        String[] columnNames = {"model_id", "name", "price"};
+        Object[][] data = new Object[models.size()][3];
+        for (int i = 0; i < models.size(); i++) {
+            Model m = models.get(i);
+            data[i][0] = m.getModelID();
+            data[i][1] = m.getName();
+            data[i][2] = m.getPrice();
+        }
+        
+        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+            public boolean isCekkEditable(int row, int column) {
+                return false;
+            }
+        };
+        jTable1.setModel(tableModel);
+    }
     /**
      * @param args the command line arguments
      */

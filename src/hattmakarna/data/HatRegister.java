@@ -53,6 +53,19 @@ public class HatRegister {
         }
         return hatList;
     }
+    public ArrayList<HashMap<String,String>>getDetailedHatRows(){
+        String sql = "SELECT name,price,size,beskrivning ,hat.hat_id,hat_model.model_id,spec_id FROM  hat_model join hat join hat h on hat_model.model_id = h.model_id join hat_spec hs on hat.hat_id = hs.hat_id";
+                        
+                        try {
+                            return idb.fetchRows(sql);
+                        } catch (InfException e) {
+                            System.out.println("Fel: " + e.getMessage());
+                            return new ArrayList<>();
+                        }
+    }
+      
+                                                                  
+    
 }
 
     
