@@ -7,6 +7,7 @@ import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -29,16 +30,19 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }
     
-    private void fillTable(){
+    public void fillTable(){
+        table.setRowCount(0);
+        
         orders = new OrderRegister().getOrders();
         
         for(Order aOrder : orders ){
             int id = aOrder.getOrder_id();
             
             String status = aOrder.getStatus().toString();
-            String date = aOrder.getRecived_data().toString();
-            
-            table.addRow(new Object[] {id,date,status});
+            Date date = aOrder.getRecived_data();
+            SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = dateF.format(date);
+            table.addRow(new Object[] {id,formattedDate,status});
             
         }
     }
@@ -57,8 +61,6 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
         lblOverview = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         btnReturn = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -78,6 +80,7 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tblOrders.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         tblOrders.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 orderTableMouseClicked(evt);
@@ -93,6 +96,11 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
         lblOverview.setText("Orderöversikt");
 
         jButton1.setText("Registrera order");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         btnReturn.setText("Tillbaka");
         btnReturn.addActionListener(new java.awt.event.ActionListener() {
@@ -100,10 +108,6 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
                 btnReturnActionPerformed(evt);
             }
         });
-
-        jTextField1.setText("jTextField1");
-
-        jButton2.setText("Sök");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -119,11 +123,7 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
                         .addComponent(lblOverview))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btnReturn)
-                        .addGap(160, 160, 160)
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(btnReturn))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(199, 199, 199)
                         .addComponent(jButton1)))
@@ -138,17 +138,9 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
-                        .addComponent(btnReturn)
-                        .addGap(15, 15, 15))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton2)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addComponent(btnReturn)
+                .addGap(15, 15, 15))
         );
 
         pack();
@@ -163,11 +155,16 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
     private void orderTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_orderTableMouseClicked
         int row = tblOrders.rowAtPoint(evt.getPoint());
         
-        int orderId = orders.get(row).getOrder_id();
+        Order order = orders.get(row);
         
-        new OrderInfoWindow("" + orderId).setVisible(true);
+        new OrderInfoWindow(this,order).setVisible(true);
         
     }//GEN-LAST:event_orderTableMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        new OrderWindow(userLoggedIn).setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -207,9 +204,7 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnReturn;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblOverview;
     private javax.swing.JTable tblOrders;
     // End of variables declaration//GEN-END:variables
