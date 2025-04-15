@@ -51,6 +51,8 @@ public class Hat {
         this.modelId = aHat.get("model_id");
         this.orderId = aHat.get("order_id");
         this.materialList = materials;
+        isSpecial = false;
+        setSpecial();
         this.price = Double.parseDouble(aHat.get("price"));
         
     }
@@ -59,13 +61,16 @@ public class Hat {
         this.hatId = hatId;
         this.modelId = modelId;
         this.orderId = orderId;
-        
+        isSpecial = false;
+        setSpecial();
     }
 
     private void setSpecial(){
         String query = "SELECT model_id FROM hat_model WHERE name = 'Special'";
         try {
-            idb.fetchSingle(query);
+          String specialId =  idb.fetchSingle(query);
+          if(hatId.equals(specialId))
+              isSpecial = true;
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -93,6 +98,10 @@ public class Hat {
         return orderId;
     }
     
+    public boolean isSpecial(){
+        return isSpecial;
+    }
+
     public double getPrice() {
         return price;
     }

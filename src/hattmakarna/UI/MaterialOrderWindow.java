@@ -49,7 +49,6 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         
         initTable();
         setLocationRelativeTo(null);
-
     }
     
     private void initTable(){
@@ -78,7 +77,8 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         HashMap<String, Double> orderMaterial = new HashMap<>();
 
         for (Hat hat : hatRegister.getAllHats()) {
-            if (!hat.getOrderId().equals(orderId)) continue;
+            
+            if (!hat.getOrderId().equals(orderId) || !hat.isSpecial()) continue;
 
             MaterialOrder mo = new MaterialOrder(hat.gethatId());
 
@@ -91,9 +91,10 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                 orderMaterial.merge(key, amount, Double::sum);
                 totalMaterial.merge(key, amount, Double::sum);
             }
+            orderData.put(orderId, orderMaterial);
         }
 
-        orderData.put(orderId, orderMaterial);
+        
     }
     return orderData;
 }
