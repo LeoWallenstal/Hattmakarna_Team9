@@ -6,7 +6,10 @@ package hattmakarna.UI;
 
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.*;
+import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
 
@@ -18,28 +21,49 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
     private Order currentOrder;
     private DefaultTableModel table;
+    private boolean isInitialized;
+    private boolean initializedMaterialOrder;
+    private OrderOverviewWindow window;
 
     /**
      * Creates new form OrderInfoWindow
      */
-    public OrderInfoWindow(String orderId) {
+    public OrderInfoWindow(OrderOverviewWindow window, Order order) {
         initComponents();
-        this.currentOrder = new Order(orderId);
+        this.currentOrder = order;
+        this.window = window;
         this.table = (DefaultTableModel) tblHats.getModel();
-        setInfo();
+
         fillTable();
         initStatusCb();
         setStatus();
+        initMaterialOrderCb();
+        setStatusMaterialOrder();
+        lblSuccessFailed.setVisible(false);
+        btnDeleteOrder.setVisible(false);
+        setInfo();
         setLocationRelativeTo(null);
+        this.isInitialized = true;
+        initializedMaterialOrder = true;
     }
 
     private void setInfo() {
         lblOrderNr.setText("Ordernummer: " + currentOrder.getOrder_id());
+
+        Date date = currentOrder.getRecived_data();
+        SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDate = dateF.format(date);
+        lblDate.setText("Datum: " + formattedDate);
         lblPrice.setText("Pris: " + currentOrder.getTotalPris());
         String id = "" + currentOrder.getCustomer_id();
 
         Customer customer = new Customer(id);
         lblCustomer.setText("Kund: " + id + ", " + customer.getFullName());
+
+        
+        if (currentOrder.getStatus().toString().equals("MOTTAGEN")) {
+            btnDeleteOrder.setVisible(true);
+        }
 
     }
 
@@ -63,10 +87,22 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         }
     }
 
-    private void setStatus() {
-        cbStatus.setSelectedItem(currentOrder.getStatus().name());
+    public void setStatus() {
+        cbStatus.setSelectedItem(currentOrder.getStatus().toString());
     }
-    
+
+    public void initMaterialOrderCb() {
+        cbMaterialOrder.addItem("BESTÄLLT");
+        cbMaterialOrder.addItem("EJ BESTÄLLT");
+    }
+
+    public void setStatusMaterialOrder() {
+        if (currentOrder.getMaterialOrdered()) {
+            cbMaterialOrder.setSelectedItem("BESTÄLLT");
+        } else {
+            cbMaterialOrder.setSelectedItem("EJ BESTÄLLT");
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -87,12 +123,26 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblHats = new javax.swing.JTable();
+        btnDeleteOrder = new javax.swing.JButton();
+        lblSuccessFailed = new javax.swing.JLabel();
+
+        setMinimumSize(new java.awt.Dimension(400, 400));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         lblOrderNr.setText("Ordernummer:");
 
         cbStatus.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cbStatusItemStateChanged(evt);
+            }
+        });
+        cbStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbStatusActionPerformed(evt);
             }
         });
 
@@ -102,7 +152,6 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
         lblCustomer.setText("Kund:");
 
-        cbMaterialOrder.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Beställt", "Ej beställt" }));
         cbMaterialOrder.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cbMaterialOrderItemStateChanged(evt);
@@ -111,7 +160,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
         jLabel3.setText("Material:");
 
-        jLabel4.setText("Status:");
+        jLabel4.setText("Orderstatus:");
 
         tblHats.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -129,89 +178,129 @@ public class OrderInfoWindow extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tblHats.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jScrollPane1.setViewportView(tblHats);
         if (tblHats.getColumnModel().getColumnCount() > 0) {
             tblHats.getColumnModel().getColumn(0).setResizable(false);
             tblHats.getColumnModel().getColumn(1).setResizable(false);
         }
 
+        btnDeleteOrder.setText("Ta bort order");
+        btnDeleteOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteOrderActionPerformed(evt);
+            }
+        });
+
+        lblSuccessFailed.setText("borttagen/misslyckades");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(49, 49, 49)
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblPrice)
-                            .addComponent(lblDate)
-                            .addComponent(lblOrderNr))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cbMaterialOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(17, 17, 17)
-                                .addComponent(jLabel4))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(14, 14, 14)
-                                .addComponent(jLabel3)))
-                        .addGap(18, 18, 18))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblCustomer))
-                        .addGap(0, 118, Short.MAX_VALUE))))
+                        .addComponent(btnDeleteOrder)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblSuccessFailed))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jLabel4)
+                        .addGroup(layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(lblPrice)
+                                .addComponent(lblDate)
+                                .addComponent(lblOrderNr)
+                                .addComponent(lblCustomer))
+                            .addGap(145, 145, 145)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(6, 6, 6)
+                                    .addComponent(jLabel3))
+                                .addComponent(cbMaterialOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(97, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(lblOrderNr)
                         .addGap(18, 18, 18)
-                        .addComponent(lblOrderNr))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel4)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblDate)
-                        .addGap(18, 18, 18)
+                        .addGap(12, 12, 12)
                         .addComponent(lblPrice)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(lblCustomer))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(5, 5, 5)
+                        .addGap(13, 13, 13)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbMaterialOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(30, 30, 30)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(37, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnDeleteOrder)
+                    .addComponent(lblSuccessFailed))
+                .addGap(18, 18, 18))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbStatusItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbStatusItemStateChanged
+        if (!isInitialized || evt.getStateChange() != ItemEvent.SELECTED) {
+            return;
+        }
         currentOrder.setStatus(Status.valueOf(cbStatus.getSelectedItem().toString()));
-        System.out.println(currentOrder.getStatus().toString());
         currentOrder.save();
+        window.fillTable();
+
+        if (cbStatus.getSelectedItem().toString().equals("MOTTAGEN")) {
+            btnDeleteOrder.setVisible(true);
+        } else {
+            btnDeleteOrder.setVisible(false);
+        }
     }//GEN-LAST:event_cbStatusItemStateChanged
 
     private void cbMaterialOrderItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbMaterialOrderItemStateChanged
-        if(cbMaterialOrder.getSelectedItem().equals("Beställd")){
-            currentOrder.setMaterialOrdered(true);
+        if (!isInitialized || evt.getStateChange() != ItemEvent.SELECTED) {
+            return;
         }
-        else{
+        if (cbMaterialOrder.getSelectedItem().equals("BESTÄLLD")) {
+            currentOrder.setMaterialOrdered(true);
+        } else {
             currentOrder.setMaterialOrdered(false);
         }
         currentOrder.save();
     }//GEN-LAST:event_cbMaterialOrderItemStateChanged
+
+    private void btnDeleteOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteOrderActionPerformed
+        boolean success = currentOrder.delete();
+        lblSuccessFailed.setVisible(true);
+        if (success) {
+            lblSuccessFailed.setText("Borttagen!");
+        } else {
+            lblSuccessFailed.setText("Misslyckades!");
+        }
+    }//GEN-LAST:event_btnDeleteOrderActionPerformed
+
+    private void cbStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbStatusActionPerformed
+
+    }//GEN-LAST:event_cbStatusActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        window.fillTable();
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
@@ -249,6 +338,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnDeleteOrder;
     private javax.swing.JComboBox<String> cbMaterialOrder;
     private javax.swing.JComboBox<String> cbStatus;
     private javax.swing.JLabel jLabel3;
@@ -258,6 +348,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblOrderNr;
     private javax.swing.JLabel lblPrice;
+    private javax.swing.JLabel lblSuccessFailed;
     private javax.swing.JTable tblHats;
     // End of variables declaration//GEN-END:variables
 }

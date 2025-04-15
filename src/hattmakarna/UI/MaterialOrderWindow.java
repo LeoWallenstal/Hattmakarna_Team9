@@ -49,6 +49,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         orderData = getOrderMaterialData();
         
         initTable();
+        setLocationRelativeTo(null);
 
     }
     
