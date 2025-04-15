@@ -6,33 +6,23 @@ package hattmakarna.UI;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import hattmakarna.data.Customer;
+import hattmakarna.data.Hat;
 import hattmakarna.data.Order;
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import org.xml.sax.InputSource;
 import oru.inf.InfException;
 
 /**
@@ -77,13 +67,15 @@ public class FraktSedelUI extends javax.swing.JFrame {
     private void setupDefaultOrderInfo() {
         weight_field.setText("0");
         vat_field.setText("25");
-        total_field.setText(getTotal());
         freight_field.setText("0");
         order_id.setText("#" + order.getOrder_id());
 
-        order.getHattar().forEach(e -> {
-            ((DefaultTableModel) order_summary_table.getModel()).addRow(new String[]{e.gethatId(), e.getModel().getName(), "100kr"});
+        order.getHattarObjects().forEach(e -> {
+            ((DefaultTableModel) order_summary_table.getModel()).addRow(new String[]{e.gethatId(), e.getModel().getName(), String.format("%.2f kr", e.getPrice())});
         });
+
+        total_field.setText(getTotal());
+
     }
 
     /**
@@ -96,9 +88,13 @@ public class FraktSedelUI extends javax.swing.JFrame {
 
         double summa = 0;
 
-        order.getHattar().forEach(e -> {
-            //  summa += e.get
-        });
+        // Summan av alla hattar
+        for (Hat h : order.getHattarObjects()) {
+            summa += h.getPrice();
+        }
+
+        summa += (Double.parseDouble(vat_field.getText()) / 100) * summa;
+        summa += Double.parseDouble(freight_field.getText());
 
         return String.format("%.2f", summa);
     }
@@ -137,7 +133,6 @@ public class FraktSedelUI extends javax.swing.JFrame {
      * Försöker öppna PDF-filen automatiskt om systemet stöder det.
      */
     private void printDeckleration() {
-
         try {
 
             String html = Files.readString(Paths.get("htmlFiles/shippingLabel.html"), StandardCharsets.UTF_8);
@@ -154,7 +149,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
             html = html.replace("{telephone}", phone_combobox.getSelectedItem().toString());
 
             StringBuilder br = new StringBuilder();
-            order.getHattar().forEach(e -> {
+            order.getHattarObjects().forEach(e -> {
 
                 br.append("<tr>");
                 br.append("<td>");
@@ -363,6 +358,9 @@ public class FraktSedelUI extends javax.swing.JFrame {
             }
         });
         freight_field.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                freight_fieldKeyPressed(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 freight_fieldKeyTyped(evt);
             }
@@ -636,11 +634,12 @@ public class FraktSedelUI extends javax.swing.JFrame {
     }//GEN-LAST:event_weight_fieldActionPerformed
 
     private void vat_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vat_fieldActionPerformed
-        // TODO add your handling code here:
+
+        total_field.setText(getTotal());
     }//GEN-LAST:event_vat_fieldActionPerformed
 
     private void freight_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_freight_fieldActionPerformed
-        // TODO add your handling code here:
+        total_field.setText(getTotal());
     }//GEN-LAST:event_freight_fieldActionPerformed
 
     private void total_fieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_total_fieldActionPerformed
@@ -661,10 +660,12 @@ public class FraktSedelUI extends javax.swing.JFrame {
 
     private void vat_fieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_vat_fieldKeyTyped
         handleNumberStringJField(evt);
+        total_field.setText(getTotal());
     }//GEN-LAST:event_vat_fieldKeyTyped
 
     private void freight_fieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_freight_fieldKeyTyped
         handleNumberStringJField(evt);
+        total_field.setText(getTotal());
     }//GEN-LAST:event_freight_fieldKeyTyped
 
     private void total_fieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_total_fieldKeyTyped
@@ -684,6 +685,10 @@ public class FraktSedelUI extends javax.swing.JFrame {
         parent.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_return_buttonActionPerformed
+
+    private void freight_fieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_freight_fieldKeyPressed
+        total_field.setText(getTotal());
+    }//GEN-LAST:event_freight_fieldKeyPressed
 
     private void handleNumberStringJField(java.awt.event.KeyEvent evt) {
         JTextField field = (JTextField) evt.getComponent();

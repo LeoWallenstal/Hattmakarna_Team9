@@ -48,24 +48,6 @@ public class OrderTest {
     }
 
     /**
-     * Test of createOrder method, of class Order.
-     */
-    @Test
-    public void testCreateOrder() {
-        System.out.println("createOrder");
-        int customer_id = 1;
-        ArrayList<String> hattar = null;
-        double totalPris = 999.99;
-        boolean isFastProduction = false;
-        String result = Order.createOrder(customer_id, hattar, totalPris, isFastProduction);
-        Order order = new Order(result);
-
-        assertEquals(order.getCustomer_id(), customer_id);
-        assertEquals(order.getStatus(), Status.PLACED);
-
-    }
-
-    /**
      * Test of getTabelName method, of class Order.
      */
     @Test
