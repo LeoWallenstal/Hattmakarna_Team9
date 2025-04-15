@@ -640,7 +640,7 @@ public class OrderWindow extends javax.swing.JFrame {
         Model model = modelRegister.getModel(id);
 
         if (model != null) {
-            double price = Double.parseDouble(model.getPrice());
+            double price = model.getPrice();
             double totalPriceForItem = price * quantity;
 
             tableModel.addRow(new Object[]{
