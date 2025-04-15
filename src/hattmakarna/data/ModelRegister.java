@@ -25,9 +25,9 @@ public class ModelRegister {
         return allModels;
     }
 
-    public Model getModel(String modelId){
+    public Model getModel(String modelID){
         for(Model aModel : allModels){
-            if(aModel.getModelID().equals(modelId)){
+            if(aModel.getModelID().equals(modelID)){
                 return aModel;
             }
         }
@@ -49,4 +49,5 @@ public class ModelRegister {
         }
         return modelList;
     }
+    
 }
