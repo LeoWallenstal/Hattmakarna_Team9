@@ -21,6 +21,7 @@ public class HattWindow extends javax.swing.JFrame {
 private Model model;
 private HatRegister hatRegister;
 private ModelRegister modelRegister;
+
     /**
      * Creates new form HattWindow
      */
@@ -29,12 +30,14 @@ private ModelRegister modelRegister;
         this.modelRegister = new ModelRegister();
         initComponents();
         fillTable();
-       
     }
     public HattWindow(){
         this.model = null;
+        this.modelRegister = new ModelRegister(idb);
         initComponents();
-        this.hatRegister = new HatRegister(idb);
+        fillTable();
+
+        
     }
     /**
      * This method is called from within the constructor to initialize the form.
