@@ -8,6 +8,8 @@ import oru.inf.InfDB;
 import oru.inf.InfException;
 import java.util.*;
 import static hattmakarna.data.Hattmakarna.idb;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,6 +22,7 @@ public class Hat {
     private ArrayList<MaterialOrder> materialBehov;
     private String modelId;
     private String orderId;
+    private boolean isSpecial;
     
     public Hat(){
         
@@ -62,6 +65,16 @@ public class Hat {
         this.orderId = orderId;
         
     }
+    
+    private void setSpecial(){
+        String query = "SELECT model_id FROM hat_model WHERE name = 'Special'";
+        try {
+            idb.fetchSingle(query);
+        } catch (InfException ex) {
+            Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public String gethatId(){
         return hatId;
     }
