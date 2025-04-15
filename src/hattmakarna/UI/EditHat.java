@@ -11,6 +11,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import hattmakarna.data.ModelRegister;
 /**
  *
  * @author sebas
@@ -184,14 +185,25 @@ public class EditHat extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnSettPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettPriceActionPerformed
-      try{
-         String modelId = tfModelNumber.getText().trim();
-          double price = Double.parseDouble(tfPrice.getText());
-          aModel.updatePrice(modelId,price);
-          System.out.println("Priset har updaterats");
-} catch (NumberFormatException e) { 
-    System.out.println("Felaktigt prisformat" + e.getMessage());
-      }     
+      try {
+        String modelID = tfModelNumber.getText().trim();
+        double price = Double.parseDouble(tfPrice.getText());
+
+        // Skapa ModelRegister tillfälligt
+        ModelRegister register = new ModelRegister(hattmakarna.data.Hattmakarna.idb);
+        Model model = register.getModel(modelID);
+
+        if (model != null) {
+            model.updatePrice(modelID, price);
+            System.out.println("Priset har uppdaterats");
+        } else {
+            System.out.println("Ingen modell hittades med det ID:t.");
+        }
+
+    } catch (NumberFormatException e) {
+        System.out.println("Felaktigt prisformat: " + e.getMessage());
+    }
+
     }//GEN-LAST:event_btnSettPriceActionPerformed
 
     private void tfPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfPriceActionPerformed

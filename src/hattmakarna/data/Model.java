@@ -39,8 +39,8 @@ public class Model {
         }
     }
 
-    public void removeMaterial(String modelId) {
-        String sqlRemoveQuery = "DELETE FROM hat_model WHERE model_id = '" + modelId + "'";
+    public void removeMaterial(String modelID) {
+        String sqlRemoveQuery = "DELETE FROM hat_model WHERE model_id = '" + modelID + "'";
 
         try {
             idb.delete(sqlRemoveQuery);
@@ -65,12 +65,12 @@ public class Model {
         return modelID;
     }
 
-    public void setModelId(String modelId) {
-        this.modelID = modelId;
+    public void setModelId(String modelID) {
+        this.modelID = modelID;
     }
 
-    public void updatePrice(String modelId, double newPrice) {
-        String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelId + "'";
+    public void updatePrice(String modelID, double newPrice) {
+        String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelID + "'";
 
         try {
             idb.update(sql);
