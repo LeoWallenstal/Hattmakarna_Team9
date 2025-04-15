@@ -23,58 +23,60 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
+          <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="btnBack" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblHeader" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblInStockHats" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lblPrice" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblName" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblModelNumber" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="tfPrice" min="-2" pref="137" max="-2" attributes="0"/>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Component id="btnSettPrice" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnBack" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+                              <Component id="lblInStockHats" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="tfModelNumber" min="-2" pref="135" max="-2" attributes="0"/>
-                          <Component id="tfNamn" min="-2" pref="135" max="-2" attributes="0"/>
                       </Group>
                   </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="lblModelNumber" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblPrice" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="tfModelNumber" max="32767" attributes="0"/>
+                          <Component id="tfPrice" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
+                      <Component id="btnSettPrice" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                      <Component id="lblHeader" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace pref="151" max="32767" attributes="0"/>
+              <EmptySpace pref="183" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
               <Component id="lblHeader" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="lblInStockHats" min="-2" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblModelNumber" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="tfModelNumber" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblName" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tfNamn" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblPrice" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="tfPrice" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnSettPrice" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="147" max="32767" attributes="0"/>
+              <EmptySpace pref="144" max="32767" attributes="0"/>
               <Component id="btnBack" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
           </Group>
@@ -108,12 +110,10 @@
         <Property name="text" type="java.lang.String" value="Pris:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lblName">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Namn:"/>
-      </Properties>
-    </Component>
     <Component class="javax.swing.JTextField" name="tfPrice">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Fyll i &#xf6;nskat pris i heltal"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tfPriceActionPerformed"/>
       </Events>
@@ -126,12 +126,10 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBackActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="tfNamn">
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tfNamnActionPerformed"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JTextField" name="tfModelNumber">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="V&#xe4;lj hatt du vill redigera "/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tfModelNumberActionPerformed"/>
       </Events>
