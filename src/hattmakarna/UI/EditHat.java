@@ -19,12 +19,13 @@ public class EditHat extends javax.swing.JFrame {
 //public final Model aModel;
     /**
      * Creates new form EditHat
-     * @param aModel
+     
      */
-    public EditHat() {
+    private final Model aModel;
+    public EditHat(Model aModel) {
         initComponents();
-        //this.aModel = aModel;
-        //aModel.updatePrice(NyttPris);
+       this.aModel = aModel;
+        
     }
 
     
@@ -85,6 +86,11 @@ public class EditHat extends javax.swing.JFrame {
         tfNamn.setText("jTextField1");
 
         tfModelNumber.setText("jTextField2");
+        tfModelNumber.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfModelNumberActionPerformed(evt);
+            }
+        });
 
         btnSettPrice.setText("Ändra pris");
         btnSettPrice.addActionListener(new java.awt.event.ActionListener() {
@@ -178,47 +184,29 @@ public class EditHat extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void btnSettPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettPriceActionPerformed
-      
+      try{
+         String modelId = tfModelNumber.getText().trim();
+          double price = Double.parseDouble(tfPrice.getText());
+          aModel.updatePrice(modelId,price);
+          System.out.println("Priset har updaterats");
+} catch (NumberFormatException e) { 
+    System.out.println("Felaktigt prisformat" + e.getMessage());
+      }     
     }//GEN-LAST:event_btnSettPriceActionPerformed
 
     private void tfPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfPriceActionPerformed
-         
+                
     }//GEN-LAST:event_tfPriceActionPerformed
+
+    private void tfModelNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfModelNumberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfModelNumberActionPerformed
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(EditHat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(EditHat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(EditHat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(EditHat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new EditHat().setVisible(true);
-            }
-        });
-    }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;

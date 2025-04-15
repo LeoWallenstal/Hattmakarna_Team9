@@ -69,8 +69,8 @@ public class Model {
         this.modelID = modelId;
     }
 
-    public void updatePrice(double newPrice) {
-        String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelID + "'";
+    public void updatePrice(String modelId, double newPrice) {
+        String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelId + "'";
 
         try {
             idb.update(sql);
@@ -79,6 +79,7 @@ public class Model {
             System.out.println("Fel vid uppdatering av pris: " + ex.getMessage());
         }
     }
+       
 
     public void updateName(String newName) {
         String sql = "UPDATE hat_model SET name = '" + newName + "' WHERE model_id = '" + modelID + "'";
