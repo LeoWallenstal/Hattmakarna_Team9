@@ -133,7 +133,7 @@ private Model model;
         editHat.setVisible(true);
     }//GEN-LAST:event_btnRedigeringActionPerformed
 private void fillList() {
-   jTable1.set(); 
+   //jTable1.set(); 
 }
     /**
      * @param args the command line arguments

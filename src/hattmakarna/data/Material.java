@@ -7,10 +7,12 @@ import static hattmakarna.data.Hattmakarna.idb;
 
 public class Material {
 
-    private final String materialId;
+    private String materialId;
     private String name;
     private String unit;
 
+    public Material(){}
+    
     public Material(String materialID) {
         this.materialId = materialID;
         this.name = fetchSingle(materialID, "name");
