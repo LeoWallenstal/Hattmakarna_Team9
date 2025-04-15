@@ -69,7 +69,7 @@ public class Hat {
         String query = "SELECT model_id FROM hat_model WHERE name = 'Special'";
         try {
           String specialId =  idb.fetchSingle(query);
-          if(hatId.equals(specialId))
+          if(modelId.equals(specialId))
               isSpecial = true;
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
