@@ -28,7 +28,7 @@ public class Specification extends DatabaseObject {
     private int hat_id;
     private String img_path;
     private BufferedImage skissImage = null;
-    public static String SAVE_TO_PATH = "Images/";
+    public static String SAVE_TO_PATH = "images/";
 
     public Specification(String specificationID) {
         super(specificationID);
@@ -120,7 +120,7 @@ public class Specification extends DatabaseObject {
 
         // Spara bild vald till fil
         String fileName = "SpecBild-hat-" + hat_id + ".png";
-        File fileToSave = new File(SAVE_TO_PATH);
+        File fileToSave = new File(SAVE_TO_PATH+fileName);
 
         fileToSave.getParentFile().mkdir();
         if (!fileToSave.canWrite()) {

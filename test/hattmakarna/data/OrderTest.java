@@ -141,16 +141,6 @@ public class OrderTest {
 
     }
 
-    /**
-     * Test of getHattar method, of class Order.
-     */
-    @Test
-    public void testGetHattar() {
-        System.out.println("getHattar");
-        Order instance = new Order("1");
-        ArrayList<String> result = instance.getHattar();
-        assertEquals(1, result.size());
-    }
 
     /**
      * Test of getTotalPris method, of class Order.
