@@ -643,7 +643,7 @@ public class EditCustomer extends javax.swing.JFrame {
 
     private void btnAddPhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPhoneActionPerformed
         lblSaved.setVisible(false);
-        new AddPhoneEmailWindow(aCustomer, EmailOrPhone.PHONE, this).setVisible(true);
+        new AddEmailPhoneWindow(aCustomer, EmailOrPhone.PHONE, this).setVisible(true);
     }//GEN-LAST:event_btnAddPhoneActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
@@ -695,7 +695,7 @@ public class EditCustomer extends javax.swing.JFrame {
 
     private void btnAddEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmailActionPerformed
         lblSaved.setVisible(false);
-        new AddPhoneEmailWindow(aCustomer, EmailOrPhone.EMAIL, this).setVisible(true);
+        new AddEmailPhoneWindow(aCustomer, EmailOrPhone.EMAIL, this).setVisible(true);
     }//GEN-LAST:event_btnAddEmailActionPerformed
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
