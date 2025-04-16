@@ -2,7 +2,16 @@
 
 <Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <Properties>
-    <Property name="defaultCloseOperation" type="int" value="3"/>
+    <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[653, 550]"/>
+    </Property>
+    <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[653, 550]"/>
+    </Property>
+    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[653, 550]"/>
+    </Property>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -27,119 +36,95 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <Group type="103" groupAlignment="1" attributes="0">
+              <EmptySpace min="24" pref="24" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                  <Component id="tfPhone" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="lbltfPhone" alignment="0" min="-2" pref="155" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
+                          <Component id="lbltfPhone" min="-2" pref="155" max="-2" attributes="0"/>
+                          <Component id="lblPhoneError" min="-2" pref="182" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="tfPhone" min="-2" pref="130" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="btnAddPhone" min="-2" pref="96" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="lblPhoneError" min="-2" pref="182" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lbltfEmail" min="-2" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="tfEmail" min="-2" pref="245" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
+                          <Component id="lblEmailError" min="-2" pref="200" max="-2" attributes="0"/>
+                          <Group type="102" attributes="0">
+                              <Component id="tfEmail" min="-2" pref="175" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="btnAddEmail" min="-2" pref="96" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="lblEmailError" alignment="0" min="-2" pref="200" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" attributes="0">
-                      <EmptySpace min="24" pref="24" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblFirstname" min="-2" max="-2" attributes="0"/>
+                                  <Component id="tfFirstName" alignment="0" min="-2" pref="245" max="-2" attributes="0"/>
+                                  <Component id="lblFirstNameError" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="tfLastName" min="-2" pref="209" max="-2" attributes="0"/>
+                                  <Component id="lblLastname" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblLastNameError" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Component id="lblRegistreraKund" min="-2" pref="237" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="lblAdress" min="-2" max="-2" attributes="0"/>
+                                  <Component id="tfAdress" alignment="0" min="-2" pref="245" max="-2" attributes="0"/>
+                                  <Component id="lblAdressError" alignment="0" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblPostalCodeError" min="-2" max="-2" attributes="0"/>
+                                  <Component id="tfPostalCode" alignment="0" min="-2" pref="76" max="-2" attributes="0"/>
+                                  <Component id="lblPostnummer" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                                      <Component id="lbltfEmail" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblCountry" min="-2" max="-2" attributes="0"/>
+                                  <Component id="cbCountry" min="-2" pref="170" max="-2" attributes="0"/>
+                                  <Component id="lblCountryError" min="-2" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jScrollPane1" alignment="0" min="-2" pref="258" max="-2" attributes="0"/>
                                   <Component id="lblPhone" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="btnRemovePhone" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="btnGoBack" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="lblCustomerSaved" min="-2" pref="87" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="lblEmail" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnRemoveEmail" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Component id="lblEmail" min="-2" max="-2" attributes="0"/>
-                                      <EmptySpace pref="279" max="32767" attributes="0"/>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Component id="jScrollPane2" min="-2" pref="245" max="-2" attributes="0"/>
-                                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                                              <Component id="btnSave" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Component id="btnRemoveEmail" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace min="0" pref="17" max="32767" attributes="0"/>
-                                  </Group>
-                              </Group>
-                          </Group>
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="lblFirstname" min="-2" max="-2" attributes="0"/>
-                                          <Component id="tfFirstName" alignment="0" min="-2" pref="245" max="-2" attributes="0"/>
-                                          <Component id="lblFirstNameError" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="tfLastName" min="-2" pref="209" max="-2" attributes="0"/>
-                                          <Component id="lblLastname" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lblLastNameError" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
-                                  <Group type="102" attributes="0">
-                                      <Component id="lblRegistreraKund" min="-2" pref="237" max="-2" attributes="0"/>
+                                      <Component id="jScrollPane2" min="-2" pref="245" max="-2" attributes="0"/>
                                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      <Component id="lblCustomerExistsError" min="-2" max="-2" attributes="0"/>
+                                      <Component id="btnSave" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                          <Component id="lblAdress" min="-2" max="-2" attributes="0"/>
-                                          <Component id="tfAdress" alignment="0" min="-2" pref="245" max="-2" attributes="0"/>
-                                          <Component id="lblAdressError" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Group type="103" groupAlignment="0" attributes="0">
-                                          <Group type="102" attributes="0">
-                                              <Component id="lblPostalCodeError" min="-2" max="-2" attributes="0"/>
-                                              <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="lblCountryError" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <Group type="102" alignment="0" attributes="0">
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="tfPostalCode" alignment="0" min="-2" pref="76" max="-2" attributes="0"/>
-                                                  <Component id="lblPostnummer" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
-                                              <Group type="103" groupAlignment="0" attributes="0">
-                                                  <Component id="lblCountry" min="-2" max="-2" attributes="0"/>
-                                                  <Component id="cbCountry" min="-2" pref="170" max="-2" attributes="0"/>
-                                              </Group>
-                                          </Group>
-                                      </Group>
-                                  </Group>
+                                  <Component id="lblCustomerExistsError" alignment="0" min="-2" pref="164" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
+                      <EmptySpace pref="12" max="32767" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="18" max="32767" attributes="0"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnGoBack" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="lblCustomerSaved" min="-2" pref="100" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -147,10 +132,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblRegistreraKund" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
-                  <Component id="lblCustomerExistsError" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="lblRegistreraKund" min="-2" pref="27" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblFirstname" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -167,32 +149,34 @@
                   <Component id="lblLastNameError" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblAdress" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblPostnummer" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblCountry" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="tfAdress" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tfPostalCode" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="cbCountry" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace min="-2" pref="31" max="-2" attributes="0"/>
-                      <Component id="lbltfEmail" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="lblAdress" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblPostnummer" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="tfAdress" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="tfPostalCode" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="lblAdressError" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="lblPostalCodeError" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="lblCountryError" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
-                      <Component id="lbltfPhone" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <Group type="102" attributes="0">
+                      <Component id="lblCountry" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="cbCountry" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="lbltfEmail" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lbltfPhone" alignment="1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -206,7 +190,7 @@
                   <Component id="lblEmailError" alignment="3" max="32767" attributes="0"/>
                   <Component id="lblPhoneError" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -226,12 +210,13 @@
                   <Component id="btnRemovePhone" min="-2" max="-2" attributes="0"/>
                   <Component id="btnRemoveEmail" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="btnGoBack" min="-2" max="-2" attributes="0"/>
-                  <Component id="lblCustomerSaved" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btnGoBack" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblCustomerSaved" alignment="3" max="32767" attributes="0"/>
+                  <Component id="lblCustomerExistsError" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -417,11 +402,17 @@
     <Component class="javax.swing.JLabel" name="lblPhoneError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Ogiltigt telefonnummer!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[128, 20]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblEmailError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Ogiltig epostadress!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[128, 20]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblPhone">
@@ -443,31 +434,49 @@
     <Component class="javax.swing.JLabel" name="lblAdressError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Ogiltig adress!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[128, 20]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblPostalCodeError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Ogiltigt postnummer!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[128, 20]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblFirstNameError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Ogiltigt namn!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[128, 20]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblLastNameError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Ogiltigt namn!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[128, 20]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblCountryError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Land ej valt!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[128, 20]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblCustomerExistsError">
       <Properties>
         <Property name="text" type="java.lang.String" value="Den h&#xe4;r kunden finns redan!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[164, 25]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnRemovePhone">
@@ -499,6 +508,9 @@
     <Component class="javax.swing.JLabel" name="lblCustomerSaved">
       <Properties>
         <Property name="text" type="java.lang.String" value="Kund sparad!"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[70, 25]"/>
+        </Property>
       </Properties>
     </Component>
   </SubComponents>
