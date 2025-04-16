@@ -3,20 +3,42 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
-
+import hattmakarna.UI.OrderWindow;
+import hattmakarna.data.User;
+import static hattmakarna.data.Hattmakarna.idb;
+import oru.inf.InfException;
+import hattmakarna.data.Model;
+import hattmakarna.data.HatRegister;
+import hattmakarna.data.ModelRegister;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
+import oru.inf.InfDB;
 /**
  *
  * @author joelf
  */
 public class HattWindow extends javax.swing.JFrame {
+private Model model;
+private HatRegister hatRegister;
+private ModelRegister modelRegister;
 
     /**
      * Creates new form HattWindow
      */
-    public HattWindow() {
+    public HattWindow( Model model) {
+        this.model = null;
+        this.modelRegister = new ModelRegister();
         initComponents();
+        fillTable();
     }
+    public HattWindow(){
+        this.model = null;
+        this.modelRegister = new ModelRegister(idb);
+        initComponents();
+        fillTable();
 
+        
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,26 +48,28 @@ public class HattWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDialog1 = new javax.swing.JDialog();
         jLabel1 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        btnRedigering = new javax.swing.JButton();
+        btnUpdate = new javax.swing.JButton();
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        jLabel1.setText("Hatt");
-
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(jList1);
-
-        jLabel2.setText("Välj hatt");
+        jLabel1.setText("Lagerförda Hattar");
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -60,78 +84,121 @@ public class HattWindow extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(jTable1);
 
+        btnRedigering.setText("Redigera lagerförda hattar");
+        btnRedigering.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRedigeringActionPerformed(evt);
+            }
+        });
+
+        btnUpdate.setText("Uppdatera Lista");
+        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUpdateActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(132, 132, 132)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(182, Short.MAX_VALUE))
+                        .addComponent(btnRedigering)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnUpdate))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(17, 17, 17)
                 .addComponent(jLabel1)
-                .addGap(32, 32, 32)
-                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnRedigering)
+                    .addComponent(btnUpdate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(100, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnRedigeringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedigeringActionPerformed
+        EditHat editHat = new EditHat(model);
+        editHat.setVisible(true);
+    }//GEN-LAST:event_btnRedigeringActionPerformed
+
+    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
+       System.out.println("knapp tryckt");
+        fillTable();
+    }//GEN-LAST:event_btnUpdateActionPerformed
+    private void fillTable() {
+        System.out.println("fillTableKörs");
+        ArrayList <Model> models = modelRegister.getAllHats();
+        
+        String[] columnNames = {"model_id", "name", "price"};
+        Object[][] data = new Object[models.size()][3];
+        for (int i = 0; i < models.size(); i++) {
+            Model m = models.get(i);
+            data[i][0] = m.getModelID();
+            data[i][1] = m.getName();
+            data[i][2] = m.getPrice();
+        }
+        
+        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+            public boolean isCekkEditable(int row, int column) {
+                return false;
+            }
+        };
+        jTable1.setModel(tableModel);
+    }
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+   // public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+        //try {
+           // for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                //if ("Nimbus".equals(info.getName())) {
+                  //  javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                  //  break;
+               // }
+           // }
+       // } catch (ClassNotFoundException ex) {
+          //  java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+       // } catch (InstantiationException ex) {
+           // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+       // } catch (IllegalAccessException ex) {
+           // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        //} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+           // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+       // }
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new HattWindow().setVisible(true);
-            }
-        });
-    }
+       // java.awt.EventQueue.invokeLater(new Runnable() {
+            //public void run() {
+                //new HattWindow().setVisible(true);
+           // }
+       // });
+   // }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnRedigering;
+    private javax.swing.JButton btnUpdate;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JList<String> jList1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables

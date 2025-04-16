@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
+
 import hattmakarna.data.Customer;
 import hattmakarna.data.CustomerRegister;
 import static hattmakarna.data.Hattmakarna.idb;
@@ -12,16 +13,19 @@ import hattmakarna.data.Material;
 import hattmakarna.data.Model;
 import hattmakarna.data.ModelRegister;
 import hattmakarna.data.Order;
+import hattmakarna.data.Specification;
 import hattmakarna.data.User;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -39,9 +43,10 @@ public class OrderWindow extends javax.swing.JFrame {
     CustomerRegister customerRegister;
     private User userLoggedIn;
     ModelRegister modelRegister;
-    private  ArrayList<Model> hatModels;
+    private ArrayList<Model> hatModels;
     private DefaultTableModel tableModel;
-    int customerID = 5;
+    int customerID = 0;
+
     /**
      * Creates new form OrderWindow
      */
@@ -55,13 +60,12 @@ public class OrderWindow extends javax.swing.JFrame {
         hatModels = modelRegister.getAllHats();
         fillModels();
         this.userLoggedIn = userLoggedIn;
-        tableModel = new DefaultTableModel(new String[]{"Modell", "Antal"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"Modell", "Beskrivning", "Storlek", "Antal"}, 0);
         tblSeeOrder.setModel(tableModel);
-        saveOrder();
-        
+
         totalPrice = 0;
         isExpress = false;
-        
+
     }
 
     /**
@@ -432,8 +436,9 @@ public class OrderWindow extends javax.swing.JFrame {
 
     private void btnNewCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewCustomerActionPerformed
         //this.setVisible(false);
-        new CustomerWindow(userLoggedIn, this).setVisible(true);
-        
+
+        new RegisterCustomerWindow(userLoggedIn, this).setVisible(true);
+
     }//GEN-LAST:event_btnNewCustomerActionPerformed
 
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
@@ -441,22 +446,22 @@ public class OrderWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnSearchActionPerformed
 
     private void btnAddFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFileActionPerformed
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "png", "jpeg", "bmp", "gif");
-    
-    fileChooser.setFileFilter(filter);
-    int result = fileChooser.showOpenDialog(null);
-    
-    if(result == JFileChooser.APPROVE_OPTION) {
-        File selectedFile = fileChooser.getSelectedFile();
-        lblPicture.setIcon(new ImageIcon(selectedFile.getAbsolutePath()));
-    }
-    
+
+        fileChooser.setFileFilter(filter);
+        int result = fileChooser.showOpenDialog(null);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            lblPicture.setIcon(new ImageIcon(selectedFile.getAbsolutePath()));
+        }
+
     }//GEN-LAST:event_btnAddFileActionPerformed
 
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
-    new MainMenu(userLoggedIn).setVisible(true);
+        new MainMenu(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnReturnActionPerformed
 
@@ -465,141 +470,212 @@ public class OrderWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddOrderActionPerformed
 
     private void btnAddSpecialToOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddSpecialToOrderActionPerformed
-    fillSpecHatToOrder();
+        fillSpecHatToOrder();
     }//GEN-LAST:event_btnAddSpecialToOrderActionPerformed
 
     private void checkFastDeliveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkFastDeliveryActionPerformed
-    isExpress = checkFastDelivery.isSelected();
-    
-     if (isExpress) {
-        totalPrice = originalTotalPrice * 1.2; // +20%
-    } else {
-        totalPrice = originalTotalPrice; // tillbaka till utan express
-    }
+        isExpress = checkFastDelivery.isSelected();
 
-    lblTotalPrice.setText("Totalpris: " + totalPrice + " kr");
-    
+        if (isExpress) {
+            totalPrice = originalTotalPrice * 1.2; // +20%
+        } else {
+            totalPrice = originalTotalPrice; // tillbaka till utan express
+        }
+
+        lblTotalPrice.setText("Totalpris: " + totalPrice + " kr");
+
     }//GEN-LAST:event_checkFastDeliveryActionPerformed
 
     private void pnlSaveOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pnlSaveOrderActionPerformed
-        // TODO add your handling code here:
+        saveOrder();
     }//GEN-LAST:event_pnlSaveOrderActionPerformed
 
     private void btnChooseCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseCustomerActionPerformed
-    selectCustomer();
+        selectCustomer();
     }//GEN-LAST:event_btnChooseCustomerActionPerformed
 
-    private void saveOrder() {
-        String query = "INSERT INTO sales_order (price, customer_id, status, recived_date, material_ordered) VALUES "
-                + "(" + totalPrice + ", " + customerID + ", 'mottagen"
-                + "', '2025-04-14', 0);";
-        try {
-            idb.insert(query);
-        } catch (InfException ex) {
-            Logger.getLogger(OrderWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    private void saveSpecOrder() {
+        Specification specification = new Specification();
+        String description = txtSpecialDesc.getText();
+        String size = String.valueOf(cbxSize.getSelectedItem());
+        specification.setDesciption(description);
+        specification.save();
+
     }
-    
+
+    private void saveOrder() {
+    try {
+        // Räkna ut rätt totalpris beroende på expressleverans
+        if (isExpress) {
+            totalPrice = originalTotalPrice * 1.2;
+        } else {
+            totalPrice = originalTotalPrice;
+        }
+
+        // Spara order i sales_order
+        String query = "INSERT INTO sales_order (price, customer_id, status, recived_date, material_ordered) VALUES ("
+                + totalPrice + ", "
+                + customerID + ", "
+                + "'mottagen', "
+                + "'2025-04-14', "
+                + "0);";
+        idb.insert(query);
+
+        // Hämta nyaste order_id
+        String getOrderIdQuery = "SELECT MAX(order_id) FROM sales_order;";
+        String orderId = idb.fetchSingle(getOrderIdQuery);
+
+        // Gå igenom alla rader i beställnings-tabellen
+        DefaultTableModel model = (DefaultTableModel) tblSeeOrder.getModel();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String modelName = model.getValueAt(i, 0).toString();
+            int quantity = Integer.parseInt(model.getValueAt(i, 3).toString());
+
+            // Hämta model_id
+            String modelId = "1"; // fallback
+            for (Model m : hatModels) {
+                if (m.getName().equalsIgnoreCase(modelName)) {
+                    modelId = m.getModelID();
+                    break;
+                }
+            }
+
+            // Om det är en specialhatt (modelId = 1)
+            if (modelId.equals("1")) {
+                String desc = model.getValueAt(i, 1).toString();
+                String size = model.getValueAt(i, 2).toString();
+
+                for (int j = 0; j < quantity; j++) {
+                    // Lägg till i hat
+                    String hatQuery = "INSERT INTO hat (model_id, order_id) VALUES ("
+                            + modelId + ", " + orderId + ");";
+                    idb.insert(hatQuery);
+
+                    // Hämta hat_id
+                    String hatId = idb.fetchSingle("SELECT MAX(hat_id) FROM hat");
+
+                    // Lägg till i hat_spec
+                    String insertSpecQuery = "INSERT INTO hat_spec (beskrivning, size, hat_id) VALUES ('"
+                            + desc.replace("'", "''") + "', '"
+                            + size + "', " + hatId + ");";
+                    idb.insert(insertSpecQuery);
+                }
+            }
+            // Lagerförd hatt (alla andra modelId)
+            else {
+                for (int j = 0; j < quantity; j++) {
+                    String hatQuery = "INSERT INTO hat (model_id, order_id) VALUES ("
+                            + modelId + ", " + orderId + ");";
+                    idb.insert(hatQuery);
+                }
+            }
+        }
+
+        JOptionPane.showMessageDialog(this, "Order sparad!");
+
+    } catch (InfException ex) {
+        Logger.getLogger(OrderWindow.class.getName()).log(Level.SEVERE, null, ex);
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Felaktigt antal eller innehåll i tabellen.", "Fel", JOptionPane.ERROR_MESSAGE);
+    }
+}
+
     public void selectCustomer() {
-        String selectedCustomer  = customerJList.getSelectedValue();
-        for(Customer customer : customerRegister.getAllCustomers()) {
-            if(customer.getFullName().equalsIgnoreCase(selectedCustomer)) {
+        String selectedCustomer = customerJList.getSelectedValue();
+        for (Customer customer : customerRegister.getAllCustomers()) {
+            if (customer.getFullName().equalsIgnoreCase(selectedCustomer)) {
                 customerID = Integer.parseInt(customer.getCustomerID());
                 break;
             }
         }
         lblCustomerOrder.setText("Vald kund: " + selectedCustomer);
     }
-    
-    public void refreshCustomers(){
+
+    public void refreshCustomers() {
         customerRegister = new CustomerRegister();
         fillSearchResults();
     }
-    
+
     private void fillSearchResults() {
-                DefaultListModel<String> listModel = new DefaultListModel<>();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
         customerJList.setModel(listModel);
         ArrayList<Customer> customerMailList = customerRegister.searchByEmail(txtSearchEmail.getText());
         ArrayList<Customer> customerNameList = customerRegister.searchByName(txtSearchEmail.getText());
         HashMap<String, Customer> customerList = new HashMap<>();
-        
-        for(Customer customer : customerMailList) {
-        customerList.put(customer.getCustomerID(), customer);
+
+        for (Customer customer : customerMailList) {
+            customerList.put(customer.getCustomerID(), customer);
         }
-        
-        for(Customer customer : customerNameList) {
-        customerList.put(customer.getCustomerID(), customer);
+
+        for (Customer customer : customerNameList) {
+            customerList.put(customer.getCustomerID(), customer);
         }
-        
-        for(Customer customer : customerList.values()) {
+
+        for (Customer customer : customerList.values()) {
             listModel.addElement(customer.getFullName());
-        } 
+        }
     }
-    
+
     private void fillModels() {
-       DefaultListModel<String> listModel = new DefaultListModel<>();
-       lstModels.setModel(listModel);
-        
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        lstModels.setModel(listModel);
+
         for (Model model : hatModels) {
             listModel.addElement(model.getName());
         }
-        
+
     }
-    
+
     private void fillStockHatToOrder() {
-        
+
         String selectedModel = lstModels.getSelectedValue();
         String id = "";
         for (Model model : hatModels) {
-            if(model.getName().equalsIgnoreCase(selectedModel)) {
-               id = model.getModelID();
-               break;
+            if (model.getName().equalsIgnoreCase(selectedModel)) {
+                id = model.getModelID();
+                break;
             }
         }
         int quantity = (int) spnAmount.getValue();
-        
+
         Model model = modelRegister.getModel(id);
-        
+
         if (model != null) {
-            double price = Double.parseDouble(model.getPrice());
+            double price = model.getPrice();
             double totalPriceForItem = price * quantity;
-            
-            
-            
-            
 
-        tableModel.addRow(new Object[]{
-            model.getName(),
-            quantity,
-        });
+            tableModel.addRow(new Object[]{
+                model.getName(),
+                "",
+                "",
+                quantity,});
 
-        originalTotalPrice += totalPriceForItem;
-        lblTotalPrice.setText("Totalpris: " + originalTotalPrice + " kr");
-    } else {
-        System.out.println("Ingen modell vald!");
+            originalTotalPrice += totalPriceForItem;
+            lblTotalPrice.setText("Totalpris: " + originalTotalPrice + " kr");
+        } else {
+            System.out.println("Ingen modell vald!");
         }
-        
+
     }
-    
+
     private void fillSpecHatToOrder() {
         String description = txtSpecialDesc.getText();
         String size = cbxSize.getSelectedItem().toString();
         String priceString = txtPrice.getText();
         double price = Double.parseDouble(priceString);
         int quantity = 1;
-        
+
         tableModel.addRow(new Object[]{
-            "Specialhatt (" + description + ")",
-            quantity,
-        }); 
-        
+            "Specialhatt",
+            description,
+            size,
+            quantity,});
+
         originalTotalPrice += price;
         lblTotalPrice.setText("Totalpris: " + originalTotalPrice + " kr");
 
     }
-    
 
-        
     /**
      * @param args the command line arguments
      */
@@ -630,7 +706,7 @@ public class OrderWindow extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new OrderWindow().setVisible(true);
+                // new OrderWindow().setVisible(true);
             }
         });
     }

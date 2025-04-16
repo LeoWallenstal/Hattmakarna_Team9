@@ -28,6 +28,8 @@ public class Customer {
     
     //För testning, skapa en blank kund.
     public Customer(){
+        telephoneNumbers = new ArrayList<String>();
+        emailAdresses = new ArrayList<String>();
     }
     
     public Customer(HashMap<String, String> customerMap){
@@ -165,6 +167,24 @@ public class Customer {
         return country;
     }
     
+    public boolean hasNumber(String number){
+        for(String aNumber : telephoneNumbers){
+            if(aNumber.equals(number)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean hasEmail(String email){
+        for(String anEmail : emailAdresses){
+            if(anEmail.equals(email)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
     //-------------------- Setters --------------------
     public void setFirstName(String newFirstName){
         if(validateName(newFirstName)){
@@ -186,6 +206,10 @@ public class Customer {
     
     public void setPostalCode(String newPostalCode){
         if(validatePostalCode(newPostalCode)){
+            if(newPostalCode.substring(3).equals(" ")){
+                String firstPart = newPostalCode.substring(0,3);
+                String secondPart = newPostalCode.substring(4,6);
+            }
             this.postalCode = newPostalCode;
         }
     }
@@ -226,6 +250,16 @@ public class Customer {
         if(indexPos >= 0 && indexPos < emailAdresses.size()){
             emailAdresses.remove(indexPos);
         }
+    }
+    
+    public boolean equals(Customer that){
+        return this.firstName.equals(that.getFirstName()) &&
+            this.lastName.equals(that.getLastName()) &&
+            this.adress.equals(that.getAdress()) &&
+            this.postalCode.equals(that.getPostalCode()) &&
+            this.country.equals(that.getCountry()) &&
+            Util.contentEquals(this.telephoneNumbers, that.getTelephoneNumbers()) &&
+            Util.contentEquals(this.emailAdresses, that.getEmailAdresses());
     }
     
     
@@ -289,7 +323,7 @@ public class Customer {
         updateEmailAdresses(unmodified);
     }
     
-    //Funkar inte just nu pga constraints.
+    
     public void delete(){
         try{
             idb.delete("DELETE FROM phone WHERE customer_id = " + customerID);
@@ -404,10 +438,7 @@ public class Customer {
             }
         }
         return emailAdressesToRemove;
-    }
-    
-    
-    
+    } 
     
     private ArrayList<String> fetchUpdates(Customer unmodified){
         ArrayList<String> updates = new ArrayList<>();
@@ -434,11 +465,10 @@ public class Customer {
     }
     
     private void updateTelephoneNumbers(Customer unmodified){
-        if(telephoneNumbers.size() > unmodified.getTelephoneNumbers().size()){
-            System.out.println("TN IF!!!!!!!!!");
-            String sqlQuery = "";
-            ArrayList<String> telephoneNumbersToAdd = fetchTelephoneNumbersToAdd();
+        String sqlQuery = "";
+        ArrayList<String> telephoneNumbersToAdd = fetchTelephoneNumbersToAdd();
 
+        if(!telephoneNumbersToAdd.isEmpty()){
             Iterator it = telephoneNumbersToAdd.iterator();
             while(it.hasNext()){
                 sqlQuery = "INSERT INTO phone (customer_id, phone_number) "
@@ -452,11 +482,12 @@ public class Customer {
                 }
             }
         }
-        else if(telephoneNumbers.size() < unmodified.getTelephoneNumbers().size()){
-            System.out.println("TN ELSE IF!!!!!!!!!");
-            String sqlQuery = "";
-            ArrayList<String> telephoneNumbersToRemove = fetchTelephoneNumbersToRemove();
+        
 
+        sqlQuery = "";
+        ArrayList<String> telephoneNumbersToRemove = fetchTelephoneNumbersToRemove();
+        
+        if(!telephoneNumbersToRemove.isEmpty()){
             Iterator it = telephoneNumbersToRemove.iterator();
             while(it.hasNext()){
                 sqlQuery = "DELETE FROM phone WHERE phone_number = '" + it.next() + "';";
@@ -472,38 +503,36 @@ public class Customer {
     }
     
     private void updateEmailAdresses(Customer unmodified){
-        if(emailAdresses.size() > unmodified.getEmailAdresses().size()){
-            String sqlQuery = "";
-            ArrayList<String> emailAdressesToAdd = fetchEmailAdressesToAdd();   
-            Iterator it = emailAdressesToAdd.iterator();
-            while(it.hasNext()){
-                sqlQuery = "INSERT INTO mail (customer_id, mail) "
-                        + "VALUES ('" + customerID + "', '" + it.next() + "');";
+        String sqlQuery = "";
+        ArrayList<String> emailAdressesToAdd = fetchEmailAdressesToAdd();   
+        Iterator it = emailAdressesToAdd.iterator();
+        while(it.hasNext()){
+            sqlQuery = "INSERT INTO mail (customer_id, mail) "
+                    + "VALUES ('" + customerID + "', '" + it.next() + "');";
 
-                try{
-                    idb.insert(sqlQuery);
-                    System.out.println("[SqlQuery]: " + sqlQuery);
-                }catch(InfException ex){
-                    System.out.println(ex.getMessage() + " if() sqlQuery, in updateEmailAdresses(), Customer.java");
-                }
+            try{
+                idb.insert(sqlQuery);
+                System.out.println("[SqlQuery]: " + sqlQuery);
+            }catch(InfException ex){
+                System.out.println(ex.getMessage() + " if() sqlQuery, in updateEmailAdresses(), Customer.java");
             }
         }
-        else if(emailAdresses.size() < unmodified.getEmailAdresses().size()){
-            System.out.println("TN ELSE IF!!!!!!!!!");
-            String sqlQuery = "";
-            ArrayList<String> emailAdressesToRemove = fetchEmailAdressesToRemove();
 
-            Iterator it = emailAdressesToRemove.iterator();
-            while(it.hasNext()){
-                sqlQuery = "DELETE FROM mail WHERE mail = '" + it.next() + "';";
+        System.out.println("TN ELSE IF!!!!!!!!!");
+        sqlQuery = "";
+        ArrayList<String> emailAdressesToRemove = fetchEmailAdressesToRemove();
 
-                try{
-                    idb.delete(sqlQuery);
-                    System.out.println("[SqlQuery]: " + sqlQuery);
-                }catch(InfException ex){
-                    System.out.println(ex.getMessage() + "else if() sqlQuery, in updateEmailAdresses(), Customer.java");
-                }
+        it = emailAdressesToRemove.iterator();
+        while(it.hasNext()){
+            sqlQuery = "DELETE FROM mail WHERE mail = '" + it.next() + "';";
+
+            try{
+                idb.delete(sqlQuery);
+                System.out.println("[SqlQuery]: " + sqlQuery);
+            }catch(InfException ex){
+                System.out.println(ex.getMessage() + "else if() sqlQuery, in updateEmailAdresses(), Customer.java");
             }
         }
+        
     }
 }

@@ -17,7 +17,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import static hattmakarna.data.Hattmakarna.idb;
 import javax.swing.*;
 import java.awt.*;
@@ -49,7 +48,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         orderData = getOrderMaterialData();
         
         initTable();
-
+        setLocationRelativeTo(null);
     }
     
     private void initTable(){
@@ -78,7 +77,8 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         HashMap<String, Double> orderMaterial = new HashMap<>();
 
         for (Hat hat : hatRegister.getAllHats()) {
-            if (!hat.getOrderId().equals(orderId)) continue;
+            
+            if (!hat.getOrderId().equals(orderId) || !hat.isSpecial()) continue;
 
             MaterialOrder mo = new MaterialOrder(hat.gethatId());
 
@@ -91,9 +91,10 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                 orderMaterial.merge(key, amount, Double::sum);
                 totalMaterial.merge(key, amount, Double::sum);
             }
+            orderData.put(orderId, orderMaterial);
         }
 
-        orderData.put(orderId, orderMaterial);
+        
     }
     return orderData;
 }
@@ -253,7 +254,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             //teckensnitt, srtl och radavstånd sätts samt startposition anges
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
             contentStream.beginText();
-            contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+            contentStream.setFont(PDType1Font.HELVETICA,12);
             contentStream.setLeading(14.5f);
             contentStream.newLineAtOffset(50, 700);
 

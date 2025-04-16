@@ -3,6 +3,8 @@ package hattmakarna.data;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import oru.inf.InfException;
 
@@ -20,7 +22,7 @@ public class Order extends DatabaseObject {
     private Date recived_date;
     private boolean material_ordered;
     private boolean isFastProduction;
-    
+
     /**
      * Tom standardkonstruktor.
      */
@@ -36,51 +38,6 @@ public class Order extends DatabaseObject {
     public Order(String orderId) {
         super(orderId);
 
-    }
-
-    /**
-     * Skapar en ny order i databasen med kopplade hattar och returnerar det nya
-     * order-ID:t.
-     *
-     * @param customer_id ID för kunden som gör beställningen
-     * @param hattar Lista med hatt-ID:n som ska kopplas till ordern
-     * @param totalPris Totala priset för ordern
-     * @param isFastProduction Om produktionen ska gå snabbare än normalt
-     * @return Det genererade order-ID:t som en sträng, eller null vid fel
-     */
-    @Deprecated
-    public static String createOrder(int customer_id, ArrayList<String> hattar,
-            double totalPris, boolean isFastProduction) {
-        try {
-            // Skapa dagens datum i SQL-format (yyyy-MM-dd)
-            String date = new java.text.SimpleDateFormat("yyyy-MM-dd")
-                    .format(new java.util.Date());
-
-            // Skapa INSERT-sats för att lägga in en ny order i sales_order-tabellen
-            String sql = String.format(Locale.US,
-                    "INSERT INTO sales_order (price, customer_id, status, recived_date) "
-                    + "VALUES (%.2f, %d, '%s', '%s');",
-                    totalPris, customer_id, Status.MOTTAGEN, date);
-
-            System.out.println(sql);
-
-            // Kör INSERT
-            hattmakarna.data.Hattmakarna.idb.insert(sql);
-
-            // Hämta det senast skapade order-ID:t för den kunden
-            String getOrderIdQuery = String.format(
-                    "SELECT order_id FROM sales_order "
-                    + "WHERE customer_id = %s ORDER BY order_id DESC LIMIT 1;",
-                    customer_id);
-
-            String id = Hattmakarna.idb.fetchSingle(getOrderIdQuery);
-
-            return id;
-
-        } catch (InfException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     /**
@@ -116,17 +73,34 @@ public class Order extends DatabaseObject {
         this.customer_id = customer_id;
     }
 
-    public ArrayList<String> getHattar() {
-        ArrayList<String> hattIds = new ArrayList<>();
+    public ArrayList<hattmakarna.data.Hat> getHattarObjects() {
+
+        ArrayList<Hat> hattar = new ArrayList<>();
+
         try {
             // Hämta alla hatt-id:n kopplade till denna order
-            hattIds = Hattmakarna.idb.fetchColumn(
-                    "SELECT hat_id FROM hat WHERE order_id = " + order_id);
+            Hattmakarna.idb.fetchColumn(
+                    "SELECT hat_id FROM hat WHERE order_id = " + order_id).forEach(h -> {
+                        hattar.add(new Hat(h));
+                    });
+
         } catch (InfException e) {
             e.printStackTrace();
         }
+        return hattar;
+    }
 
-        return hattIds;
+    public ArrayList<String> getHattar() {
+
+        try {
+            return Hattmakarna.idb.fetchColumn(
+                    "SELECT hat_id FROM hat WHERE order_id = " + order_id);
+        } catch (InfException ex) {
+            Logger.getLogger(Order.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return null;
+
     }
 
     public int getTotalPris() {
@@ -167,6 +141,10 @@ public class Order extends DatabaseObject {
 
     public boolean getMaterialOrdered() {
         return material_ordered;
+    }
+
+    public Customer getCustomer() {
+        return new Customer(String.valueOf(customer_id));
     }
 
     /**
