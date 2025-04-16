@@ -76,7 +76,6 @@ public class EditHat extends javax.swing.JFrame {
             }
         });
 
-        tfModelNumber.setText("Välj hatt du vill redigera ");
         tfModelNumber.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfModelNumberActionPerformed(evt);
@@ -114,8 +113,8 @@ public class EditHat extends javax.swing.JFrame {
                             .addComponent(lblPrice))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(tfModelNumber)
-                            .addComponent(tfPrice))
+                            .addComponent(tfPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 159, Short.MAX_VALUE)
+                            .addComponent(tfModelNumber))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
@@ -126,7 +125,7 @@ public class EditHat extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(130, 130, 130)
                         .addComponent(btnSettPrice)))
-                .addContainerGap(115, Short.MAX_VALUE))
+                .addContainerGap(98, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
