@@ -19,13 +19,14 @@ import oru.inf.InfException;
 public class Model {
 
     private String name;
-    private String price;
+    private double price;
     private String modelID;
 
+    
     public Model(HashMap<String, String> modelMap) {
         modelID = modelMap.get("model_id");
         name = modelMap.get("name");
-        price = modelMap.get("price");
+        price = Double.parseDouble(modelMap.get("price"));
     }
     
 
@@ -39,8 +40,8 @@ public class Model {
         }
     }
 
-    public void removeMaterial(String modelId) {
-        String sqlRemoveQuery = "DELETE FROM hat_model WHERE model_id = '" + modelId + "'";
+    public void removeMaterial(String modelID) {
+        String sqlRemoveQuery = "DELETE FROM hat_model WHERE model_id = '" + modelID + "'";
 
         try {
             idb.delete(sqlRemoveQuery);
@@ -57,7 +58,7 @@ public class Model {
         this.name = name;
     }
 
-    public String getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -65,11 +66,11 @@ public class Model {
         return modelID;
     }
 
-    public void setModelId(String modelId) {
-        this.modelID = modelId;
+    public void setModelId(String modelID) {
+        this.modelID = modelID;
     }
 
-    public void updatePrice(String newPrice) {
+    public void updatePrice(String modelID, double newPrice) {
         String sql = "UPDATE hat_model SET price = " + newPrice + " WHERE model_id = '" + modelID + "'";
 
         try {
@@ -79,6 +80,7 @@ public class Model {
             System.out.println("Fel vid uppdatering av pris: " + ex.getMessage());
         }
     }
+       
 
     public void updateName(String newName) {
         String sql = "UPDATE hat_model SET name = '" + newName + "' WHERE model_id = '" + modelID + "'";
