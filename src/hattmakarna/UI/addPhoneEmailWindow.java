@@ -25,7 +25,8 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
      * Creates new form addPhoneEmailWindow
      */
     public AddPhoneEmailWindow(Customer aCustomer, EmailOrPhone value, 
-            EditCustomer previousWindow) {
+            EditCustomer previousWindow) 
+    {
         initComponents();
         emailOrPhone = value;
         this.aCustomer = aCustomer;
@@ -86,11 +87,14 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblAdd)
                     .addComponent(btnAdd))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tfAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblAddError))
-                .addGap(32, 32, 32))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(tfAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblAddError)))
+                .addContainerGap(106, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -116,6 +120,12 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
                 if(!validateEmail(tfAdd.getText())){
                     lblAddError.setText("Emailadress ogilitig!");
                     lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
+                }
+                else if(aCustomer.hasEmail(tfAdd.getText())){
+                    lblAddError.setText("Emailadress finns redan!");
+                    lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
                 }
                 else{
                     aCustomer.addEmailAdress(tfAdd.getText());
@@ -131,6 +141,12 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
                     //Valideraren släpper igenom nummer med fler siffror än 10
                     lblAddError.setText("Telefonnummer ogilitigt!");
                     lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
+                }
+                else if(aCustomer.hasNumber(tfAdd.getText())){
+                    lblAddError.setText("Telefonnummret finns redan!");
+                    lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
                 }
                 else{
                     aCustomer.addTelephoneNumber(tfAdd.getText());
@@ -154,6 +170,7 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
         else{
             btnAdd.setEnabled(true);
         }
+        lblAddError.setVisible(false);
     }//GEN-LAST:event_tfAddKeyReleased
 
     
@@ -182,6 +199,12 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 

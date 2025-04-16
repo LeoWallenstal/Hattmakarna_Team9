@@ -37,7 +37,7 @@ public class Validerare {
     }
     
     public static boolean validateAdress(String adress){
-        return adress.matches("^[a-zA-Z0-9](?!.*[ ,\\-]{2})[a-zA-Z0-9 ,\\-]*[a-zA-Z0-9]$");
+        return adress.matches("^[a-zA-ZåäöÅÄÖ0-9](?!.*[ ,\\-]{2})[a-zA-ZåäöÅÄÖ0-9 ,\\-]*[a-zA-ZåäöÅÄÖ0-9]$");
     }
     
     
