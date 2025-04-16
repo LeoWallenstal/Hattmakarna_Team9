@@ -119,4 +119,21 @@ public class CustomerRegister {
         return allCustomers;
     }
     
+    public void add(Customer aCustomer){
+        if(!customerExists(aCustomer)){
+            //Debug
+            System.out.println(aCustomer + " was added");
+            allCustomers.add(aCustomer);
+        }
+    }
+    
+    public boolean customerExists(Customer aCustomer){
+        for(Customer registerCustomer : allCustomers){
+            if(registerCustomer.equals(aCustomer)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }
