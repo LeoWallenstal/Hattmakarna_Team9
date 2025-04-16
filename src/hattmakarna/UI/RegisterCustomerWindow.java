@@ -35,7 +35,6 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private Customer blankCustomer;
     private CustomerRegister customerRegister;
     private boolean saved = false;
-    private boolean unsavedChanges = false;
     
     
     public RegisterCustomerWindow(User user, OrderWindow lastWindow) {
@@ -56,68 +55,28 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         
         initCBCountry();
         
-        
         phoneModel = new ArrayList<String>();
-        for(int i = 0; i < jlPhone.getModel().getSize(); i++){
-            phoneModel.add(jlPhone.getModel().getElementAt(i));
-        }
         
         emailModel = new ArrayList<String>();
-        for(int i = 0; i < jlEmail.getModel().getSize(); i++){
-            emailModel.add(jlEmail.getModel().getElementAt(i));
-        }
+ 
         
-        
-        //Listeners
-        DocumentListener docListener = new DocumentListener() {
-            public void insertUpdate(DocumentEvent e) {
-                checkSaveButtonState();
-                checkUnsavedChanges();
-            }
-            public void removeUpdate(DocumentEvent e) { 
-                checkSaveButtonState();
-                checkUnsavedChanges();
-            }
-            public void changedUpdate(DocumentEvent e) { 
-                checkSaveButtonState();
-                checkUnsavedChanges();
-            }
-        };
-
-        tfFirstName.getDocument().addDocumentListener(docListener);
-        tfLastName.getDocument().addDocumentListener(docListener);
-        tfAdress.getDocument().addDocumentListener(docListener);
-        tfPostalCode.getDocument().addDocumentListener(docListener);
-        cbCountry.addActionListener( e -> checkSaveButtonState());
-        
-        dlPhoneModel.addListDataListener(new ListDataListener() {
-            public void contentsChanged(ListDataEvent e) { 
-                checkSaveButtonState();
-                checkUnsavedChanges();
-            }
-            public void intervalAdded(ListDataEvent e) { 
-                checkSaveButtonState(); 
-                checkUnsavedChanges();
-            }
-            public void intervalRemoved(ListDataEvent e) { 
-                checkSaveButtonState(); 
-                checkUnsavedChanges();
-            }
-        });
+        //Listener
+        tfFirstName.getDocument().addDocumentListener(new FormChangeListener());
+        tfLastName.getDocument().addDocumentListener(new FormChangeListener());
+        tfAdress.getDocument().addDocumentListener(new FormChangeListener());
+        tfPostalCode.getDocument().addDocumentListener(new FormChangeListener());
+        cbCountry.addActionListener(e -> checkFormCompletion());
         
         dlEmailModel.addListDataListener(new ListDataListener() {
-            public void contentsChanged(ListDataEvent e) { 
-                checkSaveButtonState();
-                checkUnsavedChanges();
-            }
-            public void intervalAdded(ListDataEvent e) { 
-                checkSaveButtonState();
-                checkUnsavedChanges();
-            }
-            public void intervalRemoved(ListDataEvent e) { 
-                checkSaveButtonState();
-                checkUnsavedChanges();
-            }
+            public void contentsChanged(ListDataEvent e) { checkFormCompletion(); }
+            public void intervalAdded(ListDataEvent e) { checkFormCompletion(); }
+            public void intervalRemoved(ListDataEvent e) { checkFormCompletion(); }
+        });
+
+        dlPhoneModel.addListDataListener(new ListDataListener() {
+            public void contentsChanged(ListDataEvent e) { checkFormCompletion(); }
+            public void intervalAdded(ListDataEvent e) { checkFormCompletion(); }
+            public void intervalRemoved(ListDataEvent e) { checkFormCompletion(); }
         });
         
     }
@@ -205,7 +164,10 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         btnGoBack = new javax.swing.JButton();
         lblCustomerSaved = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(653, 550));
+        setMinimumSize(new java.awt.Dimension(653, 550));
+        setPreferredSize(new java.awt.Dimension(653, 550));
+        setResizable(false);
         addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 formMouseClicked(evt);
@@ -320,8 +282,10 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         });
 
         lblPhoneError.setText("Ogiltigt telefonnummer!");
+        lblPhoneError.setPreferredSize(new java.awt.Dimension(128, 20));
 
         lblEmailError.setText("Ogiltig epostadress!");
+        lblEmailError.setPreferredSize(new java.awt.Dimension(128, 20));
 
         lblPhone.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         lblPhone.setText("Telefonnummer");
@@ -330,16 +294,22 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         lblEmail.setText("E-postadresser");
 
         lblAdressError.setText("Ogiltig adress!");
+        lblAdressError.setPreferredSize(new java.awt.Dimension(128, 20));
 
         lblPostalCodeError.setText("Ogiltigt postnummer!");
+        lblPostalCodeError.setPreferredSize(new java.awt.Dimension(128, 20));
 
         lblFirstNameError.setText("Ogiltigt namn!");
+        lblFirstNameError.setPreferredSize(new java.awt.Dimension(128, 20));
 
         lblLastNameError.setText("Ogiltigt namn!");
+        lblLastNameError.setPreferredSize(new java.awt.Dimension(128, 20));
 
         lblCountryError.setText("Land ej valt!");
+        lblCountryError.setPreferredSize(new java.awt.Dimension(128, 20));
 
         lblCustomerExistsError.setText("Den här kunden finns redan!");
+        lblCustomerExistsError.setPreferredSize(new java.awt.Dimension(164, 25));
 
         btnRemovePhone.setText("Ta bort");
         btnRemovePhone.setEnabled(false);
@@ -365,103 +335,87 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         });
 
         lblCustomerSaved.setText("Kund sparad!");
+        lblCustomerSaved.setPreferredSize(new java.awt.Dimension(70, 25));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGap(24, 24, 24)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lbltfPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblPhoneError, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(tfPhone, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lbltfPhone, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnAddPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lblPhoneError, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(tfPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnAddPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbltfEmail)
+                            .addComponent(lblEmailError, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(tfEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnAddEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(lblEmailError, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(tfEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnAddEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblFirstname)
+                                    .addComponent(tfFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblFirstNameError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(tfLastName, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblLastname)
+                                    .addComponent(lblLastNameError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lblRegistreraKund, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(lblAdress)
+                                    .addComponent(tfAdress, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblAdressError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblPostalCodeError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(tfPostalCode, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblPostnummer)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(lbltfEmail)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblCountry)
+                                    .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblCountryError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblPhone)
-                                    .addComponent(btnRemovePhone))
+                                    .addComponent(btnRemovePhone)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(btnGoBack)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(lblCustomerSaved, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblEmail)
+                                    .addComponent(btnRemoveEmail)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblEmail)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 279, Short.MAX_VALUE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(btnSave))
-                                            .addComponent(btnRemoveEmail))
-                                        .addGap(0, 17, Short.MAX_VALUE))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(lblFirstname)
-                                            .addComponent(tfFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lblFirstNameError))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(tfLastName, javax.swing.GroupLayout.PREFERRED_SIZE, 209, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lblLastname)
-                                            .addComponent(lblLastNameError)))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblRegistreraKund, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(lblCustomerExistsError))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(lblAdress)
-                                            .addComponent(tfAdress, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(lblAdressError))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(lblPostalCodeError)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(lblCountryError))
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(tfPostalCode, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                    .addComponent(lblPostnummer))
-                                                .addGap(43, 43, 43)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addComponent(lblCountry)
-                                                    .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap(18, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnGoBack)
-                .addGap(18, 18, 18)
-                .addComponent(lblCustomerSaved, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(btnSave))
+                                    .addComponent(lblCustomerExistsError, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addContainerGap(12, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(24, 24, 24)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblRegistreraKund, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblCustomerExistsError))
+                .addComponent(lblRegistreraKund, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblFirstname)
@@ -472,30 +426,31 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
                     .addComponent(tfLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblFirstNameError)
-                    .addComponent(lblLastNameError))
+                    .addComponent(lblFirstNameError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLastNameError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(23, 23, 23)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblAdress)
-                    .addComponent(lblPostnummer)
-                    .addComponent(lblCountry))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfAdress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tfPostalCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(31, 31, 31)
-                        .addComponent(lbltfEmail))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblAdress)
+                            .addComponent(lblPostnummer))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblAdressError)
-                            .addComponent(lblPostalCodeError)
-                            .addComponent(lblCountryError))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lbltfPhone)))
+                            .addComponent(tfAdress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfPostalCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblAdressError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblPostalCodeError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCountryError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblCountry)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(lbltfEmail)
+                    .addComponent(lbltfPhone, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(tfPhone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -505,8 +460,8 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblEmailError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblPhoneError))
-                .addGap(40, 40, 40)
+                    .addComponent(lblPhoneError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(43, 43, 43)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -521,11 +476,12 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnRemovePhone)
                     .addComponent(btnRemoveEmail))
-                .addGap(26, 26, 26)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGoBack)
-                    .addComponent(lblCustomerSaved))
-                .addContainerGap())
+                    .addComponent(lblCustomerSaved, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblCustomerExistsError, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -580,16 +536,19 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         }
         
         if(creationOK){
-            customerRegister.add(blankCustomer);
-            blankCustomer.insert();
-            saved = true;
-            lblCustomerSaved.setVisible(true);
-            reset();
-            
-            /*Dehär raderna var här sen innan jag(James) pillade om lite här, så
-            jag låter dem stå!*/
-            //lastWindow.refreshCustomers();
-            //lastWindow.setVisible(true);
+            if(!customerRegister.customerExists(blankCustomer)){
+                customerRegister.add(blankCustomer);
+                blankCustomer.insert();
+                saved = true;
+                reset();
+                lblCustomerSaved.setVisible(true);
+
+                lastWindow.refreshCustomers();
+            }
+            else{
+                creationOK = false;
+                lblCustomerExistsError.setVisible(true);
+            }
         }
         
     
@@ -633,8 +592,10 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
             dlPhoneModel.addElement(tfPhone.getText());
             blankCustomer.addTelephoneNumber(tfPhone.getText());
             phoneModel.add(tfPhone.getText());
+            
             tfPhone.setText("");
             btnAddPhone.setEnabled(false);
+            saved = false;
         }
         else{
             if(!validatePhoneNumber(tfPhone.getText())){
@@ -654,8 +615,10 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
             dlEmailModel.addElement(tfEmail.getText());
             blankCustomer.addEmailAdress(tfEmail.getText());
             emailModel.add(tfEmail.getText());
+            
             tfEmail.setText("");
             btnAddEmail.setEnabled(false);
+            saved = false;
         }
         else{
             if(!validateEmail(tfEmail.getText())){
@@ -672,30 +635,35 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         lblFirstNameError.setVisible(false);
         lblCustomerExistsError.setVisible(false);
         lblCustomerSaved.setVisible(false);
+        saved = false;
     }//GEN-LAST:event_tfFirstNameKeyPressed
 
     private void tfLastNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfLastNameKeyPressed
         lblLastNameError.setVisible(false);
         lblCustomerExistsError.setVisible(false);
         lblCustomerSaved.setVisible(false);
+        saved = false;
     }//GEN-LAST:event_tfLastNameKeyPressed
 
     private void tfAdressKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfAdressKeyPressed
         lblAdressError.setVisible(false);
         lblCustomerExistsError.setVisible(false);
         lblCustomerSaved.setVisible(false);
+        saved = false;
     }//GEN-LAST:event_tfAdressKeyPressed
 
     private void tfPostalCodeKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfPostalCodeKeyPressed
         lblPostalCodeError.setVisible(false);
         lblCustomerExistsError.setVisible(false);
         lblCustomerSaved.setVisible(false);
+        saved = false;
     }//GEN-LAST:event_tfPostalCodeKeyPressed
 
     private void cbCountryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCountryActionPerformed
         lblCountryError.setVisible(false);
         lblCustomerExistsError.setVisible(false);
         lblCustomerSaved.setVisible(false);
+        saved = false;
     }//GEN-LAST:event_cbCountryActionPerformed
 
     private void jlPhoneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlPhoneMouseClicked
@@ -720,6 +688,7 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         phoneModel.remove(jlPhone.getSelectedIndex());
         jlPhone.clearSelection();
         btnRemovePhone.setEnabled(false);
+        saved = false;
     }//GEN-LAST:event_btnRemovePhoneMouseClicked
 
     private void btnRemoveEmailMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnRemoveEmailMouseClicked
@@ -728,6 +697,7 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         emailModel.remove(jlEmail.getSelectedIndex());
         jlEmail.clearSelection();
         btnRemoveEmail.setEnabled(false);
+        saved = false;
     }//GEN-LAST:event_btnRemoveEmailMouseClicked
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
@@ -740,12 +710,16 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private void btnGoBackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGoBackMouseClicked
         /*NÅNTING HÄR KOMMA TILLBAKA TILL FÖRRA SKÄRMEN,
           KANSKE OCKSÅ NÅNTING OM OSPARADE ÄNDRINGAR!*/
-        if(saved && !unsavedChanges){
+        if(everythingIsEmpty() && !saved){
+            this.dispose();
+            return;
+        }
+        else if(saved && !hasChanges()){
             //DEBUG
             System.out.println("Allt är ok, och sparat.");
             //Gå tillbaka till något annat fönster
         }
-        else if(!saved && !unsavedChanges){
+        else if(!saved && hasChanges()){
             //DEBUG
             System.out.println("Inte sparat, och det finns osparade ändringar");
             Object[] options = {"Ja", "Nej"};
@@ -765,44 +739,44 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnGoBackMouseClicked
 
-    private void checkSaveButtonState(){
-        boolean tfsNotEmpty = !tfFirstName.getText().isEmpty() && 
-            !tfLastName.getText().isEmpty() && !tfAdress.getText().isEmpty() &&
-            !tfPostalCode.getText().isEmpty();
-        
-        boolean countrySelected = !cbCountry.getSelectedItem()
-            .toString().equals("Välj land...");
-        
-        boolean phoneListNotEmpty = jlPhone.getModel().getSize() > 0;
-        boolean emailListNotEmpty = jlEmail.getModel().getSize() > 0;
-        
-        btnSave.setEnabled(tfsNotEmpty && countrySelected && phoneListNotEmpty
-            && emailListNotEmpty);
-    }
-    
-    private void checkUnsavedChanges() {
-        boolean textFieldsChanged =
-            !tfFirstName.getText().equals(blankCustomer.getFirstName()) ||
-            !tfLastName.getText().equals(blankCustomer.getLastName()) ||
-            !tfAdress.getText().equals(blankCustomer.getAdress()) ||
-            !tfPostalCode.getText().equals(blankCustomer.getPostalCode());
+    private void checkFormCompletion() {
+        boolean textFieldsFilled = 
+            !tfFirstName.getText().trim().isEmpty() &&
+            !tfLastName.getText().trim().isEmpty() &&
+            !tfAdress.getText().trim().isEmpty() &&
+            !tfPostalCode.getText().trim().isEmpty();
 
-        boolean countryChanged = 
-            !cbCountry.getSelectedItem().toString().equals(blankCustomer.getCountry());
+        boolean countrySelected = 
+            cbCountry.getSelectedIndex() > 0; // Assuming index 0 is "Välj land..."
 
-        boolean phonesChanged =
-            !Util.contentEquals(blankCustomer.getTelephoneNumbers(), phoneModel);
+        boolean listsHaveItems = 
+            !dlEmailModel.isEmpty() && !dlPhoneModel.isEmpty();
 
-        boolean emailsChanged =
-            !Util.contentEquals(blankCustomer.getEmailAdresses(), emailModel);
+        boolean formComplete = textFieldsFilled && countrySelected && listsHaveItems;
 
-        boolean hasChanges = textFieldsChanged || countryChanged || phonesChanged || emailsChanged;
-
-        unsavedChanges = !hasChanges;
-        saved = !hasChanges;
+        btnSave.setEnabled(formComplete);
     }
     
     
+    private boolean everythingIsEmpty(){
+        return tfFirstName.getText().isEmpty() && tfLastName.getText().isEmpty()
+            && tfAdress.getText().isEmpty() && tfPostalCode.getText().isEmpty()
+            && cbCountry.getSelectedItem().toString().equals("Välj land...")
+            && phoneModel.isEmpty() && emailModel.isEmpty();
+    }
+    
+    private boolean hasChanges(){
+        boolean textFieldsSame = tfFirstName.getText().equals(blankCustomer.getFirstName())
+            && tfLastName.getText().equals(blankCustomer.getLastName())
+            && tfAdress.getText().equals(blankCustomer.getAdress())
+            && tfPostalCode.getText().equals(blankCustomer.getPostalCode());
+        boolean countrySame = cbCountry.getSelectedItem().toString()
+            .equals(blankCustomer.getCountry());
+        boolean listsSame = Util.contentEquals(emailModel, blankCustomer.getEmailAdresses())
+            && Util.contentEquals(phoneModel, blankCustomer.getTelephoneNumbers());
+        
+        return !(textFieldsSame && countrySame && listsSame); //returnerar true om något har förändrats
+    }
     
     private boolean numberAlreadyAdded(String telephoneNumber){
         for(int i = 0; i < dlPhoneModel.getSize(); i++){
@@ -821,6 +795,25 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         }
         return false;
     }
+    
+    private class FormChangeListener implements DocumentListener {
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            checkFormCompletion();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            checkFormCompletion();
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            checkFormCompletion();
+        }
+    }
+    
+    
     
     /**
      * @param args the command line arguments
