@@ -432,7 +432,7 @@ public class OrderWindow extends javax.swing.JFrame {
 
     private void btnNewCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewCustomerActionPerformed
         //this.setVisible(false);
-        new CustomerWindow(userLoggedIn, this).setVisible(true);
+        new RegisterCustomerWindow(userLoggedIn, this).setVisible(true);
         
     }//GEN-LAST:event_btnNewCustomerActionPerformed
 

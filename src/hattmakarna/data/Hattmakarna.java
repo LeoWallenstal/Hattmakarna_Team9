@@ -4,6 +4,7 @@
  */
 package hattmakarna.data;
 
+import hattmakarna.UI.RegisterCustomerWindow;
 import hattmakarna.UI.LogInWindow;
 import hattmakarna.data.Order;
 import hattmakarna.data.Specification;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import hattmakarna.UI.EditCustomer;
+import hattmakarna.UI.OrderWindow;
 
 import oru.inf.InfDB;
 import oru.inf.InfException;
@@ -38,7 +40,9 @@ public class Hattmakarna {
 		try {
 			connectToDB();
                         
-			new LogInWindow(idb).setVisible(true);
+			//new LogInWindow(idb).setVisible(true);
+                        User u1 = new User("1");
+                        new RegisterCustomerWindow(u1, new OrderWindow(u1)).setVisible(true);
 		} catch (InfException e) {
 			JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
 			e.printStackTrace();
