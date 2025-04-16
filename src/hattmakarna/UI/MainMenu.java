@@ -23,6 +23,12 @@ public class MainMenu extends javax.swing.JFrame {
         initComponents();
         setLocationRelativeTo(null);
         lblUserName.setText("Inloggad: " + userLoggedIn.getFirstName());
+        if(userLoggedIn.isAdmin()){
+            btnUsers.setVisible(true);
+        }
+        else{
+            btnUsers.setVisible(false);
+        }
     }
 
     /**
@@ -41,6 +47,7 @@ public class MainMenu extends javax.swing.JFrame {
         btnMaterial = new javax.swing.JButton();
         btnHat = new javax.swing.JButton();
         lblUserName = new javax.swing.JLabel();
+        btnUsers = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -84,6 +91,13 @@ public class MainMenu extends javax.swing.JFrame {
 
         lblUserName.setText("Inloggad: ");
 
+        btnUsers.setText("Hantera anställda");
+        btnUsers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUsersActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -96,7 +110,7 @@ public class MainMenu extends javax.swing.JFrame {
                             .addComponent(btnSignOut)
                             .addComponent(lblUserName))
                         .addGap(0, 511, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(btnCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -106,7 +120,9 @@ public class MainMenu extends javax.swing.JFrame {
                                 .addComponent(btnMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(lblCompanyName))
                         .addGap(33, 33, 33)
-                        .addComponent(btnHat, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnUsers, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnHat, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -122,7 +138,9 @@ public class MainMenu extends javax.swing.JFrame {
                     .addComponent(btnMaterial))
                 .addGap(14, 14, 14)
                 .addComponent(lblUserName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 247, Short.MAX_VALUE)
+                .addGap(1, 1, 1)
+                .addComponent(btnUsers)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 223, Short.MAX_VALUE)
                 .addComponent(btnSignOut)
                 .addContainerGap())
         );
@@ -158,6 +176,11 @@ public class MainMenu extends javax.swing.JFrame {
         new HattWindow().setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnHatActionPerformed
+
+    private void btnUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUsersActionPerformed
+        this.setVisible(false);
+        new EmployeesWindow(userLoggedIn).setVisible(true);
+    }//GEN-LAST:event_btnUsersActionPerformed
 
     /**
      * @param args the command line arguments
@@ -200,6 +223,7 @@ public class MainMenu extends javax.swing.JFrame {
     private javax.swing.JButton btnMaterial;
     private javax.swing.JButton btnOrder;
     private javax.swing.JButton btnSignOut;
+    private javax.swing.JButton btnUsers;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JLabel lblUserName;
     // End of variables declaration//GEN-END:variables
