@@ -31,7 +31,8 @@ public ModelRegister() {
   
     
     public ArrayList<Model> getAllHats(){
-        return allModels;
+        return initAllModels(Hattmakarna.idb);
+        
     }
 
     public Model getModel(String modelID){
