@@ -93,8 +93,8 @@ public class OrderWindow extends javax.swing.JFrame {
         this.userLoggedIn = userLoggedIn;
 
         btnRemoveCustomer.setEnabled(false);
-        
-        customerModel = (DefaultListModel<String>)customerJList.getModel();
+
+        customerModel = (DefaultListModel<String>) customerJList.getModel();
 
         totalPrice = 0;
         isExpress = false;
@@ -128,13 +128,6 @@ public class OrderWindow extends javax.swing.JFrame {
         btnChooseCustomer = new javax.swing.JButton();
         btnRemoveCustomer = new javax.swing.JButton();
         tabbedPane = new javax.swing.JTabbedPane();
-        paneStock = new javax.swing.JPanel();
-        scrollModel = new javax.swing.JScrollPane();
-        lstModels = new javax.swing.JList<>();
-        lblChooseModel = new javax.swing.JLabel();
-        btnAddOrder = new javax.swing.JButton();
-        spnAmount = new javax.swing.JSpinner();
-        jLabel3 = new javax.swing.JLabel();
         paneSpecial = new javax.swing.JPanel();
         lblHeaderSpecial = new javax.swing.JLabel();
         lblDescriptiom = new javax.swing.JLabel();
@@ -152,12 +145,19 @@ public class OrderWindow extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         materialList = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        paneOrder = new javax.swing.JPanel();
+        paneStock = new javax.swing.JPanel();
+        scrollModel = new javax.swing.JScrollPane();
+        lstModels = new javax.swing.JList<>();
+        lblChooseModel = new javax.swing.JLabel();
+        btnAddOrder = new javax.swing.JButton();
+        spnAmount = new javax.swing.JSpinner();
+        jLabel3 = new javax.swing.JLabel();
         tblOrder = new javax.swing.JScrollPane();
         tblSeeOrder = new javax.swing.JTable();
-        pnlSaveOrder = new javax.swing.JButton();
         lblTotalPrice = new javax.swing.JLabel();
         checkFastDelivery = new javax.swing.JCheckBox();
+        pnlSaveOrder = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         lblCustomerOrder = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -244,7 +244,7 @@ public class OrderWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnRemoveCustomer))
                             .addComponent(btnReturn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 96, Short.MAX_VALUE)))
+                        .addGap(0, 183, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         paneSidebarLayout.setVerticalGroup(
@@ -277,55 +277,6 @@ public class OrderWindow extends javax.swing.JFrame {
                 tabbedPaneMouseClicked(evt);
             }
         });
-
-        scrollModel.setViewportView(lstModels);
-
-        lblChooseModel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        lblChooseModel.setText("Välj modell");
-
-        btnAddOrder.setText("Lägg till i order");
-        btnAddOrder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddOrderActionPerformed(evt);
-            }
-        });
-
-        spnAmount.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
-
-        jLabel3.setText("Antal");
-
-        javax.swing.GroupLayout paneStockLayout = new javax.swing.GroupLayout(paneStock);
-        paneStock.setLayout(paneStockLayout);
-        paneStockLayout.setHorizontalGroup(
-            paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(paneStockLayout.createSequentialGroup()
-                .addGroup(paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnAddOrder)
-                    .addGroup(paneStockLayout.createSequentialGroup()
-                        .addComponent(spnAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(scrollModel)
-                    .addComponent(lblChooseModel))
-                .addGap(0, 678, Short.MAX_VALUE))
-        );
-        paneStockLayout.setVerticalGroup(
-            paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(paneStockLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblChooseModel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollModel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16)
-                .addGroup(paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(spnAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(18, 18, 18)
-                .addComponent(btnAddOrder)
-                .addContainerGap(221, Short.MAX_VALUE))
-        );
-
-        tabbedPane.addTab("Lagerförd", paneStock);
 
         lblHeaderSpecial.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lblHeaderSpecial.setText("Specialtillverkning");
@@ -398,31 +349,32 @@ public class OrderWindow extends javax.swing.JFrame {
                 .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblHeaderSpecial)
                     .addGroup(paneSpecialLayout.createSequentialGroup()
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(paneSpecialLayout.createSequentialGroup()
-                                .addComponent(lblSize)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cbxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(paneSpecialLayout.createSequentialGroup()
-                                .addComponent(lblSpecPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnAddSpecialToOrder)
-                            .addGroup(paneSpecialLayout.createSequentialGroup()
-                                .addComponent(lblPictureText, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnAddFile))
-                            .addComponent(lblDescriptiom))
-                        .addGap(18, 18, 18)
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jScrollPane3)
+                                .addGap(313, 313, 313))
                             .addGroup(paneSpecialLayout.createSequentialGroup()
                                 .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 390, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(add_material))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(lblDescriptiom)
+                                    .addComponent(btnAddSpecialToOrder))
+                                .addGap(536, 536, 536)))
+                        .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(paneSpecialLayout.createSequentialGroup()
+                        .addComponent(lblSize)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(paneSpecialLayout.createSequentialGroup()
+                        .addComponent(lblSpecPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(paneSpecialLayout.createSequentialGroup()
+                        .addComponent(lblPictureText, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnAddFile))
+                    .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(add_material)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         paneSpecialLayout.setVerticalGroup(
@@ -431,36 +383,84 @@ public class OrderWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(lblHeaderSpecial, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblDescriptiom)
-                    .addComponent(jLabel1))
+                .addComponent(lblDescriptiom)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(paneSpecialLayout.createSequentialGroup()
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lblPicture, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jScrollPane3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblSize)
-                            .addComponent(cbxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblSpecPrice)
-                            .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(21, 21, 21)
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblPictureText)
-                            .addComponent(btnAddFile))
-                        .addGap(32, 32, 32)
-                        .addComponent(btnAddSpecialToOrder))
-                    .addComponent(jScrollPane2))
+                    .addComponent(lblPicture, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(add_material)
-                .addContainerGap(109, Short.MAX_VALUE))
+                .addGap(9, 9, 9)
+                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSize)
+                    .addComponent(cbxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSpecPrice)
+                    .addComponent(txtPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(21, 21, 21)
+                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPictureText)
+                    .addComponent(btnAddFile))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnAddSpecialToOrder)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Specialmodell", paneSpecial);
+
+        scrollModel.setViewportView(lstModels);
+
+        lblChooseModel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblChooseModel.setText("Välj modell");
+
+        btnAddOrder.setText("Lägg till i order");
+        btnAddOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddOrderActionPerformed(evt);
+            }
+        });
+
+        spnAmount.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
+
+        jLabel3.setText("Antal");
+
+        javax.swing.GroupLayout paneStockLayout = new javax.swing.GroupLayout(paneStock);
+        paneStock.setLayout(paneStockLayout);
+        paneStockLayout.setHorizontalGroup(
+            paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(paneStockLayout.createSequentialGroup()
+                .addGroup(paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnAddOrder)
+                    .addGroup(paneStockLayout.createSequentialGroup()
+                        .addComponent(spnAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(scrollModel)
+                    .addComponent(lblChooseModel))
+                .addGap(0, 167, Short.MAX_VALUE))
+        );
+        paneStockLayout.setVerticalGroup(
+            paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(paneStockLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblChooseModel, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollModel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16)
+                .addGroup(paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(spnAmount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addGap(18, 18, 18)
+                .addComponent(btnAddOrder)
+                .addContainerGap(296, Short.MAX_VALUE))
+        );
+
+        tabbedPane.addTab("Lagerförd", paneStock);
 
         tblSeeOrder.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -475,13 +475,6 @@ public class OrderWindow extends javax.swing.JFrame {
         ));
         tblOrder.setViewportView(tblSeeOrder);
 
-        pnlSaveOrder.setText("Spara");
-        pnlSaveOrder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pnlSaveOrderActionPerformed(evt);
-            }
-        });
-
         lblTotalPrice.setText("Totalpris:");
 
         checkFastDelivery.setText("Snabbleverans");
@@ -491,41 +484,18 @@ public class OrderWindow extends javax.swing.JFrame {
             }
         });
 
-        lblCustomerOrder.setText("jLabel1");
+        pnlSaveOrder.setText("Spara");
+        pnlSaveOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pnlSaveOrderActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout paneOrderLayout = new javax.swing.GroupLayout(paneOrder);
-        paneOrder.setLayout(paneOrderLayout);
-        paneOrderLayout.setHorizontalGroup(
-            paneOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(paneOrderLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(checkFastDelivery)
-                .addGap(215, 215, 215)
-                .addComponent(lblTotalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(pnlSaveOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(tblOrder)
-            .addGroup(paneOrderLayout.createSequentialGroup()
-                .addComponent(lblCustomerOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        paneOrderLayout.setVerticalGroup(
-            paneOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, paneOrderLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tblOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(lblCustomerOrder)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 173, Short.MAX_VALUE)
-                .addGroup(paneOrderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(pnlSaveOrder)
-                    .addComponent(lblTotalPrice)
-                    .addComponent(checkFastDelivery))
-                .addContainerGap())
-        );
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setText("Order summering för kund: ");
 
-        tabbedPane.addTab("Se Order", paneOrder);
+        lblCustomerOrder.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblCustomerOrder.setText("jLabel4");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -534,12 +504,42 @@ public class OrderWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(paneSidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tabbedPane))
+                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tblOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(checkFastDelivery)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                        .addComponent(lblTotalPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pnlSaveOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblCustomerOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(paneSidebar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(tabbedPane)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(34, 34, 34)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(lblCustomerOrder))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tblOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTotalPrice)
+                    .addComponent(checkFastDelivery)
+                    .addComponent(pnlSaveOrder))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(tabbedPane, javax.swing.GroupLayout.PREFERRED_SIZE, 568, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 72, Short.MAX_VALUE))
         );
 
         pack();
@@ -556,46 +556,17 @@ public class OrderWindow extends javax.swing.JFrame {
         fillSearchResults();
     }//GEN-LAST:event_btnSearchActionPerformed
 
-    private void btnAddFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFileActionPerformed
-        tmp_spec_image_holder = Specification.setFileFromUser();
-    }//GEN-LAST:event_btnAddFileActionPerformed
-
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
         new MainMenu(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnReturnActionPerformed
 
-    private void btnAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddOrderActionPerformed
-        fillStockHatToOrder();
-    }//GEN-LAST:event_btnAddOrderActionPerformed
-
-    private void btnAddSpecialToOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddSpecialToOrderActionPerformed
-        fillSpecHatToOrder();
-    }//GEN-LAST:event_btnAddSpecialToOrderActionPerformed
-
-    private void checkFastDeliveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkFastDeliveryActionPerformed
-        isExpress = checkFastDelivery.isSelected();
-
-        if (isExpress) {
-            totalPrice = originalTotalPrice * 1.2; // +20%
-        } else {
-            totalPrice = originalTotalPrice; // tillbaka till utan express
-        }
-
-        lblTotalPrice.setText("Totalpris: " + totalPrice + " kr");
-
-    }//GEN-LAST:event_checkFastDeliveryActionPerformed
-
-    private void pnlSaveOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pnlSaveOrderActionPerformed
-        saveOrder();
-    }//GEN-LAST:event_pnlSaveOrderActionPerformed
-
     private void btnChooseCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseCustomerActionPerformed
         selectCustomer();
     }//GEN-LAST:event_btnChooseCustomerActionPerformed
 
-    private void add_materialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add_materialActionPerformed
-      MaterialPassContainer pass = new MaterialPassContainer();
+    private void add_materialActionPerformed() {
+        MaterialPassContainer pass = new MaterialPassContainer();
         new PickMaterialDialog(pass);
 
         if (pass.m == null) {
@@ -620,46 +591,103 @@ public class OrderWindow extends javax.swing.JFrame {
             renderMaterial();
         }
 
-
     }
-  
-    private void btnRemoveCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveCustomerActionPerformed
-            //Dialogfönster
-            int customerIndex = customerJList.getSelectedIndex();
-            Customer toRemove = customerRegister.getCustomer(customerIndex);
-            Object[] options = {"Ja", "Nej"};
 
-            int result = JOptionPane.showOptionDialog(this, 
-                ("Är du säker på att du vill ta bort " + toRemove.getFullName() + "?"), 
-                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, 
+    private void btnRemoveCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveCustomerActionPerformed
+        //Dialogfönster
+        int customerIndex = customerJList.getSelectedIndex();
+        Customer toRemove = customerRegister.getCustomer(customerIndex);
+        Object[] options = {"Ja", "Nej"};
+
+        int result = JOptionPane.showOptionDialog(this,
+                ("Är du säker på att du vill ta bort " + toRemove.getFullName() + "?"),
+                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
                 null, options, options[0]);
 
-            if (result == 0) {
-                /* "Ja" klickades, 
+        if (result == 0) {
+            /* "Ja" klickades, 
                     tar bort den kunden och stänger dialogen. */
-                customerModel.remove(customerIndex);
-                customerRegister.remove(customerIndex);
-                toRemove.delete();
-            } 
-            else if (result == 1) {
-                customerJList.clearSelection();
-                btnRemoveCustomer.setEnabled(false);
-            }
+            customerModel.remove(customerIndex);
+            customerRegister.remove(customerIndex);
+            toRemove.delete();
+        } else if (result == 1) {
+            customerJList.clearSelection();
+            btnRemoveCustomer.setEnabled(false);
+        }
     }//GEN-LAST:event_btnRemoveCustomerActionPerformed
 
     private void customerJListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_customerJListMouseClicked
         btnRemoveCustomer.setEnabled(true);
     }//GEN-LAST:event_customerJListMouseClicked
 
+    private void paneSidebarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneSidebarMouseClicked
+        btnRemoveCustomer.setEnabled(false);
+        customerJList.clearSelection();
+    }//GEN-LAST:event_paneSidebarMouseClicked
+
+    private void checkFastDeliveryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkFastDeliveryActionPerformed
+        isExpress = checkFastDelivery.isSelected();
+
+        if (isExpress) {
+            totalPrice = originalTotalPrice * 1.2; // +20%
+        } else {
+            totalPrice = originalTotalPrice; // tillbaka till utan express
+        }
+
+        lblTotalPrice.setText("Totalpris: " + totalPrice + " kr");
+    }//GEN-LAST:event_checkFastDeliveryActionPerformed
+
+    private void pnlSaveOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pnlSaveOrderActionPerformed
+        saveOrder();
+    }//GEN-LAST:event_pnlSaveOrderActionPerformed
+
     private void tabbedPaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabbedPaneMouseClicked
         btnRemoveCustomer.setEnabled(false);
         customerJList.clearSelection();
     }//GEN-LAST:event_tabbedPaneMouseClicked
 
-    private void paneSidebarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneSidebarMouseClicked
-        btnRemoveCustomer.setEnabled(false);
-        customerJList.clearSelection();
-    }//GEN-LAST:event_paneSidebarMouseClicked
+    private void btnAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddOrderActionPerformed
+        fillStockHatToOrder();
+    }//GEN-LAST:event_btnAddOrderActionPerformed
+
+    private void add_materialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add_materialActionPerformed
+        MaterialPassContainer pass = new MaterialPassContainer();
+        new PickMaterialDialog(pass);
+
+        if (pass.m == null) {
+            return;
+        }
+
+        boolean contains = false;
+        for (MaterialHat m : tmp_materials) {
+            if (pass.m.getMaterialID().equals(String.valueOf(m.getMaterial_id()))) {
+                contains = true;
+                break;
+            }
+        }
+
+        if (!contains) {
+            MaterialHat mh = new MaterialHat();
+            mh.setMaterial_id(Integer.parseInt(pass.m.getMaterialID()));
+
+            // mh.setHat_id();
+            tmp_materials.add(mh);
+
+            renderMaterial();
+        }
+     }//GEN-LAST:event_add_materialActionPerformed
+
+    private void txtPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPriceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtPriceActionPerformed
+
+    private void btnAddSpecialToOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddSpecialToOrderActionPerformed
+        fillSpecHatToOrder();
+    }//GEN-LAST:event_btnAddSpecialToOrderActionPerformed
+
+    private void btnAddFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFileActionPerformed
+        tmp_spec_image_holder = Specification.setFileFromUser();
+    }//GEN-LAST:event_btnAddFileActionPerformed
 
     private void saveSpecOrder() {
         Specification specification = new Specification();
@@ -693,8 +721,7 @@ public class OrderWindow extends javax.swing.JFrame {
             renderMaterial();
         }
 
-
-    }//GEN-LAST:event_add_materialActionPerformed
+    }
 
     private void renderMaterial() {
         materialList.removeAll();
@@ -750,10 +777,6 @@ public class OrderWindow extends javax.swing.JFrame {
         materialList.revalidate();
         materialList.repaint();
     }
-
-    private void txtPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPriceActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtPriceActionPerformed
 
     private void saveOrder() {
         try {
@@ -895,6 +918,7 @@ public class OrderWindow extends javax.swing.JFrame {
             hat.setSize("one-size");
             hat.setModelId(mId);
             hat.setPrice(hat.getModel().getPrice());
+            hat.setIsSpecial(false);
             hatsToOrder.add(hat);
         }
 
@@ -980,6 +1004,7 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JCheckBox checkFastDelivery;
     private javax.swing.JList<String> customerJList;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -997,7 +1022,6 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JLabel lblTotalPrice;
     private javax.swing.JList<String> lstModels;
     private javax.swing.JPanel materialList;
-    private javax.swing.JPanel paneOrder;
     private javax.swing.JPanel paneSidebar;
     private javax.swing.JPanel paneSpecial;
     private javax.swing.JPanel paneStock;
@@ -1030,6 +1054,8 @@ public class OrderWindow extends javax.swing.JFrame {
             e.getKey().getMaterials().forEach(mh -> {
                 materialListString.append(mh.getMaterial().getName()).append(", ");
             });
+
+            System.out.println(e.getKey().getModel().getName());
 
             ((DefaultTableModel) tblSeeOrder.getModel()).addRow(new Object[]{
                 e.getKey().getModel().getName(),

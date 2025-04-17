@@ -49,6 +49,9 @@ public class Hat extends DatabaseObject {
 
             if (specId != null && specId.isEmpty()) {
                 specification = new Specification(specId);
+                isSpecial = true;
+            } else {
+                isSpecial = false;
             }
 
             materials = new ArrayList<>();
@@ -134,10 +137,12 @@ public class Hat extends DatabaseObject {
             return false;
         }
 
+        if (!isSpecial) {
+            return true;
+        }
+
         Hat h = (Hat) e;
-
         return h.getHatId() == this.getHatId();
-
     }
 
     public String getHatId() {
@@ -161,11 +166,13 @@ public class Hat extends DatabaseObject {
     }
 
     public void setIsSpecial(boolean isSpecial) {
+        System.out.println(isSpecial);
         this.isSpecial = isSpecial;
     }
 
     @Override
     public int hashCode() {
+
         if (!isSpecial) {
             return Objects.hash(hat_id, model_id, 0);
         } else {
