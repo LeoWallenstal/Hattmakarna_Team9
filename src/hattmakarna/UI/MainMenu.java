@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicComboBoxUI;
 import oru.inf.InfException;
 
 /**
@@ -45,7 +46,7 @@ public class MainMenu extends javax.swing.JFrame {
         tasks = taskRegister.getTasks();
         taskCells = new ArrayList<>();
         startDate = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
-        monthChooser = new JMonthChooser();
+        monthChooser = new JMonthChooser(false);
         yearChooser = new JYearChooser();
 
         setupYearChooserListener();
@@ -67,27 +68,37 @@ public class MainMenu extends javax.swing.JFrame {
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Locale locale = Locale.forLanguageTag("sv-SE");
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
         topPanel.setOpaque(false);
         topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
 
-        JLabel yearLabel = new JLabel("År: ");
         yearChooser.setYear(startDate.getYear());
-        yearChooser.setPreferredSize(new Dimension(60, 25));
-        yearLabel.setFont(font);
+        yearChooser.setPreferredSize(new Dimension(70, 25));
         yearChooser.setFont(font);
 
-        JLabel monthLabel = new JLabel("Månad: ");
+        JComboBox<?> comboBox = (JComboBox) monthChooser.getComboBox();
+        comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        comboBox.setPreferredSize(new Dimension(120, 25));
+        comboBox.setUI(new BasicComboBoxUI() {
+            @Override
+            protected JButton createArrowButton() {
+                JButton button = new JButton("▼");
+                button.setBorder(BorderFactory.createEmptyBorder());
+                return button;
+            }
+        });
+
         monthChooser.setMonth(startDate.getMonthValue() - 1);
-        monthChooser.setPreferredSize(new Dimension(110, 25));
         monthChooser.setLocale(locale);
-        monthLabel.setFont(font);
         monthChooser.setFont(font);
 
-        topPanel.add(yearLabel);
+        topPanel.add(jButton1);
+        topPanel.add(Box.createHorizontalStrut(170));
         topPanel.add(yearChooser);
-        topPanel.add(monthLabel);
+        topPanel.add(Box.createHorizontalStrut(20));
         topPanel.add(monthChooser);
+        topPanel.add(Box.createHorizontalStrut(170));
+        topPanel.add(jButton2);
         return topPanel;
     }
 
@@ -103,59 +114,66 @@ public class MainMenu extends javax.swing.JFrame {
     }
 
     private JPanel createCalendarDays(HashMap<LocalDate, ArrayList<Task>> taskDates) {
-        JPanel daysPanel = new JPanel(new GridLayout(1, 7, 0, 0));
-        daysPanel.setOpaque(false);
+    JPanel daysPanel = new JPanel(new GridLayout(1, 7, 0, 0));
+    daysPanel.setOpaque(false);
 
-        for (int i = 0; i < 7; i++) {
-            JPanel dayColumn = new JPanel(new GridLayout(7, 1, 0, 0));
-            dayColumn.setOpaque(false);
+    for (int i = 0; i < 7; i++) {
+        JPanel dayColumn = new JPanel(new GridLayout(7, 1, 0, 0));
+        dayColumn.setOpaque(false);
 
-            if (i < 6) {
-                dayColumn.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK));
-            } else {
-                dayColumn.setBorder(null);
-            }
-
-            LocalDate day = startDate.plusDays(i);
-            ArrayList<Task> tasksForThisDay;
-            tasksForThisDay = taskDates.getOrDefault(day, new ArrayList<>());
-            if (taskDates.containsKey(day)) {
-
-                System.out.println("Datumet hittat: " + day);
-            } else {
-                System.out.println("Inget på: " + day);
-            }
-            Locale locale = Locale.forLanguageTag("sv-SE");
-            String weekdayName = day.getDayOfWeek().getDisplayName(TextStyle.SHORT, locale);
-            String labelText = weekdayName + " " + day.getDayOfMonth();
-
-            JLabel weekday = new JLabel(labelText, SwingConstants.CENTER);
-            weekday.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-            dayColumn.add(weekday);
-
-            for (int n = 0; n < 6; n++) {
-                JPanel taskPanel = new JPanel(new BorderLayout());
-                taskPanel.setOpaque(false);
-                if (n < 5) {
-                    taskPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-                }
-                JLabel taskLabel = new JLabel();
-                if (n < tasksForThisDay.size()) {
-                    Task task = tasksForThisDay.get(n);
-                    int taskId = task.getTaskId();
-                    taskLabel = new JLabel(String.valueOf(taskId), SwingConstants.CENTER);
-                    taskLabel.setVerticalAlignment(SwingConstants.CENTER);
-                    taskPanel.setBackground(Color.GRAY);
-                    taskPanel.setOpaque(true);
-                }
-                taskCells.add(taskPanel);
-                taskPanel.add(taskLabel);
-                dayColumn.add(taskPanel, BorderLayout.CENTER);
-            }
-            daysPanel.add(dayColumn);
+        if (i < 6) {
+            dayColumn.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK));
         }
-        return daysPanel;
+
+        LocalDate day = startDate.plusDays(i);
+        ArrayList<Task> tasksForThisDay = taskDates.getOrDefault(day, new ArrayList<>());
+        Locale locale = Locale.forLanguageTag("sv-SE");
+        String weekdayName = day.getDayOfWeek().getDisplayName(TextStyle.SHORT, locale);
+        String labelText = weekdayName + " " + day.getDayOfMonth();
+
+        JLabel weekday = new JLabel(labelText, SwingConstants.CENTER);
+        weekday.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+        dayColumn.add(weekday);
+
+        for (int n = 0; n < 6; n++) {
+            JPanel cell = new JPanel(new BorderLayout());
+            cell.setOpaque(false);
+            if (n < 5) {
+                cell.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
+            }
+
+            if (n < tasksForThisDay.size()) {
+                Task task = tasksForThisDay.get(n);
+                JPanel draggablePanel = createTaskPanel(task);
+                makeDraggable(draggablePanel);
+                cell.add(draggablePanel, BorderLayout.CENTER);
+            }
+
+            taskCells.add(cell);
+            dayColumn.add(cell);
+        }
+
+        daysPanel.add(dayColumn);
     }
+
+    return daysPanel;
+}
+    
+    private JPanel createTaskPanel(Task task) {
+    JPanel panel = new JPanel(new BorderLayout());
+    panel.setBackground(Color.LIGHT_GRAY);
+    panel.setOpaque(true);
+
+    JLabel label = new JLabel(String.valueOf(task.getTaskId()), SwingConstants.CENTER);
+    label.setVerticalAlignment(SwingConstants.CENTER);
+    panel.add(label, BorderLayout.CENTER);
+    
+    String toolTip = "Placeholder för tooltip. Kanske lägga till någon beskrivning här? :)\nKan man skriva flera rader?\nJa tydligen";
+    panel.setToolTipText(toolTip);
+    return panel;
+}
+
+
 
     private void initSchedule() {
         calendarPanel.removeAll();
@@ -170,6 +188,7 @@ public class MainMenu extends javax.swing.JFrame {
         calendarPanel.add(daysPanel, BorderLayout.CENTER);
         calendarPanel.revalidate();
         calendarPanel.repaint();
+ 
     }
 
     public void initOrders() {
@@ -219,7 +238,7 @@ public class MainMenu extends javax.swing.JFrame {
             int slotHeight = totalHeight / 8;
             int slotWidth = totalWidth / 7;
 
-            Dimension taskSize = new Dimension(slotWidth-1, slotHeight-1);
+            Dimension taskSize = new Dimension(slotWidth - 1, slotHeight - 1);
             item.setPreferredSize(taskSize);
             item.setBackground(Color.LIGHT_GRAY);
             item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -264,8 +283,8 @@ public class MainMenu extends javax.swing.JFrame {
         btnUsers = new javax.swing.JButton();
         calendarPanel = new javax.swing.JPanel();
         scrollOrders = new javax.swing.JScrollPane();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 600));
@@ -324,19 +343,29 @@ public class MainMenu extends javax.swing.JFrame {
                 calendarPanelMouseWheelMoved(evt);
             }
         });
-        calendarPanel.setLayout(new java.awt.BorderLayout());
 
-        jButton1.setText("<");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        javax.swing.GroupLayout calendarPanelLayout = new javax.swing.GroupLayout(calendarPanel);
+        calendarPanel.setLayout(calendarPanelLayout);
+        calendarPanelLayout.setHorizontalGroup(
+            calendarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 613, Short.MAX_VALUE)
+        );
+        calendarPanelLayout.setVerticalGroup(
+            calendarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 276, Short.MAX_VALUE)
+        );
 
         jButton2.setText(">");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("<");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -364,17 +393,17 @@ public class MainMenu extends javax.swing.JFrame {
                         .addComponent(btnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
                         .addComponent(btnMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 153, Short.MAX_VALUE)
                         .addComponent(btnUsers)
                         .addGap(20, 20, 20)
                         .addComponent(btnHat, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(scrollOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton1)
-                                .addGap(569, 569, 569)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton2))
                             .addComponent(calendarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
@@ -397,11 +426,11 @@ public class MainMenu extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(scrollOrders, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
                     .addComponent(calendarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(12, 12, 12)
                 .addComponent(btnSignOut)
                 .addContainerGap())
         );
@@ -548,6 +577,7 @@ public class MainMenu extends javax.swing.JFrame {
                         );
 
                         ghostPanel.setLocation(cellPos);
+                        panel.setBorder(null);
 
                         closestCell.removeAll();
                         closestCell.add(panel);
