@@ -6,6 +6,7 @@ package hattmakarna.UI;
 
 import hattmakarna.data.User;
 import hattmakarna.util.Validerare;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -24,10 +25,12 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
         this.window = window;
         lblError.setVisible(false);
         setLocationRelativeTo(null);
+        btnAdd.setEnabled(false);
+        pfPassword.setEchoChar('*');
     }
     
     public boolean fieldsCorrect(){
-        if(tfFirstName.getText().isEmpty() || tfLastName.getText().isEmpty() || tfEmail.getText().isEmpty() || tfPassword.getText().isEmpty()){
+        if(tfFirstName.getText().isEmpty() || tfLastName.getText().isEmpty() || tfEmail.getText().isEmpty() || pfPassword.getText().isEmpty()){
             lblError.setVisible(true);
             lblError.setText("Fyll i samtliga fält!");
             return false;
@@ -54,10 +57,9 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
             newUser.setFirstName(tfFirstName.getText());
             newUser.setLastName(tfLastName.getText());
             newUser.setEmail(tfEmail.getText());
-            newUser.setPWCandidate(tfPassword.getText());
-            
-            newUser.create();
-            
+            newUser.setPWCandidate(pfPassword.getText());
+            newUser.create();  
+            this.setVisible(false);
         }
     }
 
@@ -77,11 +79,12 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
         tfFirstName = new javax.swing.JTextField();
         tfLastName = new javax.swing.JTextField();
         tfEmail = new javax.swing.JTextField();
-        tfPassword = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
         btnAdd = new javax.swing.JButton();
         lblError = new javax.swing.JLabel();
+        pfPassword = new javax.swing.JPasswordField();
+        tbtnShowPassword = new javax.swing.JToggleButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,6 +95,29 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
         lblEmail.setText("E-post:");
 
         lblPassword.setText("Lösenord:");
+
+        tfFirstName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfFirstNameActionPerformed(evt);
+            }
+        });
+        tfFirstName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tfFirstNameKeyTyped(evt);
+            }
+        });
+
+        tfLastName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tfLastNameKeyTyped(evt);
+            }
+        });
+
+        tfEmail.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tfEmailKeyTyped(evt);
+            }
+        });
 
         jLabel1.setText("Lägg till en anställd");
 
@@ -111,6 +137,19 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
 
         lblError.setText("jLabel2");
 
+        pfPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                pfPasswordKeyTyped(evt);
+            }
+        });
+
+        tbtnShowPassword.setText("Visa");
+        tbtnShowPassword.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbtnShowPasswordActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -125,16 +164,18 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblLastName)
                                     .addComponent(lblPassword)
-                                    .addComponent(lblFirstName))
+                                    .addComponent(lblFirstName)
+                                    .addComponent(lblEmail))
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(tfPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
-                                    .addComponent(tfEmail)
+                                    .addComponent(tfEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
                                     .addComponent(tfLastName)
-                                    .addComponent(tfFirstName))))
+                                    .addComponent(tfFirstName)
+                                    .addComponent(pfPassword))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(tbtnShowPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
@@ -165,8 +206,9 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblPassword)
-                    .addComponent(tfPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                    .addComponent(pfPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tbtnShowPassword))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBack)
                     .addComponent(btnAdd)
@@ -178,14 +220,58 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        this.setVisible(false);
+        if(!tfFirstName.getText().isEmpty() || !tfLastName.getText().isEmpty() 
+            || !tfEmail.getText().isEmpty() || !pfPassword.getText().isEmpty()){
+            
+            Object[] options = {"Ja", "Nej"};
+            
+            int result = JOptionPane.showOptionDialog(this, "Du har osparade ändringar! Vill du fortsätta utan att spara?", 
+                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            
+            if(result == 0){
+                this.setVisible(false);
+            }
+        }
+        else{
+            this.setVisible(false);
+        }
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         addEmployee();
-        window.fillTable();
-        this.setVisible(false);
+        window.fillTable();     
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void tfFirstNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfFirstNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfFirstNameActionPerformed
+
+    private void tfFirstNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfFirstNameKeyTyped
+        btnAdd.setEnabled(true);
+    }//GEN-LAST:event_tfFirstNameKeyTyped
+
+    private void tfLastNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfLastNameKeyTyped
+        btnAdd.setEnabled(true);
+    }//GEN-LAST:event_tfLastNameKeyTyped
+
+    private void tfEmailKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfEmailKeyTyped
+        btnAdd.setEnabled(true);
+    }//GEN-LAST:event_tfEmailKeyTyped
+
+    private void tbtnShowPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbtnShowPasswordActionPerformed
+        if (pfPassword.getEchoChar() == '*') {
+            pfPassword.setEchoChar((char) 0);
+            tbtnShowPassword.setText("Dölj");
+        }       
+        else {
+            pfPassword.setEchoChar('*'); 
+            tbtnShowPassword.setText("Visa");
+        }
+    }//GEN-LAST:event_tbtnShowPasswordActionPerformed
+
+    private void pfPasswordKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pfPasswordKeyTyped
+        btnAdd.setEnabled(true);
+    }//GEN-LAST:event_pfPasswordKeyTyped
 
     /**
      * @param args the command line arguments
@@ -232,9 +318,10 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
     private javax.swing.JLabel lblFirstName;
     private javax.swing.JLabel lblLastName;
     private javax.swing.JLabel lblPassword;
+    private javax.swing.JPasswordField pfPassword;
+    private javax.swing.JToggleButton tbtnShowPassword;
     private javax.swing.JTextField tfEmail;
     private javax.swing.JTextField tfFirstName;
     private javax.swing.JTextField tfLastName;
-    private javax.swing.JTextField tfPassword;
     // End of variables declaration//GEN-END:variables
 }
