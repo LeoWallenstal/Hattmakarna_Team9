@@ -15,53 +15,52 @@ import hattmakarna.data.Model;
 import hattmakarna.data.ModelRegister;
 import javax.swing.JOptionPane;
 import hattmakarna.data.Customer;
+import static hattmakarna.data.Hattmakarna.idb;
 
 /**
  *
  * @author linahanssons
  */
 public class CustomerInformationWindow extends javax.swing.JFrame {
-    private InfDB idb;
     private CustomerRegister customerRegister;
-    
 
     /**
      * Creates new form CustomerInformationWindow
      */
     public CustomerInformationWindow() {
+        this.customerRegister = new CustomerRegister();
+        fillTable();
+        initComponents();
         
-        this.idb = hattmakarna.data.Hattmakarna.idb;
-        this.customerRegister = new CustomerRegister(idb);
-         fillTable();
-          initComponents();
         try{
-        ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
-        cbMail.removeAllItems();
-        for (String mail : mailList){
-        cbMail.addItem(mail);
+            ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
+            cbMail.removeAllItems();
+            for (String mail : mailList){
+                cbMail.addItem(mail);
+            }
+        } 
+        catch (InfException e) {
+            JOptionPane.showMessageDialog(this,"kunde inte hämta mail" + e.getMessage());
         }
-        } catch (InfException e) {
-        JOptionPane.showMessageDialog(this,"kunde inte hämta mail" + e.getMessage());
-        }
-        try {
-    ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
-
-    cbName.removeAllItems();
-    
-
-    for (HashMap<String, String> row : customerRows) {
-        String fName = row.get("first_name");
-        String lName = row.get("last_name");
         
-        String comboText = fName + " " + lName;
-        cbName.addItem(comboText);
-    }
-     } catch (InfException e) {
-        JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
-        }
+        try {
+            ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
+            cbName.removeAllItems();
 
+            for (HashMap<String, String> row : customerRows) {
+                String fName = row.get("first_name");
+                String lName = row.get("last_name");
+
+                String comboText = fName + " " + lName;
+                cbName.addItem(comboText);
+            }
+        } catch (InfException e) {
+            JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
+        }
     }
+    
     private void fillTable() {
+        //DEBUG
         System.out.println("fillTableKörs");
         ArrayList <Customer> customers = customerRegister.getAllCustomers();
         
@@ -81,7 +80,7 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         }
         
         javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
-            public boolean isCekkEditable(int row, int column) {
+            public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
