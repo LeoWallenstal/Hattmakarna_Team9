@@ -63,11 +63,7 @@ public class MainMenu extends javax.swing.JFrame {
         }
     }
 
-    private void initSchedule() {
-        calendarPanel.removeAll();
-        calendarPanel.setLayout(new BorderLayout());
-        calendarPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-
+    private JPanel setupCalendarTopPanel() {
         Font font = new Font("SansSerif", Font.BOLD, 16);
         Locale locale = Locale.forLanguageTag("sv-SE");
 
@@ -92,10 +88,10 @@ public class MainMenu extends javax.swing.JFrame {
         topPanel.add(yearChooser);
         topPanel.add(monthLabel);
         topPanel.add(monthChooser);
+        return topPanel;
+    }
 
-        JPanel daysPanel = new JPanel(new GridLayout(1, 7, 0, 0));
-        daysPanel.setOpaque(false);
-
+    private HashMap<LocalDate, ArrayList<Task>> createTaskDateMap() {
         HashMap<LocalDate, ArrayList<Task>> taskDates = new HashMap<>();
         for (Task aTask : tasks) {
             LocalDate date = aTask.getStartDate().toInstant()
@@ -103,6 +99,12 @@ public class MainMenu extends javax.swing.JFrame {
                     .toLocalDate();
             taskDates.computeIfAbsent(date, k -> new ArrayList<>()).add(aTask);
         }
+        return taskDates;
+    }
+
+    private JPanel createCalendarDays(HashMap<LocalDate, ArrayList<Task>> taskDates) {
+        JPanel daysPanel = new JPanel(new GridLayout(1, 7, 0, 0));
+        daysPanel.setOpaque(false);
 
         for (int i = 0; i < 7; i++) {
             JPanel dayColumn = new JPanel(new GridLayout(7, 1, 0, 0));
@@ -115,15 +117,15 @@ public class MainMenu extends javax.swing.JFrame {
             }
 
             LocalDate day = startDate.plusDays(i);
-            ArrayList<Task> tasksForThisDay= null;
+            ArrayList<Task> tasksForThisDay;
             tasksForThisDay = taskDates.getOrDefault(day, new ArrayList<>());
-            if (taskDates.containsValue(day)) {
-               
+            if (taskDates.containsKey(day)) {
+
                 System.out.println("Datumet hittat: " + day);
             } else {
                 System.out.println("Inget på: " + day);
             }
-
+            Locale locale = Locale.forLanguageTag("sv-SE");
             String weekdayName = day.getDayOfWeek().getDisplayName(TextStyle.SHORT, locale);
             String labelText = weekdayName + " " + day.getDayOfMonth();
 
@@ -137,22 +139,32 @@ public class MainMenu extends javax.swing.JFrame {
                 if (n < 5) {
                     taskPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
                 }
-                
-                int taskId = n;
-                if(tasksForThisDay != null && n < tasksForThisDay.size()){
-                        Task task = tasksForThisDay.get(n);
-                        taskId = 1234;
+                JLabel taskLabel = new JLabel();
+                if (n < tasksForThisDay.size()) {
+                    Task task = tasksForThisDay.get(n);
+                    int taskId = task.getTaskId();
+                    taskLabel = new JLabel(String.valueOf(taskId), SwingConstants.CENTER);
+                    taskLabel.setVerticalAlignment(SwingConstants.CENTER);
+                    taskPanel.setBackground(Color.GRAY);
+                    taskPanel.setOpaque(true);
                 }
-
-                JLabel task = new JLabel(String.valueOf(taskId), SwingConstants.CENTER);
-                task.setVerticalAlignment(SwingConstants.CENTER);
                 taskCells.add(taskPanel);
-                taskPanel.add(task);
-
+                taskPanel.add(taskLabel);
                 dayColumn.add(taskPanel, BorderLayout.CENTER);
             }
             daysPanel.add(dayColumn);
         }
+        return daysPanel;
+    }
+
+    private void initSchedule() {
+        calendarPanel.removeAll();
+        calendarPanel.setLayout(new BorderLayout());
+        calendarPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+
+        JPanel topPanel = setupCalendarTopPanel();
+        HashMap<LocalDate, ArrayList<Task>> taskDates = createTaskDateMap();
+        JPanel daysPanel = createCalendarDays(taskDates);
 
         calendarPanel.add(topPanel, BorderLayout.NORTH);
         calendarPanel.add(daysPanel, BorderLayout.CENTER);
@@ -207,7 +219,7 @@ public class MainMenu extends javax.swing.JFrame {
             int slotHeight = totalHeight / 8;
             int slotWidth = totalWidth / 7;
 
-            Dimension taskSize = new Dimension(slotWidth, slotHeight);
+            Dimension taskSize = new Dimension(slotWidth-1, slotHeight-1);
             item.setPreferredSize(taskSize);
             item.setBackground(Color.LIGHT_GRAY);
             item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -580,13 +592,11 @@ public class MainMenu extends javax.swing.JFrame {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 if ("year".equals(evt.getPropertyName())) {
                     int selectedYear = yearChooser.getYear();
-                    int lastYear = startDate.getYear();
-                    if (selectedYear != lastYear) {
-                        lastYear = selectedYear;
-                        System.out.println("Changed year to: " + selectedYear);
+                    if (selectedYear != startDate.getYear()) {
                         startDate = startDate.withYear(selectedYear);
                         initSchedule();
                     }
+
                 }
             }
         });
