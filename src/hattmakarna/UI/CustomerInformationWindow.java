@@ -10,20 +10,30 @@ import java.util.HashMap;
 import oru.inf.InfDB;
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.FillComboBox;
+import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.data.Model;
+import hattmakarna.data.ModelRegister;
 import javax.swing.JOptionPane;
+import hattmakarna.data.Customer;
+
 /**
  *
  * @author linahanssons
  */
 public class CustomerInformationWindow extends javax.swing.JFrame {
     private InfDB idb;
+    private CustomerRegister customerRegister;
+    
 
     /**
      * Creates new form CustomerInformationWindow
      */
-    public CustomerInformationWindow(InfDB idb) {
-        initComponents();
-        this.idb = idb;
+    public CustomerInformationWindow() {
+        
+        this.idb = hattmakarna.data.Hattmakarna.idb;
+        this.customerRegister = new CustomerRegister(idb);
+         fillTable();
+          initComponents();
         try{
         ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
         cbMail.removeAllItems();
@@ -50,6 +60,32 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
         }
 
+    }
+    private void fillTable() {
+        System.out.println("fillTableKörs");
+        ArrayList <Customer> customers = customerRegister.getAllCustomers();
+        
+        String[] columnNames = {"name", "customerID","email", "phone", "adress", "postalCode", "country" };
+        Object[][] data = new Object[customers.size()][3];
+        for (int i = 0; i < customers.size(); i++) {
+            Customer m = customers.get(i);
+            data[i][0] = m.getFullName();
+            data[i][1] = m.getCustomerID();
+            data[i][2] = m.getEmailAdresses();
+            data[i][3] = m.getTelephoneNumbers();
+            data[i][4] = m.getAdress();
+            data[i][5] = m.getPostalCode();
+            data[i][6] = m.getCountry();
+     
+            
+        }
+        
+        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+            public boolean isCekkEditable(int row, int column) {
+                return false;
+            }
+        };
+        jTable1.setModel(tableModel);
     }
 
     /**
