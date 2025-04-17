@@ -6,13 +6,20 @@ package hattmakarna.UI;
 
 import com.toedter.calendar.*;
 import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.data.Order;
+import hattmakarna.data.OrderRegister;
+import hattmakarna.data.Status;
 import hattmakarna.data.User;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
 import java.time.*;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
+import oru.inf.InfException;
 
 /**
  *
@@ -21,6 +28,7 @@ import javax.swing.*;
 public class MainMenu extends javax.swing.JFrame {
 
     private final User userLoggedIn;
+    private final OrderRegister orderRegister;
     private LocalDate startDate;
     JMonthChooser monthChooser;
     JYearChooser yearChooser;
@@ -30,6 +38,7 @@ public class MainMenu extends javax.swing.JFrame {
      */
     public MainMenu(User userLoggedIn) {
         this.userLoggedIn = userLoggedIn;
+        orderRegister = new OrderRegister();
         startDate = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
         monthChooser = new JMonthChooser();
         yearChooser = new JYearChooser();
@@ -37,7 +46,7 @@ public class MainMenu extends javax.swing.JFrame {
         setupMonthChooserListener();
         initComponents();
         initSchedule();
-        initTestTasks();
+        initOrders();
         setLocationRelativeTo(null);
         lblUserName.setText("Inloggad: " + userLoggedIn.getFirstName());
         if (userLoggedIn.isAdmin()) {
@@ -122,16 +131,22 @@ public class MainMenu extends javax.swing.JFrame {
         calendarPanel.repaint();
     }
 
-    public void initTestTasks() {
+    public void initOrders() {
+        ArrayList<Order> orders = orderRegister.getOrders();
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-
-        for (int i = 1; i <= 5; i++) {
-            ArrayList<String> items = new ArrayList();
-            items.add("Item A");
-            items.add("Item B");
-            items.add("Item C");
-            addOrders(listPanel, "Order #" + i, items);
+        for(Order aOrder : orders){
+            if(aOrder.getStatus() != Status.BEKRÄFTAD) continue;
+            
+            String query = "SELECT name from hat_model WHERE model_id in"
+                    +"(SELECT hat_id FROM hat WHERE order_id = " + aOrder.getOrder_id()+")";
+            
+            try {
+                ArrayList<String> hats = idb.fetchColumn(query);
+                addOrders(listPanel, "Order #"+aOrder.getOrder_id(), hats);
+            } catch (InfException ex) {
+                Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
+            }        
         }
         scrollOrders.setViewportView(listPanel);
     }
@@ -204,7 +219,6 @@ public class MainMenu extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(800, 600));
-        setPreferredSize(new java.awt.Dimension(800, 600));
 
         btnSignOut.setText("Logga ut");
         btnSignOut.addActionListener(new java.awt.event.ActionListener() {
@@ -300,17 +314,17 @@ public class MainMenu extends javax.swing.JFrame {
                         .addComponent(btnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20)
                         .addComponent(btnMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 124, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnUsers)
                         .addGap(20, 20, 20)
                         .addComponent(btnHat, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(scrollOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(scrollOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(569, 569, 569)
                                 .addComponent(jButton2))
                             .addComponent(calendarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addContainerGap())))
@@ -337,7 +351,7 @@ public class MainMenu extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
                     .addComponent(jButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSignOut)
                 .addContainerGap())
         );
@@ -401,6 +415,14 @@ public class MainMenu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_calendarPanelMouseWheelMoved
 
+    private void makeDraggable(JPanel panel){
+        Point initialClick = new Point();
+        
+        panel.addMouseListener(new MouseAdapter(){
+            
+        })
+    }    
+    
     private void setupYearChooserListener() {
         yearChooser.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
     @Override
