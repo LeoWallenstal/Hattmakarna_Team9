@@ -7,7 +7,7 @@ package hattmakarna.data;
 
 import java.util.*;
 import oru.inf.InfException;
-import hattmakarna.util.Util;
+import hattmakarna.util.*;
 import static hattmakarna.data.Hattmakarna.idb;
 import static hattmakarna.util.Validerare.*;
 
@@ -305,17 +305,11 @@ public class Customer {
         
             try{
                 idb.update(sqlQuery);
+                PrintDebugger.info(sqlQuery);
             }catch(InfException ex){
                 System.out.println(ex.getMessage() + "1st query in save(), Customer.java");
                 System.out.println(sqlQuery);
             }
-        }
-        
-        
-        //DEBUG
-        System.out.print("UPDATES: ");
-        for(String anUpdate : updates){
-            System.out.println(anUpdate);
         }
         
         updateTelephoneNumbers(unmodified);
@@ -330,9 +324,14 @@ public class Customer {
             idb.delete("DELETE FROM mail WHERE customer_id = " + customerID);
             idb.update("UPDATE sales_order SET customer_ID = NULL WHERE customer_id = " + customerID);
             idb.delete("DELETE FROM customer WHERE customer_id = " + customerID); 
-
+            
+            PrintDebugger.info(("DELETE FROM phone WHERE customer_id = " + customerID),
+                ("DELETE FROM mail WHERE customer_id = " + customerID),
+                ("UPDATE sales_order SET customer_ID = NULL WHERE customer_id = " + customerID),
+                ("DELETE FROM customer WHERE customer_id = " + customerID));
+            
         } catch (InfException ex) {
-            System.out.println(ex.getMessage() + "in delete(), Customer.java");
+            PrintDebugger.error(ex.getMessage());
         }
     }
     
@@ -349,6 +348,7 @@ public class Customer {
                 + "address, postalcode, country) "
                 + "VALUES (" + newID + ", '" + firstName + "', '" + lastName
                 + "', '" + adress + "', '" + postalCode + "', '" + country + "');";
+        PrintDebugger.info(sqlQuery);
         
         try{
             idb.insert(sqlQuery);
@@ -364,7 +364,7 @@ public class Customer {
             
             try{
                 idb.insert(sqlQuery);
-                System.out.println("[SqlQuery]: " + sqlQuery);
+                PrintDebugger.info(sqlQuery);
             }catch(InfException ex){
                 System.out.println(ex.getMessage() + " 2nd sqlQuery, in insert(), Customer.java");
             }
@@ -378,7 +378,7 @@ public class Customer {
             
             try{
                 idb.insert(sqlQuery);
-                System.out.println("[SqlQuery]: " + sqlQuery);
+                PrintDebugger.info(sqlQuery);
             }catch(InfException ex){
                 System.out.println(ex.getMessage() + " 3rd sqlQuery, in insert(), Customer.java");
             }
@@ -476,7 +476,7 @@ public class Customer {
 
                 try{
                     idb.insert(sqlQuery);
-                    System.out.println("[SqlQuery]: " + sqlQuery);
+                    PrintDebugger.info(sqlQuery);
                 }catch(InfException ex){
                     System.out.println(ex.getMessage() + "if() sqlQuery, in updateTelephoneNumbers(), Customer.java");
                 }
@@ -494,7 +494,7 @@ public class Customer {
 
                 try{
                     idb.delete(sqlQuery);
-                    System.out.println("[SqlQuery]: " + sqlQuery);
+                    PrintDebugger.info(sqlQuery);
                 }catch(InfException ex){
                     System.out.println(ex.getMessage() + "else if() sqlQuery, in updateTelephoneNumbers(), Customer.java");
                 }
