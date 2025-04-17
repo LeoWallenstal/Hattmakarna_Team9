@@ -3,13 +3,17 @@ package hattmakarna.UI;
 import hattmakarna.data.Material;
 import hattmakarna.data.MaterialPassContainer;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import oru.inf.InfException;
 
 /**
@@ -43,7 +47,7 @@ public class PickMaterialDialog extends JDialog {
 
         setVisible(true);
     }
-
+    
     private void initComponents() {
         material_list = new JList<>();
         material_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -100,9 +104,67 @@ public class PickMaterialDialog extends JDialog {
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                     JOptionPane.showMessageDialog(null,
-                    "Att skapa material går ej än, tyvärr!", "error", JOptionPane.ERROR_MESSAGE);
+                JDialog createDialog = new JDialog();
+                createDialog.setTitle("Nytt material");
+                createDialog.setModal(true);
+                createDialog.setSize(300, 400);
+                createDialog.setResizable(false);
+                createDialog.setLocationRelativeTo(null);
+                createDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+                
+                JLabel name = new JLabel("Namn:");
+                JTextField nameField = new JTextField("0");
+                JLabel unit = new JLabel("Enhet:");
+                JTextField unitField = new JTextField(""); //Alt att detta byts ut till en JComboBox
+                
+                 // Huvudpanelen med BoxLayout (vertikal layout)
+                JPanel mainPanel = new JPanel();
+                mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+                // Panel för namn och enhet
+                JPanel inputPanel = new JPanel();
+                inputPanel.add(name);
+                inputPanel.add(nameField);
+                inputPanel.add(unit);
+                inputPanel.add(unitField);
+
+                // Panel för knappar (centrerad layout)
+                JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+                JButton createBtn = new JButton("Skapa");
+                JButton cancelBtn = new JButton("Avbryt");
+                buttonPanel.add(cancelBtn);
+                buttonPanel.add(createBtn);
+
+                mainPanel.add(Box.createVerticalStrut(100));//Lägger till mellanrum högst upp
+                mainPanel.add(inputPanel);//Lägger till delen med label och textfield
+                mainPanel.add(Box.createVerticalStrut(180)); //Lägger till mellanrum till knapparna
+                mainPanel.add(buttonPanel); //Lägger till delen med knapparna
+
+                createDialog.add(mainPanel);
+
+                cancelBtn.addActionListener(new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        createDialog.dispose(); //stänger rutan utan ändringar
+                    }
+                });
+                createBtn.addActionListener(new ActionListener(){
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Material s = new Material();
+                        s.setName(nameField.getText());
+                        s.setUnit(unitField.getText());
+                        
+                        OrderWindow.addMaterial(s);
+                        
+                        //System.out.println(nameField.getText());
+                        //System.out.println(unitField.getText());
+                    }
+                
+                });
+                  createDialog.setVisible(true);
             }
         });
+        
     }
 }

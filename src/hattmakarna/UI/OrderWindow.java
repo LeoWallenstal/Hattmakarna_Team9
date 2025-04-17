@@ -16,17 +16,28 @@ import hattmakarna.data.ModelRegister;
 import hattmakarna.data.Order;
 import hattmakarna.data.Specification;
 import hattmakarna.data.User;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -47,7 +58,6 @@ public class OrderWindow extends javax.swing.JFrame {
     private ArrayList<Model> hatModels;
     private DefaultTableModel tableModel;
     private ArrayList<Material> tmp_materials;
-    private DefaultListModel<String> matListModel;
     int customerID = 0;
 
     /**
@@ -55,10 +65,8 @@ public class OrderWindow extends javax.swing.JFrame {
      */
     public OrderWindow(User userLoggedIn) {
         initComponents();
-        matListModel = new DefaultListModel<>();
-        material_list.setModel(matListModel);
-        tmp_materials = new ArrayList<Material>();
 
+        tmp_materials = new ArrayList<>();
         setLocationRelativeTo(null);
         setResizable(false);
         customerRegister = new CustomerRegister();
@@ -72,6 +80,11 @@ public class OrderWindow extends javax.swing.JFrame {
 
         totalPrice = 0;
         isExpress = false;
+
+        // Fixa layout för material lista
+        BoxLayout b = new BoxLayout(materialList, BoxLayout.Y_AXIS);
+        materialList.setLayout(b);
+        jScrollPane2.setViewportView(materialList);
 
     }
 
@@ -116,10 +129,10 @@ public class OrderWindow extends javax.swing.JFrame {
         lblPicture = new javax.swing.JLabel();
         lblSpecPrice = new javax.swing.JLabel();
         txtPrice = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        material_list = new javax.swing.JList<>();
         add_material = new javax.swing.JButton();
         remove_material = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        materialList = new javax.swing.JPanel();
         paneOrder = new javax.swing.JPanel();
         tblOrder = new javax.swing.JScrollPane();
         tblSeeOrder = new javax.swing.JTable();
@@ -249,7 +262,7 @@ public class OrderWindow extends javax.swing.JFrame {
                         .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(scrollModel)
                     .addComponent(lblChooseModel))
-                .addGap(0, 293, Short.MAX_VALUE))
+                .addGap(0, 483, Short.MAX_VALUE))
         );
         paneStockLayout.setVerticalGroup(
             paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -303,8 +316,6 @@ public class OrderWindow extends javax.swing.JFrame {
 
         txtPrice.setText("0");
 
-        jScrollPane1.setViewportView(material_list);
-
         add_material.setText("Lägg till");
         add_material.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -312,12 +323,25 @@ public class OrderWindow extends javax.swing.JFrame {
             }
         });
 
-        remove_material.setText("Tabort");
+        remove_material.setText("unused");
         remove_material.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 remove_materialActionPerformed(evt);
             }
         });
+
+        javax.swing.GroupLayout materialListLayout = new javax.swing.GroupLayout(materialList);
+        materialList.setLayout(materialListLayout);
+        materialListLayout.setHorizontalGroup(
+            materialListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 190, Short.MAX_VALUE)
+        );
+        materialListLayout.setVerticalGroup(
+            materialListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 257, Short.MAX_VALUE)
+        );
+
+        jScrollPane2.setViewportView(materialList);
 
         javax.swing.GroupLayout paneSpecialLayout = new javax.swing.GroupLayout(paneSpecial);
         paneSpecial.setLayout(paneSpecialLayout);
@@ -345,15 +369,15 @@ public class OrderWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnAddFile)))
                         .addGap(18, 18, 18)
-                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(paneSpecialLayout.createSequentialGroup()
-                                    .addComponent(remove_material)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(add_material))
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 188, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(17, Short.MAX_VALUE))
+                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addGroup(paneSpecialLayout.createSequentialGroup()
+                                .addComponent(remove_material)
+                                .addGap(46, 46, 46)
+                                .addComponent(add_material))
+                            .addComponent(jScrollPane2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblPicture, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         paneSpecialLayout.setVerticalGroup(
             paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -364,11 +388,11 @@ public class OrderWindow extends javax.swing.JFrame {
                 .addComponent(lblDescriptiom)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lblPicture, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane3))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(paneSpecialLayout.createSequentialGroup()
+                        .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblPicture, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jScrollPane3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblSize)
                             .addComponent(cbxSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -382,12 +406,12 @@ public class OrderWindow extends javax.swing.JFrame {
                             .addComponent(btnAddFile))
                         .addGap(32, 32, 32)
                         .addComponent(btnAddSpecialToOrder))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(jScrollPane2))
+                .addGap(14, 14, 14)
                 .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(add_material)
                     .addComponent(remove_material))
-                .addContainerGap(98, Short.MAX_VALUE))
+                .addContainerGap(101, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Specialmodell", paneSpecial);
@@ -544,8 +568,8 @@ public class OrderWindow extends javax.swing.JFrame {
         }
 
         boolean contains = false;
-        for (Object s : matListModel.toArray()) {
-            if (s.equals(pass.m.getName())) {
+        for (Material m : tmp_materials) {
+            if (pass.m.getMaterialID().equals(m.getMaterialID())) {
                 contains = true;
                 break;
             }
@@ -553,17 +577,63 @@ public class OrderWindow extends javax.swing.JFrame {
 
         if (!contains) {
             tmp_materials.add(pass.m);
-            matListModel.addElement(pass.m.getName());
+
+            renderMaterial();
         }
+
 
     }//GEN-LAST:event_add_materialActionPerformed
 
+    private void renderMaterial() {
+        materialList.removeAll();
+
+        final int[] index = {0};
+
+        tmp_materials.forEach(e -> {
+            JPanel jp = new JPanel();
+            jp.setMaximumSize(new Dimension(200, 35));
+            JLabel label = new JLabel(e.getName());
+
+            jp.add(label);
+
+            JTextField field = new JTextField("0");
+
+            field.addKeyListener(new KeyListener() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    FraktSedelUI.handleNumberStringJField(e);
+                }
+
+                @Override
+                public void keyPressed(KeyEvent e) {
+                }
+
+                @Override
+                public void keyReleased(KeyEvent e) {
+                }
+            });
+            jp.add(field);
+            final int const_index = index[0];
+
+            JButton btn = new JButton("Ta bort");
+            btn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    tmp_materials.remove(const_index);
+                    renderMaterial();
+                }
+            });
+            
+            jp.add(btn);
+
+            index[0]++;
+            materialList.add(jp);
+        });
+        materialList.revalidate();
+        materialList.repaint();
+    }
+
     private void remove_materialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_remove_materialActionPerformed
-        int index = material_list.getSelectedIndex();
-        if (index > -1) {
-            tmp_materials.remove(index);
-            matListModel.remove(index);
-        }
 
     }//GEN-LAST:event_remove_materialActionPerformed
 
@@ -736,7 +806,7 @@ public class OrderWindow extends javax.swing.JFrame {
         String priceString = txtPrice.getText();
         double price = Double.parseDouble(priceString);
         int quantity = 1;
-        
+
         tableModel.addRow(new Object[]{
             "Specialhatt",
             description,
@@ -745,7 +815,7 @@ public class OrderWindow extends javax.swing.JFrame {
 
         originalTotalPrice += price;
         lblTotalPrice.setText("Totalpris: " + originalTotalPrice + " kr");
-        
+
     }
 
     /**
@@ -796,7 +866,7 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JCheckBox checkFastDelivery;
     private javax.swing.JList<String> customerJList;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel lblChooseModel;
     private javax.swing.JLabel lblCustomer;
@@ -811,7 +881,7 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JLabel lblSpecPrice;
     private javax.swing.JLabel lblTotalPrice;
     private javax.swing.JList<String> lstModels;
-    private javax.swing.JList<String> material_list;
+    private javax.swing.JPanel materialList;
     private javax.swing.JPanel paneOrder;
     private javax.swing.JPanel paneSidebar;
     private javax.swing.JPanel paneSpecial;

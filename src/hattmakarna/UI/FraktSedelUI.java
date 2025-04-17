@@ -690,7 +690,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
         total_field.setText(getTotal());
     }//GEN-LAST:event_freight_fieldKeyPressed
 
-    private void handleNumberStringJField(java.awt.event.KeyEvent evt) {
+    public  static void handleNumberStringJField(java.awt.event.KeyEvent evt) {
         JTextField field = (JTextField) evt.getComponent();
         field.setText((field.getText() + evt.getKeyChar()).replaceAll("[^0-9,]", ""));
         evt.consume();
