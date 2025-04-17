@@ -51,7 +51,7 @@ public class Hattmakarna {
 
         try {
             IntelliJTheme.setup(new FileInputStream("themes/theme1.properties"));
-//        FlatLaf.setup(new FlatMacLightLaf());
+        // FlatLaf.setup(new FlatMacLightLaf());
         } catch (FileNotFoundException ex) {
             Logger.getLogger(Hattmakarna.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -31,13 +31,14 @@ public class PickMaterialDialog extends JDialog {
     private JButton chooseButton;
     private JButton cancelButton;
     private JButton createButton;
+    private JButton deleteButton;
 
     public PickMaterialDialog(MaterialPassContainer m) {
         this.m = m;
 
         setTitle("Välj material");
         setModal(true);
-        setSize(300, 400);
+        setSize(400, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -47,7 +48,7 @@ public class PickMaterialDialog extends JDialog {
 
         setVisible(true);
     }
-    
+
     private void initComponents() {
         material_list = new JList<>();
         material_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -55,11 +56,13 @@ public class PickMaterialDialog extends JDialog {
         chooseButton = new JButton("Välj");
         cancelButton = new JButton("Avbryt");
         createButton = new JButton("Skapa");
+        deleteButton = new JButton("Ta bort");
 
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(chooseButton);
         buttonPanel.add(cancelButton);
         buttonPanel.add(createButton);
+        buttonPanel.add(deleteButton);
 
         this.setLayout(new BorderLayout());
         this.add(new JScrollPane(material_list), BorderLayout.CENTER);
@@ -111,13 +114,13 @@ public class PickMaterialDialog extends JDialog {
                 createDialog.setResizable(false);
                 createDialog.setLocationRelativeTo(null);
                 createDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-                
+
                 JLabel name = new JLabel("Namn:");
                 JTextField nameField = new JTextField("0");
                 JLabel unit = new JLabel("Enhet:");
                 JTextField unitField = new JTextField(""); //Alt att detta byts ut till en JComboBox
-                
-                 // Huvudpanelen med BoxLayout (vertikal layout)
+
+                // Huvudpanelen med BoxLayout (vertikal layout)
                 JPanel mainPanel = new JPanel();
                 mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
@@ -142,29 +145,43 @@ public class PickMaterialDialog extends JDialog {
 
                 createDialog.add(mainPanel);
 
-                cancelBtn.addActionListener(new ActionListener(){
+                cancelBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         createDialog.dispose(); //stänger rutan utan ändringar
                     }
                 });
-                createBtn.addActionListener(new ActionListener(){
+
+                createBtn.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         Material s = new Material();
                         s.setName(nameField.getText());
                         s.setUnit(unitField.getText());
-                        
-                        OrderWindow.addMaterial(s);
-                        
-                        //System.out.println(nameField.getText());
-                        //System.out.println(unitField.getText());
+
+                        s.save();
+
+                        createDialog.dispose();
+
+                        populateList();
                     }
-                
                 });
-                  createDialog.setVisible(true);
+                createDialog.setVisible(true);
             }
         });
-        
+
+        deleteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedIndex = material_list.getSelectedIndex();
+                if (selectedIndex >= 0) {
+                    String selectedMaterialId = ids.get(selectedIndex);
+                    new Material(selectedMaterialId).delete(); // pass it to caller
+                    populateList();
+                } else {
+                    JOptionPane.showMessageDialog(PickMaterialDialog.this, "Välj ett material först.", "Ingen markering", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
     }
 }

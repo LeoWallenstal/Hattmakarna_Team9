@@ -16,19 +16,22 @@ import oru.inf.InfException;
  *
  * @author linahanssons
  */
-public class Model {
+public class Model extends DatabaseObject {
 
     private String name;
     private double price;
-    private String modelID;
+    private int model_id;
 
-    
+    public Model(String id) {
+        super(id);
+    }
+
     public Model(HashMap<String, String> modelMap) {
-        modelID = modelMap.get("model_id");
+        model_id = Integer.parseInt(modelMap.get("model_id"));
         name = modelMap.get("name");
+        System.out.println(modelMap.get("price"));
         price = Double.parseDouble(modelMap.get("price"));
     }
-    
 
     public void addMaterial(String name, double price) {
         String sqlAddQuery = "INSERT INTO hat_model VALUES ('" + name + "', " + price + ")";
@@ -63,11 +66,11 @@ public class Model {
     }
 
     public String getModelID() {
-        return modelID;
+        return String.valueOf(model_id);
     }
 
     public void setModelId(String modelID) {
-        this.modelID = modelID;
+        this.model_id = Integer.parseInt(modelID);
     }
 
     public void updatePrice(String modelID, double newPrice) {
@@ -80,10 +83,9 @@ public class Model {
             System.out.println("Fel vid uppdatering av pris: " + ex.getMessage());
         }
     }
-       
 
     public void updateName(String newName) {
-        String sql = "UPDATE hat_model SET name = '" + newName + "' WHERE model_id = '" + modelID + "'";
+        String sql = "UPDATE hat_model SET name = '" + newName + "' WHERE model_id = '" + model_id + "'";
 
         try {
             idb.update(sql);
@@ -91,6 +93,26 @@ public class Model {
         } catch (InfException ex) {
             System.out.println("Fel vid uppdatering av namn: " + ex.getMessage());
         }
+    }
+
+    @Override
+    protected String getTabelName() {
+        return "hat_model";
+    }
+
+    @Override
+    protected String getIdAttributeName() {
+        return "model_id";
+    }
+
+    @Override
+    protected String getIdString() {
+        return String.valueOf(model_id);
+    }
+
+    @Override
+    protected void setIdString(String id) {
+        this.model_id = Integer.parseInt(id);
     }
 
 }
