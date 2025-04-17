@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import oru.inf.InfException;
+import oru.inf.InfDB;
 import static hattmakarna.data.Hattmakarna.idb;
 
 /**
@@ -16,11 +17,14 @@ import static hattmakarna.data.Hattmakarna.idb;
  */
 public class CustomerRegister {
     private final ArrayList<Customer> allCustomers;
-    
+    private InfDB idb;
     public CustomerRegister(){
         allCustomers = initAllCustomers();
     }
-    
+public CustomerRegister(InfDB idb){ 
+    this.idb = idb; 
+    allCustomers = initAllCustomers();
+}   
     private ArrayList<Customer> initAllCustomers(){
 
         
@@ -141,5 +145,6 @@ public class CustomerRegister {
         }
         return false;
     }
+    
     
 }
