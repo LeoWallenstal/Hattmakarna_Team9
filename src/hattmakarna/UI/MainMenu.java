@@ -34,6 +34,7 @@ public class MainMenu extends javax.swing.JFrame {
     private LocalDate startDate;
     JMonthChooser monthChooser;
     JYearChooser yearChooser;
+    private final ArrayList<JPanel> taskCells;
 
     /**
      * Creates new form MainMenu
@@ -41,6 +42,7 @@ public class MainMenu extends javax.swing.JFrame {
     public MainMenu(User userLoggedIn) {
         this.userLoggedIn = userLoggedIn;
         orderRegister = new OrderRegister();
+        taskCells = new ArrayList<>();
         startDate = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
         monthChooser = new JMonthChooser();
         yearChooser = new JYearChooser();
@@ -120,6 +122,7 @@ public class MainMenu extends javax.swing.JFrame {
 
                 JLabel task = new JLabel(String.valueOf(n), SwingConstants.CENTER);
                 task.setVerticalAlignment(SwingConstants.CENTER);
+                taskCells.add(taskPanel);
                 taskPanel.add(task);
 
                 dayColumn.add(taskPanel, BorderLayout.CENTER);
@@ -155,7 +158,7 @@ public class MainMenu extends javax.swing.JFrame {
         scrollOrders.setViewportView(listPanel);
     }
 
-    private static void addOrders(JPanel parent, String orderTitle, ArrayList<String> items) {
+    private void addOrders(JPanel parent, String orderTitle, ArrayList<String> items) {
         // Container for this order (vertical)
         JPanel orderContainer = new JPanel();
         orderContainer.setLayout(new BorderLayout());
@@ -175,7 +178,13 @@ public class MainMenu extends javax.swing.JFrame {
 
         for (String itemName : items) {
             JPanel item = new JPanel();
-            item.setPreferredSize(new Dimension(50, 50));
+            int totalHeight = calendarPanel.getHeight();
+            int totalWidth = calendarPanel.getWidth();
+            int slotHeight = totalHeight / 8;
+            int slotWidth = totalWidth / 7;
+
+            Dimension taskSize = new Dimension(slotWidth, slotHeight);
+            item.setPreferredSize(taskSize);
             item.setBackground(Color.LIGHT_GRAY);
             item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             item.add(new JLabel(itemName));
@@ -378,7 +387,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomerActionPerformed
         // TODO add your handling code here:
-        //new CustomerInformationWindow().setVisible(true);
+        new CustomerInformationWindow().setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnCustomerActionPerformed
 
@@ -421,7 +430,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     }//GEN-LAST:event_calendarPanelMouseWheelMoved
 
-    private static void makeDraggable(JPanel panel) {
+    private void makeDraggable(JPanel panel) {
         Point initialClick = new Point();
 
         panel.addMouseListener(new MouseAdapter() {
@@ -441,40 +450,83 @@ public class MainMenu extends javax.swing.JFrame {
                 ghostPanel.setBackground(panel.getBackground());
                 ghostPanel.setSize(panel.getSize());
                 ghostPanel.setBorder(panel.getBorder());
-                ghostPanel.setLocation(panel.getLocation());
-                
-
                 for (Component comp : panel.getComponents()) {
                     if (comp instanceof JLabel label) {
                         ghostPanel.add(new JLabel(label.getText()));
                     }
                 }
 
-                Point screenPoint = panel.getLocationOnScreen();
-                Point framePoint = frame.getLocationOnScreen();
-                int x = screenPoint.x - framePoint.x;
-                int y = screenPoint.y - framePoint.y;
+                Point panelPosInGlass = SwingUtilities.convertPoint(panel.getParent(), panel.getLocation(), frame.getGlassPane());
 
-                ghostPanel.setBounds(x, y, panel.getWidth(), panel.getHeight());
+                ghostPanel.setBounds(panelPosInGlass.x, panelPosInGlass.y, panel.getWidth(), panel.getHeight());
                 glassPane.add(ghostPanel);
                 glassPane.repaint();
 
                 panel.setVisible(false);
-                
+
                 frame.setCursor(Cursor.HAND_CURSOR);
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (ghostPanel != null) {
-                    JComponent glassPane = (JComponent) frame.getGlassPane();
-                    glassPane.remove(ghostPanel);
-                    glassPane.repaint();
-                    ghostPanel = null;
-                    panel.setVisible(true);
-                    glassPane.setVisible(false);
-                    frame.setCursor(Cursor.DEFAULT_CURSOR);
+                if (ghostPanel == null) {
+                    return;
                 }
+                Point ghostLocation = ghostPanel.getLocationOnScreen();
+                Point calendarLocationOnScreen = calendarPanel.getLocationOnScreen();
+                Dimension calendarSize = calendarPanel.getSize();
+                Rectangle calendarBounds = new Rectangle(calendarLocationOnScreen, calendarSize);
+
+                JComponent glassPane = (JComponent) frame.getGlassPane();
+
+                if (calendarBounds.contains(ghostLocation)) {
+                    Point ghostCenter = new Point(
+                            ghostPanel.getX() + ghostPanel.getWidth() / 2,
+                            ghostPanel.getY() + ghostPanel.getHeight() / 2
+                    );
+
+                    JPanel closestCell = null;
+                    double closestDistance = Double.MAX_VALUE;
+
+                    for (JPanel cell : taskCells) {
+                        Point cellOnGlass = SwingUtilities.convertPoint(
+                                cell.getParent(), cell.getLocation(), glassPane
+                        );
+
+                        Rectangle cellBounds = new Rectangle(cellOnGlass, cell.getSize());
+                        Point cellCenter = new Point(
+                                cellBounds.x + cellBounds.width / 2,
+                                cellBounds.y + cellBounds.height / 2
+                        );
+
+                        double distance = ghostCenter.distance(cellCenter);
+                        if (distance < closestDistance) {
+                            closestDistance = distance;
+                            closestCell = cell;
+                        }
+                    }
+
+                    if (closestCell != null) {
+                        Point cellPos = SwingUtilities.convertPoint(
+                                closestCell.getParent(), closestCell.getLocation(), glassPane
+                        );
+
+                        ghostPanel.setLocation(cellPos);
+
+                        closestCell.removeAll();
+                        closestCell.add(panel);
+                        panel.setVisible(true);
+                        closestCell.revalidate();
+                        closestCell.repaint();
+                    }
+                }
+
+                glassPane.remove(ghostPanel);
+                glassPane.repaint();
+                glassPane.setVisible(false);
+                ghostPanel = null;
+                frame.setCursor(Cursor.DEFAULT_CURSOR);
+                panel.setVisible(true);
             }
         });
 
@@ -484,15 +536,11 @@ public class MainMenu extends javax.swing.JFrame {
                 JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
                 JComponent glassPane = (JComponent) frame.getGlassPane();
 
-                Point mouseOnScreen = MouseInfo.getPointerInfo().getLocation();
-                Point frameOnScreen = frame.getLocationOnScreen();
-
-                int x = mouseOnScreen.x - frameOnScreen.x - initialClick.x;
-                int y = mouseOnScreen.y - frameOnScreen.y - initialClick.y;
+                Point cursor = SwingUtilities.convertPoint(panel, e.getPoint(), glassPane);
 
                 for (Component comp : glassPane.getComponents()) {
                     if (comp instanceof JPanel ghost) {
-                        ghost.setLocation(x, y);
+                        ghost.setLocation(cursor.x - initialClick.x, cursor.y - initialClick.y);
                     }
                 }
 
