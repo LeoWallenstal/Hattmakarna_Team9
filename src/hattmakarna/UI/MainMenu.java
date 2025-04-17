@@ -6,17 +6,14 @@ package hattmakarna.UI;
 
 import com.toedter.calendar.*;
 import static hattmakarna.data.Hattmakarna.idb;
-import hattmakarna.data.Order;
-import hattmakarna.data.OrderRegister;
-import hattmakarna.data.Status;
-import hattmakarna.data.User;
+import hattmakarna.data.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.awt.event.*;
 import java.time.*;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,10 +28,12 @@ public class MainMenu extends javax.swing.JFrame {
 
     private final User userLoggedIn;
     private final OrderRegister orderRegister;
+    private final TaskRegister taskRegister;
     private LocalDate startDate;
     JMonthChooser monthChooser;
     JYearChooser yearChooser;
     private final ArrayList<JPanel> taskCells;
+    private ArrayList<Task> tasks;
 
     /**
      * Creates new form MainMenu
@@ -42,15 +41,19 @@ public class MainMenu extends javax.swing.JFrame {
     public MainMenu(User userLoggedIn) {
         this.userLoggedIn = userLoggedIn;
         orderRegister = new OrderRegister();
+        taskRegister = new TaskRegister();
+        tasks = taskRegister.getTasks();
         taskCells = new ArrayList<>();
         startDate = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
         monthChooser = new JMonthChooser();
         yearChooser = new JYearChooser();
+
         setupYearChooserListener();
         setupMonthChooserListener();
         initComponents();
         initSchedule();
         initOrders();
+
         setLocationRelativeTo(null);
         lblUserName.setText("Inloggad: " + userLoggedIn.getFirstName());
         if (userLoggedIn.isAdmin()) {
@@ -93,6 +96,14 @@ public class MainMenu extends javax.swing.JFrame {
         JPanel daysPanel = new JPanel(new GridLayout(1, 7, 0, 0));
         daysPanel.setOpaque(false);
 
+        HashMap<LocalDate, ArrayList<Task>> taskDates = new HashMap<>();
+        for (Task aTask : tasks) {
+            LocalDate date = aTask.getStartDate().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            taskDates.computeIfAbsent(date, k -> new ArrayList<>()).add(aTask);
+        }
+
         for (int i = 0; i < 7; i++) {
             JPanel dayColumn = new JPanel(new GridLayout(7, 1, 0, 0));
             dayColumn.setOpaque(false);
@@ -104,6 +115,15 @@ public class MainMenu extends javax.swing.JFrame {
             }
 
             LocalDate day = startDate.plusDays(i);
+            ArrayList<Task> tasksForThisDay= null;
+            tasksForThisDay = taskDates.getOrDefault(day, new ArrayList<>());
+            if (taskDates.containsValue(day)) {
+               
+                System.out.println("Datumet hittat: " + day);
+            } else {
+                System.out.println("Inget på: " + day);
+            }
+
             String weekdayName = day.getDayOfWeek().getDisplayName(TextStyle.SHORT, locale);
             String labelText = weekdayName + " " + day.getDayOfMonth();
 
@@ -116,11 +136,15 @@ public class MainMenu extends javax.swing.JFrame {
                 taskPanel.setOpaque(false);
                 if (n < 5) {
                     taskPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-                } else {
-                    taskPanel.setBorder(null);
+                }
+                
+                int taskId = n;
+                if(tasksForThisDay != null && n < tasksForThisDay.size()){
+                        Task task = tasksForThisDay.get(n);
+                        taskId = 1234;
                 }
 
-                JLabel task = new JLabel(String.valueOf(n), SwingConstants.CENTER);
+                JLabel task = new JLabel(String.valueOf(taskId), SwingConstants.CENTER);
                 task.setVerticalAlignment(SwingConstants.CENTER);
                 taskCells.add(taskPanel);
                 taskPanel.add(task);
