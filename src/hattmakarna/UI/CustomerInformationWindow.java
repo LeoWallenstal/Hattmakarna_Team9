@@ -7,7 +7,6 @@ import oru.inf.InfException;
 import hattmakarna.data.CustomerRegister;
 import java.util.ArrayList;
 import java.util.HashMap;
-import oru.inf.InfDB;
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.FillComboBox;
 import static hattmakarna.data.Hattmakarna.idb;
@@ -16,6 +15,7 @@ import hattmakarna.data.ModelRegister;
 import javax.swing.JOptionPane;
 import hattmakarna.data.Customer;
 import static hattmakarna.data.Hattmakarna.idb;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -79,7 +79,7 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
             
         }
         
-        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
