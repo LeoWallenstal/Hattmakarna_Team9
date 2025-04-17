@@ -71,7 +71,7 @@ public class Specification extends DatabaseObject {
      *
      * @return file-object till den bild fil som valts. Null om ingen bild valts
      */
-    public void setFileFromUser() {
+    public static BufferedImage setFileFromUser() {
 
         try {
             // Set native look and feel
@@ -89,11 +89,13 @@ public class Specification extends DatabaseObject {
             try {
                 File file = chooser.getSelectedFile();
 
-                this.skissImage = ImageIO.read(file);
+                return ImageIO.read(file);
             } catch (IOException ex) {
                 Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+
+        return null;
     }
 
     @Override
@@ -124,9 +126,9 @@ public class Specification extends DatabaseObject {
                 String fileName = "specBild-hat-" + hat_id + ".png";
                 File fileToSave = new File(SAVE_TO_PATH + fileName);
                 fileToSave.getParentFile().mkdirs();
-                
+
                 ImageIO.write(skissImage, "png", fileToSave);
-                
+
                 img_path = fileToSave.getPath().replace("\\", "\\\\");
             }
             return super.save();
@@ -136,8 +138,6 @@ public class Specification extends DatabaseObject {
         }
     }
 
-      
-      
     @Override
     protected void setIdString(String id) {
         this.spec_id = Integer.parseInt(id);

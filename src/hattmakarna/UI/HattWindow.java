@@ -159,6 +159,7 @@ private ModelRegister modelRegister;
         };
         jTable1.setModel(tableModel);
     }
+
     /**
      * @param args the command line arguments
      */

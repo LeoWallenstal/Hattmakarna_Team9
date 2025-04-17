@@ -44,9 +44,10 @@ import oru.inf.InfException;
  */
 public abstract class DatabaseObject {
 
-    protected boolean hasId = false;
+    protected boolean hasId;
 
     public DatabaseObject() {
+        hasId = false;
     }
 
     /**
@@ -295,7 +296,7 @@ public abstract class DatabaseObject {
             String sql;
 
             // Ny post → INSERT
-            if (getIdString() == null || getIdString().isEmpty()) {
+            if (getIdString().equals("0") || getIdString() == null || getIdString().isEmpty()) {
                 String id = Hattmakarna.idb.getAutoIncrement(getTabelName(), getIdAttributeName());
                 attributeNames.add(getIdAttributeName());
                 attributeValues.add(id);

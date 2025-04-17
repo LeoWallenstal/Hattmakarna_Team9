@@ -5,18 +5,23 @@ import oru.inf.InfDB;
 import oru.inf.InfException;
 import static hattmakarna.data.Hattmakarna.idb;
 
-public class Material {
+public class Material extends DatabaseObject {
 
-    private final String materialId;
+    private int material_id;
     private String name;
     private String unit;
 
-    public Material(String materialID) {
-        this.materialId = materialID;
-        this.name = fetchSingle(materialID, "name");
-        this.unit = fetchSingle(materialID, "unit");
+    public Material() {
+        super();
     }
 
+    public Material(String materialID) {
+        super(materialID);
+        
+        System.out.println(name);
+    }
+
+    @Deprecated
     private String fetchSingle(String id, String column) {
         String result = "";
         String query = "SELECT " + column + " FROM Material WHERE material_id = '" + id + "'";
@@ -28,6 +33,7 @@ public class Material {
         return result;
     }
 
+    @Deprecated
     public void addMaterial(String name, String unit) {
         String sqlAddQuery = "INSERT INTO Material VALUES ('" + name + "', '" + unit + "')";
 
@@ -38,6 +44,7 @@ public class Material {
         }
     }
 
+    @Deprecated
     public void removeMaterial(String materialId) {
         String sqlRemoveQuery = "DELETE FROM Material WHERE material_id = '" + materialId + "'";
 
@@ -59,7 +66,7 @@ public class Material {
     }
 
     public String getMaterialID() {
-        return materialId;
+        return String.valueOf(material_id);
     }
 
     public String getUnit() {
@@ -72,5 +79,25 @@ public class Material {
         } else {
             System.out.println("Error: Field is empty or blank");
         }
+    }
+
+    @Override
+    protected String getTabelName() {
+        return "material";
+    }
+
+    @Override
+    protected String getIdAttributeName() {
+        return "material_id";
+    }
+
+    @Override
+    protected String getIdString() {
+        return String.valueOf(material_id);
+    }
+
+    @Override
+    protected void setIdString(String id) {
+        this.material_id = Integer.parseInt(id);
     }
 }
