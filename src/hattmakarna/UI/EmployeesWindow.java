@@ -7,6 +7,7 @@ package hattmakarna.UI;
 import hattmakarna.data.*;
 import java.awt.Cursor;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -69,8 +70,6 @@ public class EmployeesWindow extends javax.swing.JFrame {
         btnAdd = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
         tblEmployees.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -85,6 +84,11 @@ public class EmployeesWindow extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        tblEmployees.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseMoved(java.awt.event.MouseEvent evt) {
+                tblEmployeesMouseMoved(evt);
             }
         });
         tblEmployees.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -175,7 +179,6 @@ public class EmployeesWindow extends javax.swing.JFrame {
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
         if (delete == false) {
             delete = true;
-            setCursor(new Cursor(Cursor.HAND_CURSOR));
             btnBack.setEnabled(false);
             btnAdd.setEnabled(false);
             btnDelete.setText("Ångra");
@@ -192,17 +195,36 @@ public class EmployeesWindow extends javax.swing.JFrame {
 
     private void tblEmployeesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEmployeesMouseClicked
         if (delete) {
+            
+            
             int row = tblEmployees.rowAtPoint(evt.getPoint());
             User user = users.get(row);
-            user.delete();
-            fillTable();
+            
+            Object[] options = {"Ja", "Nej"};
+            
+            int result = JOptionPane.showOptionDialog(this, "Är du säker på att du vill ta bort " + user.getFullName() + "?",
+                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            
+            if(result == 0){
+                user.delete();
+                fillTable();
+            }
+            
             delete = false;
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             btnBack.setEnabled(true);
             btnAdd.setEnabled(true);
             btnDelete.setText("Ta bort");
         }
     }//GEN-LAST:event_tblEmployeesMouseClicked
+
+    private void tblEmployeesMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEmployeesMouseMoved
+        if(delete){
+            tblEmployees.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+        else{
+            tblEmployees.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        }
+    }//GEN-LAST:event_tblEmployeesMouseMoved
 
     /**
      * @param args the command line arguments
