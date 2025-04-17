@@ -73,13 +73,6 @@ public class Specification extends DatabaseObject {
      */
     public static BufferedImage setFileFromUser() {
 
-        try {
-            // Set native look and feel
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
         chooser.setFileFilter(filter);

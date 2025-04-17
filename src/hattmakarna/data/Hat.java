@@ -78,20 +78,20 @@ public class Hat extends DatabaseObject {
 
     public Hat(InfDB idb, String hatId, String modelId, String orderId) {
          
-        this.hatId = hatId;
-        this.modelId = aHat.get("model_id");
-        this.orderId = aHat.get("order_id");
-        this.materialList = materials;
+        this.hat_id = Integer.parseInt(hatId);
+        this.model_id = Integer.parseInt(modelId);
+        this.order_id = Integer.parseInt(orderId);
+        //this.materialList = materials;
         isSpecial = false;
         setSpecial();
-        this.price = Double.parseDouble(aHat.get("price"));
+        //this.price = Double.parseDouble(aHat.get("price"));
     }
 
     private void setSpecial() {
         String query = "SELECT model_id FROM hat_model WHERE name = 'Special'";
         try {
           String specialId =  idb.fetchSingle(query);
-          if(modelId.equals(specialId))
+          if(String.valueOf(model_id).equals(specialId))
               isSpecial = true;
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
