@@ -100,6 +100,12 @@ public class CustomerRegister {
         System.out.println("getCustomer(int), in CustomerRegister.java returned NULL! :(");
         return null;
     }
+    
+    public void remove(int indexPos){
+        if(indexPos > 0 && indexPos < allCustomers.size()){
+            allCustomers.remove(indexPos);
+        }
+    }
             
     @Override
     public String toString(){
