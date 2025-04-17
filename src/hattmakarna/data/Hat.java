@@ -33,8 +33,6 @@ public class Hat extends DatabaseObject {
 
     private List<MaterialHat> materials;
 
-  
-
     private boolean isSpecial;
     private Specification specification;
 
@@ -52,7 +50,7 @@ public class Hat extends DatabaseObject {
             if (specId != null && specId.isEmpty()) {
                 specification = new Specification(specId);
             }
-            
+
             materials = new ArrayList<>();
             // Hämta material
             Hattmakarna.idb.fetchColumn("select material_hat_id from hat_material where hat_id = " + hatId).forEach(e -> {
@@ -73,26 +71,28 @@ public class Hat extends DatabaseObject {
     }
 
     public Specification getSpecification() {
-        return specification;    
+        return specification;
     }
 
+    @Deprecated
     public Hat(InfDB idb, String hatId, String modelId, String orderId) {
-         
-        this.hatId = hatId;
-        this.modelId = aHat.get("model_id");
-        this.orderId = aHat.get("order_id");
-        this.materialList = materials;
+
+        this.hat_id = Integer.parseInt(hatId);
+        this.model_id = Integer.parseInt(modelId);
+        this.order_id = Integer.parseInt(orderId);
+        //this.materialList = materials;
         isSpecial = false;
         setSpecial();
-        this.price = Double.parseDouble(aHat.get("price"));
+        this.price = 0;
     }
 
     private void setSpecial() {
         String query = "SELECT model_id FROM hat_model WHERE name = 'Special'";
         try {
-          String specialId =  idb.fetchSingle(query);
-          if(modelId.equals(specialId))
-              isSpecial = true;
+            String specialId = idb.fetchSingle(query);
+            if (String.valueOf(model_id).equals(specialId)) {
+                isSpecial = true;
+            }
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -114,10 +114,10 @@ public class Hat extends DatabaseObject {
     public String getOrderId() {
         return String.valueOf(order_id);
     }
-    
-    public boolean isSpecial(){
+
+    public boolean isSpecial() {
         return isSpecial;
-}
+    }
 
     public double getPrice() {
         return price;
