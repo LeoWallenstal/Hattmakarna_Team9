@@ -12,6 +12,8 @@ import hattmakarna.data.Status;
 import hattmakarna.data.User;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.time.*;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -135,18 +137,20 @@ public class MainMenu extends javax.swing.JFrame {
         ArrayList<Order> orders = orderRegister.getOrders();
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        for(Order aOrder : orders){
-            if(aOrder.getStatus() != Status.BEKRÄFTAD) continue;
-            
+        for (Order aOrder : orders) {
+            if (aOrder.getStatus() != Status.BEKRÄFTAD) {
+                continue;
+            }
+
             String query = "SELECT name from hat_model WHERE model_id in"
-                    +"(SELECT hat_id FROM hat WHERE order_id = " + aOrder.getOrder_id()+")";
-            
+                    + "(SELECT hat_id FROM hat WHERE order_id = " + aOrder.getOrder_id() + ")";
+
             try {
                 ArrayList<String> hats = idb.fetchColumn(query);
-                addOrders(listPanel, "Order #"+aOrder.getOrder_id(), hats);
+                addOrders(listPanel, "Order #" + aOrder.getOrder_id(), hats);
             } catch (InfException ex) {
                 Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
-            }        
+            }
         }
         scrollOrders.setViewportView(listPanel);
     }
@@ -175,6 +179,7 @@ public class MainMenu extends javax.swing.JFrame {
             item.setBackground(Color.LIGHT_GRAY);
             item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             item.add(new JLabel(itemName));
+            makeDraggable(item);
             itemsPanel.add(item);
         }
 
@@ -373,7 +378,8 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomerActionPerformed
         // TODO add your handling code here:
-        System.out.println("Ett nytt window ska komma här");
+        //new CustomerInformationWindow().setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_btnCustomerActionPerformed
 
     private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
@@ -412,32 +418,105 @@ public class MainMenu extends javax.swing.JFrame {
         Timer timer = new Timer(150, e -> calendarPanel.setBackground(Color.WHITE));
         timer.setRepeats(false);
         timer.start();
-        
+
     }//GEN-LAST:event_calendarPanelMouseWheelMoved
 
-    private void makeDraggable(JPanel panel){
+    private static void makeDraggable(JPanel panel) {
         Point initialClick = new Point();
-        
-        panel.addMouseListener(new MouseAdapter(){
-            
-        })
-    }    
-    
+
+        panel.addMouseListener(new MouseAdapter() {
+            JPanel ghostPanel;
+            JFrame frame;
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                initialClick.setLocation(e.getPoint());
+
+                frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+                JComponent glassPane = (JComponent) frame.getGlassPane();
+                glassPane.setLayout(null);
+                glassPane.setVisible(true);
+
+                ghostPanel = new JPanel();
+                ghostPanel.setBackground(panel.getBackground());
+                ghostPanel.setSize(panel.getSize());
+                ghostPanel.setBorder(panel.getBorder());
+                ghostPanel.setLocation(panel.getLocation());
+                
+
+                for (Component comp : panel.getComponents()) {
+                    if (comp instanceof JLabel label) {
+                        ghostPanel.add(new JLabel(label.getText()));
+                    }
+                }
+
+                Point screenPoint = panel.getLocationOnScreen();
+                Point framePoint = frame.getLocationOnScreen();
+                int x = screenPoint.x - framePoint.x;
+                int y = screenPoint.y - framePoint.y;
+
+                ghostPanel.setBounds(x, y, panel.getWidth(), panel.getHeight());
+                glassPane.add(ghostPanel);
+                glassPane.repaint();
+
+                panel.setVisible(false);
+                
+                frame.setCursor(Cursor.HAND_CURSOR);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (ghostPanel != null) {
+                    JComponent glassPane = (JComponent) frame.getGlassPane();
+                    glassPane.remove(ghostPanel);
+                    glassPane.repaint();
+                    ghostPanel = null;
+                    panel.setVisible(true);
+                    glassPane.setVisible(false);
+                    frame.setCursor(Cursor.DEFAULT_CURSOR);
+                }
+            }
+        });
+
+        panel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+                JComponent glassPane = (JComponent) frame.getGlassPane();
+
+                Point mouseOnScreen = MouseInfo.getPointerInfo().getLocation();
+                Point frameOnScreen = frame.getLocationOnScreen();
+
+                int x = mouseOnScreen.x - frameOnScreen.x - initialClick.x;
+                int y = mouseOnScreen.y - frameOnScreen.y - initialClick.y;
+
+                for (Component comp : glassPane.getComponents()) {
+                    if (comp instanceof JPanel ghost) {
+                        ghost.setLocation(x, y);
+                    }
+                }
+
+                glassPane.repaint();
+            }
+        });
+
+    }
+
     private void setupYearChooserListener() {
         yearChooser.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-    @Override
-    public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        if ("year".equals(evt.getPropertyName())) {
-            int selectedYear = yearChooser.getYear();
-            int lastYear = startDate.getYear();
-            if (selectedYear != lastYear) {
-                lastYear = selectedYear;
-                System.out.println("Changed year to: " + selectedYear);
-                startDate = startDate.withYear(selectedYear);
-                initSchedule();
+            @Override
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                if ("year".equals(evt.getPropertyName())) {
+                    int selectedYear = yearChooser.getYear();
+                    int lastYear = startDate.getYear();
+                    if (selectedYear != lastYear) {
+                        lastYear = selectedYear;
+                        System.out.println("Changed year to: " + selectedYear);
+                        startDate = startDate.withYear(selectedYear);
+                        initSchedule();
+                    }
+                }
             }
-        }
-    }
         });
     }
 
