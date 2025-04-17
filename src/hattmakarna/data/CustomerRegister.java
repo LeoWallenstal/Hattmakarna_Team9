@@ -20,7 +20,7 @@ public class CustomerRegister {
     public CustomerRegister(){
         allCustomers = initAllCustomers();
     }
-    
+
     private ArrayList<Customer> initAllCustomers(){
 
         
@@ -141,5 +141,6 @@ public class CustomerRegister {
         }
         return false;
     }
+    
     
 }

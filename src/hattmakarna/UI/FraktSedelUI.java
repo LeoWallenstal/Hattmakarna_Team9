@@ -17,6 +17,8 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -133,10 +135,37 @@ public class FraktSedelUI extends javax.swing.JFrame {
      * Försöker öppna PDF-filen automatiskt om systemet stöder det.
      */
     private void printDeckleration() {
+        
+    String selectedLanguage = cbxLang.getSelectedItem().toString();
+    Locale locale = switch (selectedLanguage) {
+        case "Engelska" -> new Locale("en");
+        case "Tyska" -> new Locale("de");
+        case "Spanska" -> new Locale("es");
+        case "Franska"     -> new Locale("fr");
+        case "Svenska" -> new Locale("sv");
+        default         -> new Locale("sv");
+    };
+        
+        ResourceBundle bundle = ResourceBundle.getBundle("resources.lang.labels", locale);
+
+        
+        
         try {
 
             String html = Files.readString(Paths.get("htmlFiles/shippingLabel.html"), StandardCharsets.UTF_8);
 
+            // Översättning av pdf-filen till vald locale
+            html = html.replace("FROM:", bundle.getString("from"));
+            html = html.replace("TO", bundle.getString("to"));
+            html = html.replace("Shipping number", bundle.getString("shippingNumber"));
+            html = html.replace("Order #", bundle.getString("orderNumber"));
+            html = html.replace("Weight", bundle.getString("weight"));
+            html = html.replace("Contents Value", bundle.getString("contentsValue"));
+            html = html.replace("Shipping", bundle.getString("shipping"));
+            html = html.replace("Fragile?", bundle.getString("fragile"));
+            html = html.replace("Contents", bundle.getString("contents"));
+            html = html.replace("THANK YOU FOR YOUR ORDER", bundle.getString("thankYouForYourOrder"));
+            
             html = html.replace("{weight}", weight_field.getText());
             html = html.replace("{orderId}", String.valueOf(order.getOrder_id()));
             html = html.replace("{shipping}", "Postnord AB, 2 days");
@@ -153,7 +182,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
 
                 br.append("<tr>");
                 br.append("<td>");
-                br.append("Hat model:");
+                br.append(bundle.getString("hatModel"));
                 br.append("</td>");
                 br.append("<td>");
                 br.append(e.getModel().getName());
@@ -231,6 +260,8 @@ public class FraktSedelUI extends javax.swing.JFrame {
         shippingNumberField = new javax.swing.JTextField();
         jLabel19 = new javax.swing.JLabel();
         return_button = new javax.swing.JButton();
+        cbxLang = new javax.swing.JComboBox<>();
+        jLabel18 = new javax.swing.JLabel();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -421,6 +452,10 @@ public class FraktSedelUI extends javax.swing.JFrame {
             }
         });
 
+        cbxLang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Svenska", "Engelska", "Tyska", "Spanska", "Franska" }));
+
+        jLabel18.setText("Språk");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -500,7 +535,10 @@ public class FraktSedelUI extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lastname_field, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbxLang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lastname_field, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addContainerGap(70, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
@@ -532,11 +570,13 @@ public class FraktSedelUI extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel7)
-                                    .addComponent(email_combobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(email_combobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel18))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel8)
-                                    .addComponent(phone_combobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(phone_combobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbxLang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(18, 18, 18)
                                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -690,7 +730,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
         total_field.setText(getTotal());
     }//GEN-LAST:event_freight_fieldKeyPressed
 
-    private void handleNumberStringJField(java.awt.event.KeyEvent evt) {
+    public  static void handleNumberStringJField(java.awt.event.KeyEvent evt) {
         JTextField field = (JTextField) evt.getComponent();
         field.setText((field.getText() + evt.getKeyChar()).replaceAll("[^0-9,]", ""));
         evt.consume();
@@ -738,6 +778,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField adress_field;
+    private javax.swing.JComboBox<String> cbxLang;
     private javax.swing.JComboBox<String> email_combobox;
     private javax.swing.JTextField freight_field;
     private javax.swing.JButton jButton1;
@@ -750,6 +791,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
