@@ -125,6 +125,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         tblHats = new javax.swing.JTable();
         btnDeleteOrder = new javax.swing.JButton();
         lblSuccessFailed = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(400, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -194,6 +195,13 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
         lblSuccessFailed.setText("borttagen/misslyckades");
 
+        jButton1.setText("Skapa fraktsedel");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -204,7 +212,9 @@ public class OrderInfoWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnDeleteOrder)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(lblSuccessFailed))
+                        .addComponent(lblSuccessFailed)
+                        .addGap(18, 18, 18)
+                        .addComponent(jButton1))
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jLabel4)
                         .addGroup(layout.createSequentialGroup()
@@ -221,7 +231,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
                                 .addComponent(cbMaterialOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(97, Short.MAX_VALUE))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -250,7 +260,8 @@ public class OrderInfoWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnDeleteOrder)
-                    .addComponent(lblSuccessFailed))
+                    .addComponent(lblSuccessFailed)
+                    .addComponent(jButton1))
                 .addGap(18, 18, 18))
         );
 
@@ -302,6 +313,12 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         window.fillTable();
     }//GEN-LAST:event_formWindowClosing
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String id = Integer.toString(currentOrder.getOrder_id());
+        
+        new FraktSedelUI(this, id).setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -341,6 +358,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnDeleteOrder;
     private javax.swing.JComboBox<String> cbMaterialOrder;
     private javax.swing.JComboBox<String> cbStatus;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;

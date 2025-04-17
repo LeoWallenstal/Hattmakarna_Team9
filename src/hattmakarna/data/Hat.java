@@ -64,13 +64,6 @@ public class Hat extends DatabaseObject {
         }
     }
 
-    public Hat(InfDB idb, String hatId, String modelId, String orderId) {
-        /* this.hat_id = hatId;
-        this.model_id = modelId;
-        this.order_id = orderId;*/
-        throw new IllegalArgumentException("Kolla super klassen, DatabaseObject och sedan dess implementation i Hat. Tack.");
-
-    }
     public List<MaterialHat> getMaterials() {
         return materials;
     }
@@ -80,13 +73,26 @@ public class Hat extends DatabaseObject {
     }
 
     public Specification getSpecification() {
-        return specification;
+        return specification;    
+    }
+
+    public Hat(InfDB idb, String hatId, String modelId, String orderId) {
+         
+        this.hatId = hatId;
+        this.modelId = aHat.get("model_id");
+        this.orderId = aHat.get("order_id");
+        this.materialList = materials;
+        isSpecial = false;
+        setSpecial();
+        this.price = Double.parseDouble(aHat.get("price"));
     }
 
     private void setSpecial() {
         String query = "SELECT model_id FROM hat_model WHERE name = 'Special'";
         try {
-            idb.fetchSingle(query);
+          String specialId =  idb.fetchSingle(query);
+          if(modelId.equals(specialId))
+              isSpecial = true;
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -108,6 +114,10 @@ public class Hat extends DatabaseObject {
     public String getOrderId() {
         return String.valueOf(order_id);
     }
+    
+    public boolean isSpecial(){
+        return isSpecial;
+}
 
     public double getPrice() {
         return price;

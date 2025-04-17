@@ -17,7 +17,7 @@ public class UserRegister {
     
     private final ArrayList<User> allUsers;
     
-    public UserRegister(InfDB idb){
+    public UserRegister(){
         allUsers = initAllUsers();
     }
     

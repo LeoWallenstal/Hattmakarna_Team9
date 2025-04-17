@@ -67,6 +67,9 @@ public class OrderWindow extends javax.swing.JFrame {
     ModelRegister modelRegister;
     private ArrayList<Model> hatModels;
     private ArrayList<MaterialHat> tmp_materials;
+    private DefaultTableModel tableModel;
+    private DefaultListModel<String> customerModel;
+
     int customerID = 0;
     private ArrayList<Hat> hatsToOrder;
 
@@ -88,6 +91,10 @@ public class OrderWindow extends javax.swing.JFrame {
         hatModels = modelRegister.getAllHats();
         fillModels();
         this.userLoggedIn = userLoggedIn;
+
+        btnRemoveCustomer.setEnabled(false);
+        
+        customerModel = (DefaultListModel<String>)customerJList.getModel();
 
         totalPrice = 0;
         isExpress = false;
@@ -119,6 +126,7 @@ public class OrderWindow extends javax.swing.JFrame {
         scrollSearchResult = new javax.swing.JScrollPane();
         customerJList = new javax.swing.JList<>();
         btnChooseCustomer = new javax.swing.JButton();
+        btnRemoveCustomer = new javax.swing.JButton();
         tabbedPane = new javax.swing.JTabbedPane();
         paneStock = new javax.swing.JPanel();
         scrollModel = new javax.swing.JScrollPane();
@@ -155,6 +163,11 @@ public class OrderWindow extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         paneSidebar.setForeground(new java.awt.Color(102, 204, 255));
+        paneSidebar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                paneSidebarMouseClicked(evt);
+            }
+        });
 
         lblHeader.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblHeader.setText("Registrera Order");
@@ -185,12 +198,24 @@ public class OrderWindow extends javax.swing.JFrame {
 
         lblSearchResult.setText("Sökresultat:");
 
+        customerJList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                customerJListMouseClicked(evt);
+            }
+        });
         scrollSearchResult.setViewportView(customerJList);
 
         btnChooseCustomer.setText("Välj kund");
         btnChooseCustomer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnChooseCustomerActionPerformed(evt);
+            }
+        });
+
+        btnRemoveCustomer.setText("Ta bort");
+        btnRemoveCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveCustomerActionPerformed(evt);
             }
         });
 
@@ -215,7 +240,9 @@ public class OrderWindow extends javax.swing.JFrame {
                             .addComponent(lblSearchResult)
                             .addGroup(paneSidebarLayout.createSequentialGroup()
                                 .addGap(4, 4, 4)
-                                .addComponent(btnChooseCustomer))
+                                .addComponent(btnChooseCustomer)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRemoveCustomer))
                             .addComponent(btnReturn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 96, Short.MAX_VALUE)))
                 .addContainerGap())
@@ -236,13 +263,20 @@ public class OrderWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scrollSearchResult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnChooseCustomer)
+                .addGroup(paneSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnChooseCustomer)
+                    .addComponent(btnRemoveCustomer))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnReturn)
                 .addContainerGap())
         );
 
         tabbedPane.setBackground(javax.swing.UIManager.getDefaults().getColor("Actions.Blue"));
+        tabbedPane.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tabbedPaneMouseClicked(evt);
+            }
+        });
 
         scrollModel.setViewportView(lstModels);
 
@@ -513,7 +547,8 @@ public class OrderWindow extends javax.swing.JFrame {
 
     private void btnNewCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewCustomerActionPerformed
         //this.setVisible(false);
-        new CustomerWindow(userLoggedIn, this).setVisible(true);
+
+        new RegisterCustomerWindow(userLoggedIn, this).setVisible(true);
 
     }//GEN-LAST:event_btnNewCustomerActionPerformed
 
@@ -560,6 +595,78 @@ public class OrderWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnChooseCustomerActionPerformed
 
     private void add_materialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add_materialActionPerformed
+      MaterialPassContainer pass = new MaterialPassContainer();
+        new PickMaterialDialog(pass);
+
+        if (pass.m == null) {
+            return;
+        }
+
+        boolean contains = false;
+        for (MaterialHat m : tmp_materials) {
+            if (pass.m.getMaterialID().equals(String.valueOf(m.getMaterial_id()))) {
+                contains = true;
+                break;
+            }
+        }
+
+        if (!contains) {
+            MaterialHat mh = new MaterialHat();
+            mh.setMaterial_id(Integer.parseInt(pass.m.getMaterialID()));
+
+            // mh.setHat_id();
+            tmp_materials.add(mh);
+
+            renderMaterial();
+        }
+
+
+    }
+  
+    private void btnRemoveCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveCustomerActionPerformed
+            //Dialogfönster
+            int customerIndex = customerJList.getSelectedIndex();
+            Customer toRemove = customerRegister.getCustomer(customerIndex);
+            Object[] options = {"Ja", "Nej"};
+
+            int result = JOptionPane.showOptionDialog(this, 
+                ("Är du säker på att du vill ta bort " + toRemove.getFullName() + "?"), 
+                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, 
+                null, options, options[0]);
+
+            if (result == 0) {
+                /* "Ja" klickades, 
+                    tar bort den kunden och stänger dialogen. */
+                customerModel.remove(customerIndex);
+                customerRegister.remove(customerIndex);
+                toRemove.delete();
+            } 
+            else if (result == 1) {
+                customerJList.clearSelection();
+                btnRemoveCustomer.setEnabled(false);
+            }
+    }//GEN-LAST:event_btnRemoveCustomerActionPerformed
+
+    private void customerJListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_customerJListMouseClicked
+        btnRemoveCustomer.setEnabled(true);
+    }//GEN-LAST:event_customerJListMouseClicked
+
+    private void tabbedPaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabbedPaneMouseClicked
+        btnRemoveCustomer.setEnabled(false);
+        customerJList.clearSelection();
+    }//GEN-LAST:event_tabbedPaneMouseClicked
+
+    private void paneSidebarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneSidebarMouseClicked
+        btnRemoveCustomer.setEnabled(false);
+        customerJList.clearSelection();
+    }//GEN-LAST:event_paneSidebarMouseClicked
+
+    private void saveSpecOrder() {
+        Specification specification = new Specification();
+        String description = txtSpecialDesc.getText();
+        String size = String.valueOf(cbxSize.getSelectedItem());
+        specification.setDesciption(description);
+        specification.save();
 
         MaterialPassContainer pass = new MaterialPassContainer();
         new PickMaterialDialog(pass);
@@ -866,6 +973,7 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnAddSpecialToOrder;
     private javax.swing.JButton btnChooseCustomer;
     private javax.swing.JButton btnNewCustomer;
+    private javax.swing.JButton btnRemoveCustomer;
     private javax.swing.JButton btnReturn;
     private javax.swing.JButton btnSearch;
     private javax.swing.JComboBox<String> cbxSize;

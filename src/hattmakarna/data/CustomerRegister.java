@@ -100,6 +100,12 @@ public class CustomerRegister {
         System.out.println("getCustomer(int), in CustomerRegister.java returned NULL! :(");
         return null;
     }
+    
+    public void remove(int indexPos){
+        if(indexPos > 0 && indexPos < allCustomers.size()){
+            allCustomers.remove(indexPos);
+        }
+    }
             
     @Override
     public String toString(){
@@ -117,6 +123,23 @@ public class CustomerRegister {
     
     public ArrayList<Customer> getAllCustomers() {
         return allCustomers;
+    }
+    
+    public void add(Customer aCustomer){
+        if(!customerExists(aCustomer)){
+            //Debug
+            System.out.println(aCustomer + " was added");
+            allCustomers.add(aCustomer);
+        }
+    }
+    
+    public boolean customerExists(Customer aCustomer){
+        for(Customer registerCustomer : allCustomers){
+            if(registerCustomer.equals(aCustomer)){
+                return true;
+            }
+        }
+        return false;
     }
     
 }

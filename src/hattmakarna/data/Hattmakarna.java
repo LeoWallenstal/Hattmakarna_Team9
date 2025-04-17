@@ -10,6 +10,7 @@ import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import hattmakarna.UI.RegisterCustomerWindow;
 import hattmakarna.UI.LogInWindow;
 import hattmakarna.data.Order;
 import hattmakarna.data.Specification;
@@ -28,6 +29,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.multi.MultiLookAndFeel;
+import hattmakarna.UI.OrderWindow;
 
 import oru.inf.InfDB;
 import oru.inf.InfException;

@@ -7,6 +7,7 @@ package hattmakarna.UI;
 import hattmakarna.data.Customer;
 import hattmakarna.data.User;
 import static hattmakarna.util.Validerare.*;
+import hattmakarna.util.Util;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -16,9 +17,14 @@ import javax.swing.DefaultListModel;
 import javax.swing.*;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import hattmakarna.util.CountryList;
 import javax.swing.ScrollPaneConstants;
 import hattmakarna.data.EmailOrPhone;
 import javax.swing.JButton;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 
 /**
  *
@@ -32,10 +38,11 @@ public class EditCustomer extends javax.swing.JFrame {
     
     private final Customer copy;
     private Customer aCustomer;
-    private final ArrayList<String> countries;
     private User userLoggedIn;
     private DefaultListModel<String> dlPhoneModel;
     private DefaultListModel<String> dlEmailModel;
+    private ArrayList<String> phoneModel;
+    private ArrayList<String> emailModel;
     private boolean editOK = true;
 
     
@@ -43,35 +50,6 @@ public class EditCustomer extends javax.swing.JFrame {
     public EditCustomer(Customer aCustomer) {
         this.aCustomer = aCustomer;
         copy = new Customer(aCustomer);
-        
-        countries = new ArrayList<>(Arrays.asList(
-    "Afghanistan", "Albanien", "Algeriet", "Andorra", "Angola", "Antigua och Barbuda", "Argentina",
-    "Armenien", "Australien", "Austrien", "Azerbajdzjan", "Bahamas", "Bahrain", "Bangladesh",
-    "Barbados", "Belgien", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnien och Hercegovina",
-    "Botswana", "Brasilien", "Brunei", "Bulgarien", "Burkina Faso", "Burundi", "Centralafrikanska republiken",
-    "Chile", "Colombia", "Comorerna", "Costa Rica", "Croatien", "Cypern", "Danmark", "Dominica",
-    "Dominikanska republiken", "Ecuador", "Egypten", "El Salvador", "Ekvatorialguinea", "Eritrea",
-    "Estland", "Etiopien", "Fiji", "Filippinerna", "Finland", "Frankrike", "Gabon", "Gambia",
-    "Georgien", "Ghana", "Grekland", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
-    "Haiti", "Honduras", "Indien", "Indonesien", "Irak", "Iran", "Irland", "Island", "Israel",
-    "Italien", "Jamaica", "Japan", "Jordanien", "Kambodja", "Kamerun", "Kanada", "Kap Verde", 
-    "Kazakstan", "Kenya", "Kina", "Kirgizistan", "Kiribati", "Colombia", "Kongo-Kinshasa",
-    "Kongo-Brazzaville", "Kroatien", "Kuba", "Kuwait", "Laos", "Lettland", "Libanon", "Liberia",
-    "Libyen", "Liechtenstein", "Litauen", "Luxemburg", "Madagaskar", "Malawi", "Malaysia", 
-    "Maldiverna", "Mali", "Malta", "Marocko", "Marshallöarna", "Mauretanien", "Mauritius", 
-    "Mexiko", "Mikronesiens federerade stater", "Moldavien", "Monaco", "Mongoliet", "Montenegro",
-    "Moçambique", "Myanmar", "Namibia", "Nauru", "Nederländerna", "Nepal", "Nicaragua", "Niger",
-    "Nigeria", "Nordkorea", "Nordmakedonien", "Norge", "Nya Zeeland", "Oman", "Pakistan", 
-    "Palau", "Panama", "Papua Nya Guinea", "Paraguay", "Peru", "Polen", "Portugal", "Qatar",
-    "Rumänien", "Ryssland", "Rwanda", "Saint Kitts och Nevis", "Saint Lucia", "Saint Vincent och Grenadinerna",
-    "Salomonöarna", "Samoa", "San Marino", "Saudiarabien", "Schweiz", "Senegal", "Serbien", "Seychellerna",
-    "Sierra Leone", "Singapore", "Slovakien", "Slovenien", "Somalia", "Spanien", "Sri Lanka", 
-    "Storbritannien", "Sudan", "Surinam", "Swaziland", "Sverige", "Sydafrika", "Sydkorea", "Sydsudan",
-    "Syrien", "Tadzjikistan", "Taiwan", "Tanzania", "Thailand", "Tjeckien", "Togo", "Tonga",
-    "Trinidad och Tobago", "Tunisien", "Turkiet", "Turkmenistan", "Tuvalu", "Tyskland", "Uganda",
-    "Ukraina", "Ungern", "Uruguay", "USA", "Uzbekistan", "Vanuatu", "Vatikanstaten", "Venezuela",
-    "Vietnam", "Vitryssland", "Zambia", "Zimbabwe"
-));
  
         
         initComponents();
@@ -83,6 +61,7 @@ public class EditCustomer extends javax.swing.JFrame {
         setCustomerInfoText();
         jScrollPane4.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        
         lblCustomer.setText("Redigera " + aCustomer.getFullName() + "s uppgifter");
         lblFirstNameError.setVisible(false);
         lblLastNameError.setVisible(false);
@@ -90,21 +69,90 @@ public class EditCustomer extends javax.swing.JFrame {
         lblPostalCodeError.setVisible(false);
         lblCountryError.setVisible(false);
         btnSave.setEnabled(false);
-        dlPhoneModel = (DefaultListModel<String>) jlPhone.getModel();
-        dlEmailModel = (DefaultListModel<String>) jlEmail.getModel();
+        
+        dlPhoneModel = (DefaultListModel<String>)jlPhone.getModel();
+        dlEmailModel = (DefaultListModel<String>)jlEmail.getModel();
+        
+        //Setting up listeners
+        DocumentListener docListener = new DocumentListener() {
+            public void insertUpdate(DocumentEvent e){  checkChanges(); }
+            public void removeUpdate(DocumentEvent e){  checkChanges(); }
+            public void changedUpdate(DocumentEvent e){ checkChanges(); }
+        };
+        
+        dlPhoneModel.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                checkChanges();
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                checkChanges();
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                checkChanges();
+            }
+        });
+        
+        dlEmailModel.addListDataListener(new ListDataListener() {
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                checkChanges();
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                checkChanges();
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                checkChanges();
+            }
+        });
+        
+    
+        tfFirstName.getDocument().addDocumentListener(docListener);
+        tfLastName.getDocument().addDocumentListener(docListener);
+        tfAdress.getDocument().addDocumentListener(docListener);
+        tfPostalCode.getDocument().addDocumentListener(docListener);
+        cbCountry.addActionListener(e -> checkChanges());
+        
+        phoneModel = new ArrayList<String>();
+        for(int i = 0; i < jlPhone.getModel().getSize(); i++){
+            phoneModel.add(jlPhone.getModel().getElementAt(i));
+        }
+        
+        emailModel = new ArrayList<String>();
+        for(int i = 0; i < jlEmail.getModel().getSize(); i++){
+            emailModel.add(jlEmail.getModel().getElementAt(i));
+        }
+            
     }
     
-    private void resetErrors(){
-        lblFirstNameError.setVisible(false);
-        lblLastNameError.setVisible(false);
-        lblAdressError.setVisible(false);
-        lblPostalCodeError.setVisible(false);
-        lblCountryError.setVisible(false);
+    private void checkChanges() {
+        boolean fieldsChanged = !tfFirstName.getText().equals(aCustomer.getFirstName()) ||
+            !tfLastName.getText().equals(aCustomer.getLastName()) ||
+            !tfAdress.getText().equals(aCustomer.getAdress()) ||
+            !tfPostalCode.getText().equals(aCustomer.getPostalCode()) ||
+            !cbCountry.getSelectedItem().toString().equals(aCustomer.getCountry());
+        
+      
+        
+        boolean phoneListChanged = !Util.contentEquals(aCustomer.getTelephoneNumbers(), phoneModel);
+        boolean emailListChanged = !Util.contentEquals(aCustomer.getEmailAdresses(), emailModel);
+        
+        boolean anythingChanged = fieldsChanged || phoneListChanged || emailListChanged;
+        
+        btnSave.setEnabled(anythingChanged);
     }
     
     private void initCBCountry(){
         cbCountry.addItem("Välj land...");
-        for(String aCountry : countries){
+        for(String aCountry : CountryList.getCountries()){
             cbCountry.addItem(aCountry);
         }
     }
@@ -119,6 +167,7 @@ public class EditCustomer extends javax.swing.JFrame {
     public JButton getSaveButton(){
         return btnSave;
     }
+    
     
     private void setCustomerInfoText(){
         int countryIndex = getCountryIndex();
@@ -137,8 +186,8 @@ public class EditCustomer extends javax.swing.JFrame {
     }
     
     private int getCountryIndex(){
-        for(int i = 0; i < countries.size(); i++){
-            if(countries.get(i).equals(aCustomer.getCountry())){
+        for(int i = 0; i < CountryList.getCountries().size(); i++){
+            if(CountryList.getCountries().get(i).equals(aCustomer.getCountry())){
                 return i;
             }
         }
@@ -583,14 +632,18 @@ public class EditCustomer extends javax.swing.JFrame {
     private void btnDeletePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeletePhoneActionPerformed
         aCustomer.removeTelephoneNumber(jlPhone.getSelectedIndex());
         dlPhoneModel.remove(jlPhone.getSelectedIndex());
+        dlPhoneModel.removeElementAt(jlPhone.getSelectedIndex());
         btnSave.setEnabled(true);
+        btnDeletePhone.setEnabled(false);
         if(dlPhoneModel.getSize() == 0){
             btnDeletePhone.setEnabled(false);
         }
+        lblSaved.setVisible(false);
     }//GEN-LAST:event_btnDeletePhoneActionPerformed
 
     private void btnAddPhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPhoneActionPerformed
-        new AddPhoneEmailWindow(aCustomer, EmailOrPhone.PHONE, this).setVisible(true);
+        lblSaved.setVisible(false);
+        new AddEmailPhoneWindow(aCustomer, EmailOrPhone.PHONE, this).setVisible(true);
     }//GEN-LAST:event_btnAddPhoneActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
@@ -630,22 +683,31 @@ public class EditCustomer extends javax.swing.JFrame {
 
     private void btnDeleteEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteEmailActionPerformed
         aCustomer.removeEmailAdress(jlEmail.getSelectedIndex());
+        dlEmailModel.removeElement(jlEmail.getSelectedIndex());
         dlEmailModel.remove(jlEmail.getSelectedIndex());
         btnSave.setEnabled(true);
+        btnDeleteEmail.setEnabled(false);
         if(dlEmailModel.getSize() == 0){
             btnDeleteEmail.setEnabled(false);
         }
+        lblSaved.setVisible(false);
     }//GEN-LAST:event_btnDeleteEmailActionPerformed
 
     private void btnAddEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmailActionPerformed
-        new AddPhoneEmailWindow(aCustomer, EmailOrPhone.EMAIL, this).setVisible(true);
+        lblSaved.setVisible(false);
+        new AddEmailPhoneWindow(aCustomer, EmailOrPhone.EMAIL, this).setVisible(true);
     }//GEN-LAST:event_btnAddEmailActionPerformed
 
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
         jlPhone.clearSelection();
         jlEmail.clearSelection();
+        btnDeletePhone.setEnabled(false);
+        btnDeleteEmail.setEnabled(false);
     }//GEN-LAST:event_formMouseClicked
 
+   
+    
+    
     /**
      * @param args the command line arguments
      */

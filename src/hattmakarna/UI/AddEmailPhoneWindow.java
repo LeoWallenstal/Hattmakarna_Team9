@@ -3,17 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
+
 import hattmakarna.data.Customer;
 import hattmakarna.data.EmailOrPhone;
-import static hattmakarna.util.Validerare.*;
+import static hattmakarna.data.EmailOrPhone.EMAIL;
+import static hattmakarna.data.EmailOrPhone.PHONE;
+import static hattmakarna.util.Validerare.validateEmail;
+import static hattmakarna.util.Validerare.validatePhoneNumber;
 import java.awt.event.KeyEvent;
 
 /**
  *
  * @author james
  */
-
-public class AddPhoneEmailWindow extends javax.swing.JFrame {
+public class AddEmailPhoneWindow extends javax.swing.JFrame {
 
     private EmailOrPhone emailOrPhone;
     private Customer aCustomer;
@@ -24,8 +27,9 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
     /**
      * Creates new form addPhoneEmailWindow
      */
-    public AddPhoneEmailWindow(Customer aCustomer, EmailOrPhone value, 
-            EditCustomer previousWindow) {
+    public AddEmailPhoneWindow(Customer aCustomer, EmailOrPhone value, 
+            EditCustomer previousWindow) 
+    {
         initComponents();
         emailOrPhone = value;
         this.aCustomer = aCustomer;
@@ -60,6 +64,8 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
         btnAdd = new javax.swing.JButton();
         lblAddError = new javax.swing.JLabel();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
         lblAdd.setText("jLabel1");
 
         tfAdd.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -75,30 +81,32 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
             }
         });
 
-        lblAddError.setText("jLabel1");
+        lblAddError.setText("jLabel2");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(16, 16, 16)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblAdd)
-                    .addComponent(btnAdd))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tfAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblAddError))
-                .addGap(32, 32, 32))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblAdd)
+                        .addGap(18, 18, 18)
+                        .addComponent(tfAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnAdd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblAddError)))
+                .addContainerGap(135, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(46, Short.MAX_VALUE)
+                .addContainerGap(39, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblAdd))
+                    .addComponent(lblAdd)
+                    .addComponent(tfAdd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAdd)
@@ -116,6 +124,12 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
                 if(!validateEmail(tfAdd.getText())){
                     lblAddError.setText("Emailadress ogilitig!");
                     lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
+                }
+                else if(aCustomer.hasEmail(tfAdd.getText())){
+                    lblAddError.setText("Emailadress finns redan!");
+                    lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
                 }
                 else{
                     aCustomer.addEmailAdress(tfAdd.getText());
@@ -131,6 +145,12 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
                     //Valideraren släpper igenom nummer med fler siffror än 10
                     lblAddError.setText("Telefonnummer ogilitigt!");
                     lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
+                }
+                else if(aCustomer.hasNumber(tfAdd.getText())){
+                    lblAddError.setText("Telefonnummret finns redan!");
+                    lblAddError.setVisible(true);
+                    btnAdd.setEnabled(false);
                 }
                 else{
                     aCustomer.addTelephoneNumber(tfAdd.getText());
@@ -154,9 +174,9 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
         else{
             btnAdd.setEnabled(true);
         }
+        lblAddError.setVisible(false);
     }//GEN-LAST:event_tfAddKeyReleased
 
-    
     /**
      * @param args the command line arguments
      */
@@ -174,21 +194,20 @@ public class AddPhoneEmailWindow extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddEmailPhoneWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddEmailPhoneWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddEmailPhoneWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(AddPhoneEmailWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AddEmailPhoneWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                //new addPhoneEmailWindow().setVisible(true);
+                //new AddEmailPhoneWindow().setVisible(true);
             }
         });
     }
