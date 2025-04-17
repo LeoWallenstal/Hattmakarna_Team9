@@ -34,18 +34,20 @@
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="lblEmail" min="-2" pref="37" max="-2" attributes="0"/>
                                   <Component id="lblLastName" min="-2" max="-2" attributes="0"/>
                                   <Component id="lblPassword" alignment="1" min="-2" max="-2" attributes="0"/>
                                   <Component id="lblFirstName" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblEmail" alignment="1" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="tfPassword" alignment="0" pref="143" max="32767" attributes="0"/>
-                                  <Component id="tfEmail" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="tfEmail" alignment="0" pref="143" max="32767" attributes="0"/>
                                   <Component id="tfLastName" alignment="0" max="32767" attributes="0"/>
                                   <Component id="tfFirstName" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="pfPassword" alignment="0" max="32767" attributes="0"/>
                               </Group>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="tbtnShowPassword" min="-2" pref="72" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -86,9 +88,10 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblPassword" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="tfPassword" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="pfPassword" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="tbtnShowPassword" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="39" max="32767" attributes="0"/>
+              <EmptySpace pref="45" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnBack" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnAdd" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -121,12 +124,20 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="tfFirstName">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tfFirstNameActionPerformed"/>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfFirstNameKeyTyped"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="tfLastName">
+      <Events>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfLastNameKeyTyped"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="tfEmail">
-    </Component>
-    <Component class="javax.swing.JTextField" name="tfPassword">
+      <Events>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tfEmailKeyTyped"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
@@ -153,6 +164,19 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="jLabel2"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JPasswordField" name="pfPassword">
+      <Events>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="pfPasswordKeyTyped"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JToggleButton" name="tbtnShowPassword">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Visa"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tbtnShowPasswordActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
