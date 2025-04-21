@@ -187,7 +187,6 @@ public class MainMenu extends javax.swing.JFrame {
         // TODO add your handling code here:
         //new CustomerInformationWindow().setVisible(true);
         //this.setVisible(false);
-        new Test(userLoggedIn).setVisible(true);
     }//GEN-LAST:event_btnCustomerActionPerformed
 
     private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
