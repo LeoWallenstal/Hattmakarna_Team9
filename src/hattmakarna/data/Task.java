@@ -48,12 +48,17 @@ public class Task extends DatabaseObject{
         task_id = Integer.parseInt(id);
     }
     
+    
     public int getTaskId(){
         return task_id;
     }
     
     public Date getStartDate(){
         return start_date;
+    }
+    
+    public void setStartDate(Date start_date){
+        this.start_date = start_date;
     }
     
     public TaskStatus getStatus(){
@@ -67,4 +72,5 @@ public class Task extends DatabaseObject{
     public int getHatId(){
         return hat_id;
     }
+    
 }

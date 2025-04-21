@@ -4,22 +4,8 @@
  */
 package hattmakarna.UI;
 
-import com.toedter.calendar.*;
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.time.*;
-import java.time.format.TextStyle;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicComboBoxUI;
-import oru.inf.InfException;
 
 /**
  *
@@ -28,32 +14,15 @@ import oru.inf.InfException;
 public class MainMenu extends javax.swing.JFrame {
 
     private final User userLoggedIn;
-    private final OrderRegister orderRegister;
-    private final TaskRegister taskRegister;
-    private LocalDate startDate;
-    JMonthChooser monthChooser;
-    JYearChooser yearChooser;
-    private final ArrayList<JPanel> taskCells;
-    private ArrayList<Task> tasks;
+    ScheduleManager scheduleManager;
 
     /**
      * Creates new form MainMenu
      */
     public MainMenu(User userLoggedIn) {
         this.userLoggedIn = userLoggedIn;
-        orderRegister = new OrderRegister();
-        taskRegister = new TaskRegister();
-        tasks = taskRegister.getTasks();
-        taskCells = new ArrayList<>();
-        startDate = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
-        monthChooser = new JMonthChooser(false);
-        yearChooser = new JYearChooser();
-
-        setupYearChooserListener();
-        setupMonthChooserListener();
         initComponents();
-        initSchedule();
-        initOrders();
+        scheduleManager = new ScheduleManager(userLoggedIn, calendarPanel, scrollOrders);
 
         setLocationRelativeTo(null);
         lblUserName.setText("Inloggad: " + userLoggedIn.getFirstName());
@@ -62,206 +31,6 @@ public class MainMenu extends javax.swing.JFrame {
         } else {
             btnUsers.setVisible(false);
         }
-    }
-
-    private JPanel setupCalendarTopPanel() {
-        Font font = new Font("SansSerif", Font.BOLD, 16);
-        Locale locale = Locale.forLanguageTag("sv-SE");
-
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 5));
-        topPanel.setOpaque(false);
-        topPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-
-        yearChooser.setYear(startDate.getYear());
-        yearChooser.setPreferredSize(new Dimension(70, 25));
-        yearChooser.setFont(font);
-
-        JComboBox<?> comboBox = (JComboBox) monthChooser.getComboBox();
-        comboBox.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        comboBox.setPreferredSize(new Dimension(120, 25));
-        comboBox.setUI(new BasicComboBoxUI() {
-            @Override
-            protected JButton createArrowButton() {
-                JButton button = new JButton("▼");
-                button.setBorder(BorderFactory.createEmptyBorder());
-                return button;
-            }
-        });
-
-        monthChooser.setMonth(startDate.getMonthValue() - 1);
-        monthChooser.setLocale(locale);
-        monthChooser.setFont(font);
-
-        topPanel.add(jButton1);
-        topPanel.add(Box.createHorizontalStrut(170));
-        topPanel.add(yearChooser);
-        topPanel.add(Box.createHorizontalStrut(20));
-        topPanel.add(monthChooser);
-        topPanel.add(Box.createHorizontalStrut(170));
-        topPanel.add(jButton2);
-        return topPanel;
-    }
-
-    private HashMap<LocalDate, ArrayList<Task>> createTaskDateMap() {
-        HashMap<LocalDate, ArrayList<Task>> taskDates = new HashMap<>();
-        for (Task aTask : tasks) {
-            LocalDate date = aTask.getStartDate().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-            taskDates.computeIfAbsent(date, k -> new ArrayList<>()).add(aTask);
-        }
-        return taskDates;
-    }
-
-    private JPanel createCalendarDays(HashMap<LocalDate, ArrayList<Task>> taskDates) {
-    JPanel daysPanel = new JPanel(new GridLayout(1, 7, 0, 0));
-    daysPanel.setOpaque(false);
-
-    for (int i = 0; i < 7; i++) {
-        JPanel dayColumn = new JPanel(new GridLayout(7, 1, 0, 0));
-        dayColumn.setOpaque(false);
-
-        if (i < 6) {
-            dayColumn.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.BLACK));
-        }
-
-        LocalDate day = startDate.plusDays(i);
-        ArrayList<Task> tasksForThisDay = taskDates.getOrDefault(day, new ArrayList<>());
-        Locale locale = Locale.forLanguageTag("sv-SE");
-        String weekdayName = day.getDayOfWeek().getDisplayName(TextStyle.SHORT, locale);
-        String labelText = weekdayName + " " + day.getDayOfMonth();
-
-        JLabel weekday = new JLabel(labelText, SwingConstants.CENTER);
-        weekday.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-        dayColumn.add(weekday);
-
-        for (int n = 0; n < 6; n++) {
-            JPanel cell = new JPanel(new BorderLayout());
-            cell.setOpaque(false);
-            if (n < 5) {
-                cell.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-            }
-
-            if (n < tasksForThisDay.size()) {
-                Task task = tasksForThisDay.get(n);
-                JPanel draggablePanel = createTaskPanel(task);
-                makeDraggable(draggablePanel);
-                cell.add(draggablePanel, BorderLayout.CENTER);
-            }
-
-            taskCells.add(cell);
-            dayColumn.add(cell);
-        }
-
-        daysPanel.add(dayColumn);
-    }
-
-    return daysPanel;
-}
-    
-    private JPanel createTaskPanel(Task task) {
-    JPanel panel = new JPanel(new BorderLayout());
-    panel.setBackground(Color.LIGHT_GRAY);
-    panel.setOpaque(true);
-
-    JLabel label = new JLabel(String.valueOf(task.getTaskId()), SwingConstants.CENTER);
-    label.setVerticalAlignment(SwingConstants.CENTER);
-    panel.add(label, BorderLayout.CENTER);
-    
-    String toolTip = "Placeholder för tooltip. Kanske lägga till någon beskrivning här? :)\nKan man skriva flera rader?\nJa tydligen";
-    panel.setToolTipText(toolTip);
-    return panel;
-}
-
-
-
-    private void initSchedule() {
-        calendarPanel.removeAll();
-        calendarPanel.setLayout(new BorderLayout());
-        calendarPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-
-        JPanel topPanel = setupCalendarTopPanel();
-        HashMap<LocalDate, ArrayList<Task>> taskDates = createTaskDateMap();
-        JPanel daysPanel = createCalendarDays(taskDates);
-
-        calendarPanel.add(topPanel, BorderLayout.NORTH);
-        calendarPanel.add(daysPanel, BorderLayout.CENTER);
-        calendarPanel.revalidate();
-        calendarPanel.repaint();
- 
-    }
-
-    public void initOrders() {
-        ArrayList<Order> orders = orderRegister.getOrders();
-        JPanel listPanel = new JPanel();
-        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
-        for (Order aOrder : orders) {
-            if (aOrder.getStatus() != Status.BEKRÄFTAD) {
-                continue;
-            }
-
-            String query = "SELECT name from hat_model WHERE model_id in"
-                    + "(SELECT hat_id FROM hat WHERE order_id = " + aOrder.getOrder_id() + ")";
-
-            try {
-                ArrayList<String> hats = idb.fetchColumn(query);
-                addOrders(listPanel, "Order #" + aOrder.getOrder_id(), hats);
-            } catch (InfException ex) {
-                Logger.getLogger(MainMenu.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        scrollOrders.setViewportView(listPanel);
-    }
-
-    private void addOrders(JPanel parent, String orderTitle, ArrayList<String> items) {
-        // Container for this order (vertical)
-        JPanel orderContainer = new JPanel();
-        orderContainer.setLayout(new BorderLayout());
-        orderContainer.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
-        orderContainer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        // Toggle button
-        JButton toggleButton = new JButton("▶ " + orderTitle);
-        toggleButton.setFocusPainted(false);
-        toggleButton.setContentAreaFilled(false);
-        toggleButton.setBorderPainted(false);
-        toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
-
-        // Panel to hold item squares
-        JPanel itemsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        itemsPanel.setVisible(false);
-
-        for (String itemName : items) {
-            JPanel item = new JPanel();
-            int totalHeight = calendarPanel.getHeight();
-            int totalWidth = calendarPanel.getWidth();
-            int slotHeight = totalHeight / 8;
-            int slotWidth = totalWidth / 7;
-
-            Dimension taskSize = new Dimension(slotWidth - 1, slotHeight - 1);
-            item.setPreferredSize(taskSize);
-            item.setBackground(Color.LIGHT_GRAY);
-            item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-            item.add(new JLabel(itemName));
-            makeDraggable(item);
-            itemsPanel.add(item);
-        }
-
-        // Toggle logic
-        toggleButton.addActionListener(e -> {
-            boolean visible = itemsPanel.isVisible();
-            itemsPanel.setVisible(!visible);
-            toggleButton.setText((visible ? "▶ " : "▼ ") + orderTitle);
-            parent.revalidate();
-            parent.repaint();
-        });
-
-        // Add components to order container
-        orderContainer.add(toggleButton, BorderLayout.NORTH);
-        orderContainer.add(itemsPanel, BorderLayout.CENTER);
-
-        // Add this order to the main list panel
-        parent.add(orderContainer);
     }
 
     /**
@@ -281,13 +50,11 @@ public class MainMenu extends javax.swing.JFrame {
         btnHat = new javax.swing.JButton();
         lblUserName = new javax.swing.JLabel();
         btnUsers = new javax.swing.JButton();
-        calendarPanel = new javax.swing.JPanel();
         scrollOrders = new javax.swing.JScrollPane();
-        jButton2 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        calendarPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(800, 600));
+        setMinimumSize(new java.awt.Dimension(829, 545));
 
         btnSignOut.setText("Logga ut");
         btnSignOut.addActionListener(new java.awt.event.ActionListener() {
@@ -336,103 +103,69 @@ public class MainMenu extends javax.swing.JFrame {
             }
         });
 
+        scrollOrders.setEnabled(false);
+
         calendarPanel.setBackground(new java.awt.Color(255, 255, 255));
         calendarPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        calendarPanel.setInheritsPopupMenu(true);
+        calendarPanel.setPreferredSize(new java.awt.Dimension(618, 279));
         calendarPanel.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
                 calendarPanelMouseWheelMoved(evt);
             }
         });
-
-        javax.swing.GroupLayout calendarPanelLayout = new javax.swing.GroupLayout(calendarPanel);
-        calendarPanel.setLayout(calendarPanelLayout);
-        calendarPanelLayout.setHorizontalGroup(
-            calendarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 613, Short.MAX_VALUE)
-        );
-        calendarPanelLayout.setVerticalGroup(
-            calendarPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 276, Short.MAX_VALUE)
-        );
-
-        jButton2.setText(">");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        jButton1.setText("<");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+        calendarPanel.setLayout(null);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSignOut)
-                            .addComponent(lblUserName)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(207, 207, 207)
-                        .addComponent(lblCompanyName)))
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(207, 207, 207)
+                .addComponent(lblCompanyName))
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(btnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(btnMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 153, Short.MAX_VALUE)
-                        .addComponent(btnUsers)
-                        .addGap(20, 20, 20)
-                        .addComponent(btnHat, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(scrollOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton2))
-                            .addComponent(calendarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())))
+                .addGap(6, 6, 6)
+                .addComponent(btnCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addComponent(btnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addComponent(btnMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(159, 159, 159)
+                .addComponent(btnUsers)
+                .addGap(20, 20, 20)
+                .addComponent(btnHat, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(lblUserName))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(scrollOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
+                .addComponent(calendarPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(btnSignOut))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addComponent(lblCompanyName, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnCustomer)
                     .addComponent(btnOrder)
-                    .addComponent(btnHat)
                     .addComponent(btnMaterial)
-                    .addComponent(btnUsers))
+                    .addComponent(btnUsers)
+                    .addComponent(btnHat))
                 .addGap(18, 18, 18)
                 .addComponent(lblUserName)
-                .addGap(25, 25, 25)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(scrollOrders, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
-                    .addComponent(calendarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
-                .addGap(12, 12, 12)
-                .addComponent(btnSignOut)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(calendarPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(scrollOrders, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                .addComponent(btnSignOut))
         );
 
         pack();
@@ -452,8 +185,9 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomerActionPerformed
         // TODO add your handling code here:
-        new CustomerInformationWindow().setVisible(true);
-        this.setVisible(false);
+        //new CustomerInformationWindow().setVisible(true);
+        //this.setVisible(false);
+        new Test(userLoggedIn).setVisible(true);
     }//GEN-LAST:event_btnCustomerActionPerformed
 
     private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
@@ -473,176 +207,9 @@ public class MainMenu extends javax.swing.JFrame {
         new EmployeesWindow(userLoggedIn).setVisible(true);
     }//GEN-LAST:event_btnUsersActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        startDate = startDate.minusDays(1);
-        initSchedule();
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        startDate = startDate.plusDays(1);
-        initSchedule();
-    }//GEN-LAST:event_jButton2ActionPerformed
-
     private void calendarPanelMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_calendarPanelMouseWheelMoved
         // TODO add your handling code here:
-        int direction = evt.getWheelRotation();
-        startDate = startDate.minusDays(direction);
-        initSchedule();
-        calendarPanel.setBackground(Color.LIGHT_GRAY);
-        Timer timer = new Timer(150, e -> calendarPanel.setBackground(Color.WHITE));
-        timer.setRepeats(false);
-        timer.start();
-
     }//GEN-LAST:event_calendarPanelMouseWheelMoved
-
-    private void makeDraggable(JPanel panel) {
-        Point initialClick = new Point();
-
-        panel.addMouseListener(new MouseAdapter() {
-            JPanel ghostPanel;
-            JFrame frame;
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                initialClick.setLocation(e.getPoint());
-
-                frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
-                JComponent glassPane = (JComponent) frame.getGlassPane();
-                glassPane.setLayout(null);
-                glassPane.setVisible(true);
-
-                ghostPanel = new JPanel();
-                ghostPanel.setBackground(panel.getBackground());
-                ghostPanel.setSize(panel.getSize());
-                ghostPanel.setBorder(panel.getBorder());
-                for (Component comp : panel.getComponents()) {
-                    if (comp instanceof JLabel label) {
-                        ghostPanel.add(new JLabel(label.getText()));
-                    }
-                }
-
-                Point panelPosInGlass = SwingUtilities.convertPoint(panel.getParent(), panel.getLocation(), frame.getGlassPane());
-
-                ghostPanel.setBounds(panelPosInGlass.x, panelPosInGlass.y, panel.getWidth(), panel.getHeight());
-                glassPane.add(ghostPanel);
-                glassPane.repaint();
-
-                panel.setVisible(false);
-
-                frame.setCursor(Cursor.HAND_CURSOR);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (ghostPanel == null) {
-                    return;
-                }
-                Point ghostLocation = ghostPanel.getLocationOnScreen();
-                Point calendarLocationOnScreen = calendarPanel.getLocationOnScreen();
-                Dimension calendarSize = calendarPanel.getSize();
-                Rectangle calendarBounds = new Rectangle(calendarLocationOnScreen, calendarSize);
-
-                JComponent glassPane = (JComponent) frame.getGlassPane();
-
-                if (calendarBounds.contains(ghostLocation)) {
-                    Point ghostCenter = new Point(
-                            ghostPanel.getX() + ghostPanel.getWidth() / 2,
-                            ghostPanel.getY() + ghostPanel.getHeight() / 2
-                    );
-
-                    JPanel closestCell = null;
-                    double closestDistance = Double.MAX_VALUE;
-
-                    for (JPanel cell : taskCells) {
-                        Point cellOnGlass = SwingUtilities.convertPoint(
-                                cell.getParent(), cell.getLocation(), glassPane
-                        );
-
-                        Rectangle cellBounds = new Rectangle(cellOnGlass, cell.getSize());
-                        Point cellCenter = new Point(
-                                cellBounds.x + cellBounds.width / 2,
-                                cellBounds.y + cellBounds.height / 2
-                        );
-
-                        double distance = ghostCenter.distance(cellCenter);
-                        if (distance < closestDistance) {
-                            closestDistance = distance;
-                            closestCell = cell;
-                        }
-                    }
-
-                    if (closestCell != null) {
-                        Point cellPos = SwingUtilities.convertPoint(
-                                closestCell.getParent(), closestCell.getLocation(), glassPane
-                        );
-
-                        ghostPanel.setLocation(cellPos);
-                        panel.setBorder(null);
-
-                        closestCell.removeAll();
-                        closestCell.add(panel);
-                        panel.setVisible(true);
-                        closestCell.revalidate();
-                        closestCell.repaint();
-                    }
-                }
-
-                glassPane.remove(ghostPanel);
-                glassPane.repaint();
-                glassPane.setVisible(false);
-                ghostPanel = null;
-                frame.setCursor(Cursor.DEFAULT_CURSOR);
-                panel.setVisible(true);
-            }
-        });
-
-        panel.addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
-                JComponent glassPane = (JComponent) frame.getGlassPane();
-
-                Point cursor = SwingUtilities.convertPoint(panel, e.getPoint(), glassPane);
-
-                for (Component comp : glassPane.getComponents()) {
-                    if (comp instanceof JPanel ghost) {
-                        ghost.setLocation(cursor.x - initialClick.x, cursor.y - initialClick.y);
-                    }
-                }
-
-                glassPane.repaint();
-            }
-        });
-
-    }
-
-    private void setupYearChooserListener() {
-        yearChooser.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            @Override
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                if ("year".equals(evt.getPropertyName())) {
-                    int selectedYear = yearChooser.getYear();
-                    if (selectedYear != startDate.getYear()) {
-                        startDate = startDate.withYear(selectedYear);
-                        initSchedule();
-                    }
-
-                }
-            }
-        });
-    }
-
-    private void setupMonthChooserListener() {
-        monthChooser.addPropertyChangeListener("month", new java.beans.PropertyChangeListener() {
-            @Override
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                int selectedMonth = monthChooser.getMonth(); // 0-indexed
-                System.out.println("Month changed to: " + (selectedMonth + 1));
-                startDate = startDate.withMonth(selectedMonth + 1);
-                initSchedule();
-            }
-        });
-    }
 
     /**
      * @param args the command line arguments
@@ -687,8 +254,6 @@ public class MainMenu extends javax.swing.JFrame {
     private javax.swing.JButton btnSignOut;
     private javax.swing.JButton btnUsers;
     private javax.swing.JPanel calendarPanel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel lblCompanyName;
     private javax.swing.JLabel lblUserName;
     private javax.swing.JScrollPane scrollOrders;

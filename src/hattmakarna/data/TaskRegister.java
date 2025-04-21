@@ -39,4 +39,8 @@ public class TaskRegister {
         return allTasks;
     }
     
+    public void refreshTasks(){
+        allTasks.clear();
+        initAllTasks();
+    }
 }
