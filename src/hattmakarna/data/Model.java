@@ -29,7 +29,6 @@ public class Model extends DatabaseObject {
     public Model(HashMap<String, String> modelMap) {
         model_id = Integer.parseInt(modelMap.get("model_id"));
         name = modelMap.get("name");
-        System.out.println(modelMap.get("price"));
         price = Double.parseDouble(modelMap.get("price"));
     }
 

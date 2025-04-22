@@ -2,6 +2,7 @@ package hattmakarna.data;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +23,8 @@ public class Order extends DatabaseObject {
     private Date recived_date;
     private boolean material_ordered;
     private boolean isFastProduction;
+
+    private List<Hat> hats;
 
     /**
      * Tom standardkonstruktor.
@@ -103,6 +106,10 @@ public class Order extends DatabaseObject {
 
     }
 
+    public void setHats(List<Hat> hats) {
+        this.hats = hats;
+    }
+
     public int getTotalPris() {
         return totalPris;
     }
@@ -159,5 +166,20 @@ public class Order extends DatabaseObject {
     @Override
     protected void setIdString(String id) {
         this.order_id = Integer.parseInt(id);
+    }
+
+    @Override
+    public boolean save() {
+        // Spara order objektet
+        super.save();
+
+        if (hats != null) {
+            hats.forEach(e -> {
+                e.setOrder_id(order_id);
+                e.save();
+            });
+        }
+
+        return true;
     }
 }

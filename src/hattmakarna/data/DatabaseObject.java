@@ -296,7 +296,7 @@ public abstract class DatabaseObject {
             String sql;
 
             // Ny post → INSERT
-            if (getIdString().equals("0") || getIdString() == null || getIdString().isEmpty()) {
+            if (getIdString() == null ||getIdString().equals("0") || getIdString().isEmpty()) {
                 String id = Hattmakarna.idb.getAutoIncrement(getTabelName(), getIdAttributeName());
                 attributeNames.add(getIdAttributeName());
                 attributeValues.add(id);
@@ -305,7 +305,7 @@ public abstract class DatabaseObject {
                         + " (" + String.join(", ", attributeNames) + ") VALUES ("
                         + String.join(", ", attributeValues) + ");";
 
-                System.out.println("Genererad SQL: " + sql);
+                //System.out.println("Genererad SQL: " + sql);
                 hattmakarna.data.Hattmakarna.idb.insert(sql);
                 setIdString(id);
                 
@@ -321,7 +321,7 @@ public abstract class DatabaseObject {
                         + " SET " + String.join(", ", setClauses)
                         + " WHERE " + getIdAttributeName() + " = " + getIdString() + ";";
 
-                System.out.println("Genererad SQL: " + sql);
+                //System.out.println("Genererad SQL: " + sql);
                 hattmakarna.data.Hattmakarna.idb.update(sql);
             }
 

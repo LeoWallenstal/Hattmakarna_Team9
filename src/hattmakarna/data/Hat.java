@@ -25,8 +25,41 @@ public class Hat extends DatabaseObject {
     private int hat_id;
     private int model_id;
     private int order_id;
+
+    public int getHat_id() {
+        return hat_id;
+    }
+
+    public void setHat_id(int hat_id) {
+        this.hat_id = hat_id;
+    }
+
+    public int getModel_id() {
+        return model_id;
+    }
+
+    public void setModel_id(int model_id) {
+        this.model_id = model_id;
+    }
+
+    public int getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(int order_id) {
+        this.order_id = order_id;
+    }
     private double price;
     private String size;
+    private boolean isExpress;
+
+    public boolean isIsExpress() {
+        return isExpress;
+    }
+
+    public void setIsExpress(boolean isExpress) {
+        this.isExpress = isExpress;
+    }
 
     @Deprecated
     private ArrayList<MaterialOrder> materialBehov;
@@ -37,7 +70,6 @@ public class Hat extends DatabaseObject {
     private Specification specification;
 
     public Hat() {
-        specification = new Specification();
         materials = new ArrayList<>();
     }
 
@@ -74,6 +106,10 @@ public class Hat extends DatabaseObject {
     }
 
     public Specification getSpecification() {
+        if (specification == null) {
+            specification = new Specification();
+        }
+
         return specification;
     }
 
@@ -166,7 +202,6 @@ public class Hat extends DatabaseObject {
     }
 
     public void setIsSpecial(boolean isSpecial) {
-        System.out.println(isSpecial);
         this.isSpecial = isSpecial;
     }
 
@@ -174,9 +209,9 @@ public class Hat extends DatabaseObject {
     public int hashCode() {
 
         if (!isSpecial) {
-            return Objects.hash(hat_id, model_id, 0);
+            return Objects.hash(hat_id, model_id, 0, isExpress);
         } else {
-            return Objects.hash(hat_id, model_id, id);
+            return Objects.hash(hat_id, model_id, id, isExpress);
         }
     }
 
@@ -206,5 +241,20 @@ public class Hat extends DatabaseObject {
     @Override
     protected void setIdString(String id) {
         this.hat_id = Integer.parseInt(id);
+    }
+
+    @Override
+    public boolean save() {
+
+        if (!super.save()) {
+            return false;
+        }
+
+        if (specification != null) {
+            specification.setHatId(hat_id);
+            return specification.save();
+        }
+
+        return true;
     }
 }
