@@ -225,7 +225,8 @@ public class ScheduleManager {
 
                 if (n < tasksForThisDay.size()) {
                     Task task = tasksForThisDay.get(n);
-                    JPanel taskPanel = createTaskPanel(task);
+                    JPanel taskPanel = createTaskPanel(task.getModelName());
+                    taskPanel.putClientProperty("task", task);
                     makeDraggable(taskPanel);
                     cell.add(taskPanel, BorderLayout.CENTER);
                 } else {
@@ -239,18 +240,15 @@ public class ScheduleManager {
         return daysPanel;
     }
 
-    private JPanel createTaskPanel(Task task) {
+    private JPanel createTaskPanel(String modelName) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.LIGHT_GRAY);
         panel.setOpaque(true);
-        
-        Hat hat = new Hat(String.valueOf(task.getHatId()));
-        Model model = new Model(hat.getModelId());
 
-        JLabel label = new JLabel(model.getName(), SwingConstants.CENTER);
+        JLabel label = new JLabel(modelName, SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);
         panel.add(label, BorderLayout.CENTER);
-        panel.putClientProperty("task", task);
+        
 
         URL imageUrl = getClass().getResource("/resources/icons/magician-hat.png");
         String toolTip = "<html>"
@@ -316,7 +314,7 @@ public class ScheduleManager {
                 String hatId = hat.get("hat_id");
                 String hatName = hat.get("name");
 
-                JPanel item = new JPanel();
+                JPanel item = createTaskPanel(hatName);
                 int totalHeight = calendarPanel.getHeight();
                 int totalWidth = calendarPanel.getWidth();
                 int slotHeight = totalHeight / 8;
@@ -335,7 +333,6 @@ public class ScheduleManager {
                 item.setPreferredSize(taskSize);
                 item.setBackground(Color.LIGHT_GRAY);
                 item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-                item.add(new JLabel(hatName));
                 item.putClientProperty("hat_id", hatId);
                 makeDraggable(item);
                 currentRow.add(item);

@@ -6,6 +6,7 @@ package hattmakarna.data;
 
 import static hattmakarna.data.Hattmakarna.idb;
 import java.util.ArrayList;
+import java.util.HashMap;
 import oru.inf.InfException;
 
 /**
@@ -13,7 +14,7 @@ import oru.inf.InfException;
  * @author walle
  */
 public class TaskRegister {
-    
+
     private ArrayList<Task> allTasks;
 
     public TaskRegister() {
@@ -22,24 +23,31 @@ public class TaskRegister {
     }
 
     private void initAllTasks() {
-        String sqlQuery = "SELECT task_id FROM task";
+        String sqlQuery = """
+            SELECT 
+            t.*, 
+            m.name AS model_name
+            FROM task t
+            JOIN hat h ON t.hat_id = h.hat_id
+            JOIN hat_model m ON h.model_id = m.model_id
+        """;
 
         try {
-            ArrayList<String> tasks = idb.fetchColumn(sqlQuery);
-            for (String id : tasks) {
-                allTasks.add(new Task(id));
+            ArrayList<HashMap<String, String>> tasks = idb.fetchRows(sqlQuery);
+            for (HashMap<String, String> taskMap : tasks) {
+                allTasks.add(new Task(taskMap));
             }
         } catch (InfException ex) {
             System.out.println(" in initAllTasks()");
         }
 
     }
-    
-    public ArrayList<Task> getTasks(){
+
+    public ArrayList<Task> getTasks() {
         return allTasks;
     }
-    
-    public void refreshTasks(){
+
+    public void refreshTasks() {
         allTasks.clear();
         initAllTasks();
     }
