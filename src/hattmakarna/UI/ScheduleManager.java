@@ -51,7 +51,10 @@ public class ScheduleManager {
         emptyCells = new ArrayList<>();
 
         initSchedule();
-        initOrders();
+        initOrders();       
+        
+        
+       
     }
 
     public void refreshSchedule() {
@@ -226,11 +229,11 @@ public class ScheduleManager {
                 if (n < tasksForThisDay.size()) {
                     Task task = tasksForThisDay.get(n);
                     JPanel taskPanel = createTaskPanel(task.getModelName());
-                    
+
                     JLabel orderLabel = new JLabel("Order #" + task.getOrderId(), SwingConstants.CENTER);
                     orderLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
                     taskPanel.add(orderLabel, BorderLayout.SOUTH);
-                    
+
                     taskPanel.putClientProperty("task", task);
                     makeDraggable(taskPanel);
                     cell.add(taskPanel, BorderLayout.CENTER);
@@ -279,12 +282,23 @@ public class ScheduleManager {
                        m.name,
                        u.first_name,
                        u.last_name,
-                       CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task
+                       CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
+                       CASE WHEN t.status = 'KLAR' THEN 1 ELSE 0 END AS done
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
                 LEFT JOIN user u ON t.user_id = u.user_id
-                WHERE h.order_id = """ + aOrder.getOrder_id();
+                WHERE h.order_id = """ + aOrder.getOrder_id()  
+//                   + """
+//                  AND (
+//                        SELECT COUNT(*) 
+//                        FROM task t2
+//                        JOIN hat h2 ON t2.hat_id = h2.hat_id
+//                        WHERE h2.order_id = h.order_id
+//                          AND t2.status <> 'KLAR'
+//                      ) > 0
+//                """
+            ;
 
             try {
                 ArrayList<HashMap<String, String>> hats = idb.fetchRows(query);
@@ -324,6 +338,7 @@ public class ScheduleManager {
                 String hatName = hat.get("name");
                 String userName = hat.get("first_name") + " " + hat.get("last_name");
                 boolean isAssigned = "1".equals(hat.get("in_task"));
+                boolean isDone = "1".equals(hat.get("done"));
 
                 JPanel item = createTaskPanel(hatName);
                 int totalHeight = calendarPanel.getHeight();
@@ -343,10 +358,14 @@ public class ScheduleManager {
                 Dimension taskSize = new Dimension(slotWidth - 1, slotHeight - 1);
                 item.setPreferredSize(taskSize);
                 if (isAssigned) {
-                    item.setBackground(Color.YELLOW);
                     JLabel workerLabel = new JLabel(userName, SwingConstants.CENTER);
                     workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
                     item.add(workerLabel, BorderLayout.SOUTH);
+                    if (isDone) {
+                        item.setBackground(Color.GREEN);
+                    } else {
+                        item.setBackground(Color.YELLOW);
+                    }
                 } else {
                     item.setBackground(Color.LIGHT_GRAY);
                     makeDraggable(item);
@@ -392,7 +411,7 @@ public class ScheduleManager {
                 if (calendarBounds.contains(panel.getLocationOnScreen())) {
                     originCell[0] = (JPanel) panel.getParent();
                 }
-                tempPanel[0] = createTempPanel(panel);
+                tempPanel[0] = clonePanel(panel, false, panel.getBackground());
                 tempPanel[0].setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
                 Point panelPosInGlass = SwingUtilities.convertPoint(panel.getParent(), panel.getLocation(), frame.getGlassPane());
@@ -438,22 +457,17 @@ public class ScheduleManager {
                 panel.setOpaque(true);
                 panel.setBackground(Color.LIGHT_GRAY);
 
-                if (highlightedCell != null) {
-                    Container parent = highlightedCell.getParent();
-                    Component[] all = parent.getComponents();
-
-                    boolean isBottomRow = all[all.length - 1] == highlightedCell;
-                    if (isBottomRow) {
-                        highlightedCell.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
-                    } else {
-                        highlightedCell.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+                for (Component comp : panel.getComponents()) {
+                    if (comp instanceof JLabel) {
+                        comp.setVisible(true);
                     }
+                }
+
+                if (highlightedCell != null) {
+                    resetHighlightedCellBorder(highlightedCell);
                     highlightedCell = null;
                 }
 
-                for (Component c : panel.getComponents()) {
-                    c.setVisible(true);
-                }
             }
         });
 
@@ -472,15 +486,7 @@ public class ScheduleManager {
                     JPanel currentBestCell = findBestEmptyCell(tempBounds);
 
                     if (highlightedCell != null && highlightedCell != currentBestCell) {
-                        Container parent = highlightedCell.getParent();
-                        Component[] all = parent.getComponents();
-
-                        boolean isBottomRow = all[all.length - 1] == highlightedCell;
-                        if (isBottomRow) {
-                            highlightedCell.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
-                        } else {
-                            highlightedCell.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
-                        }
+                        resetHighlightedCellBorder(highlightedCell);
                     }
 
                     if (currentBestCell != null && currentBestCell != highlightedCell) {
@@ -493,6 +499,18 @@ public class ScheduleManager {
             }
         });
 
+    }
+
+    private void resetHighlightedCellBorder(JPanel highlightedCell) {
+        Container parent = highlightedCell.getParent();
+        Component[] all = parent.getComponents();
+
+        boolean isBottomRow = all[all.length - 1] == highlightedCell;
+        if (isBottomRow) {
+            highlightedCell.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.GRAY));
+        } else {
+            highlightedCell.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        }
     }
 
     private void moveTask(JPanel panel, JPanel bestCell, JPanel originCell, LocalDate dropDate) {
@@ -511,7 +529,7 @@ public class ScheduleManager {
             if (task == null) {
                 task = createNewTaskFromPanel(panel, dropDate);
                 if (task != null) {
-                    replacePanelWithCopy(panel);
+                    setHatAsAssigned(panel);
                     tasks.add(task);
                     panel.putClientProperty("task", task);
                 }
@@ -520,46 +538,63 @@ public class ScheduleManager {
         bestCell.removeAll();
         bestCell.add(panel);
         panel.setBorder(null);
-        panel.setVisible(true);
         bestCell.revalidate();
         bestCell.repaint();
         emptyCells.remove(bestCell);
         taskRegister.refreshTasks();
         tasks = taskRegister.getTasks();
-    }
-    
-    private void replacePanelWithCopy(JPanel originalPanel) {
-    Container parent = originalPanel.getParent();
-    if (parent == null) return;
-
-    JPanel clone = new JPanel(originalPanel.getLayout());
-    clone.setBackground(Color.YELLOW);
-    clone.setSize(originalPanel.getSize());
-    clone.setPreferredSize(originalPanel.getPreferredSize());
-    clone.setBorder(originalPanel.getBorder());
-    clone.setOpaque(true);
-
-    for (Component comp : originalPanel.getComponents()) {
-        clone.add(comp);
+        refreshSchedule();
     }
 
-    int index = -1;
-    Component[] siblings = parent.getComponents();
-    for (int i = 0; i < siblings.length; i++) {
-        if (siblings[i] == originalPanel) {
-            index = i;
-            break;
+    private JPanel clonePanel(JPanel originalPanel, boolean showOriginalComponents, Color overrideBackground) {
+        JPanel clone = new JPanel(originalPanel.getLayout());
+        clone.setOpaque(true);
+        clone.setBackground(overrideBackground != null ? overrideBackground : originalPanel.getBackground());
+        clone.setSize(originalPanel.getSize());
+        clone.setPreferredSize(originalPanel.getPreferredSize());
+        clone.setBorder(originalPanel.getBorder());
+
+        for (Component comp : originalPanel.getComponents()) {
+            if (comp instanceof JLabel) {
+                JLabel originalLabel = (JLabel) comp;
+                JLabel copy = new JLabel(originalLabel.getText(), originalLabel.getHorizontalAlignment());
+                copy.setFont(originalLabel.getFont());
+                copy.setToolTipText(originalLabel.getToolTipText());
+                clone.add(copy);
+                comp.setVisible(showOriginalComponents);
+            }
+        }
+
+        return clone;
+    }
+
+    private void setHatAsAssigned(JPanel original) {
+        Container parent = original.getParent();
+        if (parent == null) {
+            return;
+        }
+
+        JPanel clone = clonePanel(original, true, Color.YELLOW);
+
+        JLabel workerLabel = new JLabel(userLoggedIn.getFullName(), SwingConstants.CENTER);
+        workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        clone.add(workerLabel, BorderLayout.SOUTH);
+
+        int index = -1;
+        Component[] siblings = parent.getComponents();
+        for (int i = 0; i < siblings.length; i++) {
+            if (siblings[i] == original) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            parent.add(clone, index);
+            parent.revalidate();
+            parent.repaint();
         }
     }
-
-    if (index != -1) {
-        originalPanel.setVisible(false);
-        parent.add(clone, index);
-        parent.revalidate();
-        parent.repaint();
-    }
-}
-
 
     private Task createNewTaskFromPanel(JPanel taskPanel, LocalDate dropDate) {
         String userId = userLoggedIn.getID();
@@ -608,17 +643,6 @@ public class ScheduleManager {
         } else {
             return null;
         }
-    }
-
-    private JPanel createTempPanel(JPanel original) {
-        JPanel tempPanel = new JPanel();
-        tempPanel.setBackground(original.getBackground());
-        tempPanel.setSize(original.getSize());
-        tempPanel.setBorder(original.getBorder());
-        for (Component comp : original.getComponents()) {
-            comp.setVisible(false);
-        }
-        return tempPanel;
     }
 
     private void setupNavigationListeners(JButton backButton, JButton forwardButton, JMonthChooser monthChooser, JYearChooser yearChooser) {
