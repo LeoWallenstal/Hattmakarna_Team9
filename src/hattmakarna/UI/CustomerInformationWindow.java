@@ -31,52 +31,38 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
     /**
      * Creates new form CustomerInformationWindow
      */
-    public CustomerInformationWindow(User userLoggedIn) {
-        this.userLoggedIn = userLoggedIn;
-        this.idb = hattmakarna.data.Hattmakarna.idb;
-        this.customerRegister = new CustomerRegister(idb);
-          initComponents();
-          fillTable();
-          
+public CustomerInformationWindow(User userLoggedIn) {
+    this.userLoggedIn = userLoggedIn;
+    this.customerRegister = new CustomerRegister();
 
-     
-    /**
-     * Creates new form CustomerInformationWindow
-     */
-    
-        
-        
-        
-        
+    initComponents();
+    fillTable();
 
-        try{
-            ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
-            cbMail.removeAllItems();
-            for (String mail : mailList){
-                cbMail.addItem(mail);
-            }
-        } 
-        catch (InfException e) {
-            JOptionPane.showMessageDialog(this,"kunde inte hämta mail" + e.getMessage());
+    try {
+        ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
+        cbMail.removeAllItems();
+        for (String mail : mailList) {
+            cbMail.addItem(mail);
         }
-        
-        try {
-            ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
-            cbName.removeAllItems();
-
-            for (HashMap<String, String> row : customerRows) {
-                String fName = row.get("first_name");
-                String lName = row.get("last_name");
-
-                String comboText = fName + " " + lName;
-                cbName.addItem(comboText);
-            }
-        } catch (InfException e) {
-            JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
-        }
-        cbMail.addActionListener(e -> mailSelected());
-        cbName.addActionListener(e -> nameSelected());
+    } catch (InfException e) {
+        JOptionPane.showMessageDialog(this, "Kunde inte hämta mail: " + e.getMessage());
     }
+
+    try {
+        ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
+        cbName.removeAllItems();
+        for (HashMap<String, String> row : customerRows) {
+            String fName = row.get("first_name");
+            String lName = row.get("last_name");
+            cbName.addItem(fName + " " + lName);
+        }
+    } catch (InfException e) {
+        JOptionPane.showMessageDialog(this, "Kunde inte hämta namn: " + e.getMessage());
+    }
+
+    cbMail.addActionListener(e -> mailSelected());
+    cbName.addActionListener(e -> nameSelected());
+}
     
     private void fillTable() {
         //DEBUG
