@@ -15,6 +15,7 @@ import hattmakarna.data.ModelRegister;
 import javax.swing.JOptionPane;
 import hattmakarna.data.Customer;
 import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.data.User;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -23,14 +24,15 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CustomerInformationWindow extends javax.swing.JFrame {
     private CustomerRegister customerRegister;
-
+     private User userLoggedIn;
     /**
      * Creates new form CustomerInformationWindow
      */
-    public CustomerInformationWindow() {
+    public CustomerInformationWindow(User userLoggedIn) {
+        this.userLoggedIn = userLoggedIn;
         this.customerRegister = new CustomerRegister();
-        fillTable();
         initComponents();
+         fillTable();
         
         try{
             ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
@@ -57,6 +59,8 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         } catch (InfException e) {
             JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
         }
+        cbMail.addActionListener(e -> mailSelected());
+        cbName.addActionListener(e -> nameSelected());
     }
     
     private void fillTable() {
@@ -65,7 +69,7 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         ArrayList <Customer> customers = customerRegister.getAllCustomers();
         
         String[] columnNames = {"name", "customerID","email", "phone", "adress", "postalCode", "country" };
-        Object[][] data = new Object[customers.size()][3];
+        Object[][] data = new Object[customers.size()][7];
         for (int i = 0; i < customers.size(); i++) {
             Customer m = customers.get(i);
             data[i][0] = m.getFullName();
@@ -86,6 +90,76 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         };
         jTable1.setModel(tableModel);
     }
+    private void updateTable(ArrayList<Customer> customers) {
+    String[] columnNames = {"Namn", "E-mail", "Nummer", "Adress", "Postnummer", "Land"};
+    Object[][] data = new Object[customers.size()][6];
+    
+    for (int i = 0; i < customers.size(); i++) {
+        Customer m = customers.get(i);
+        data[i][0] = m.getFullName();
+        data[i][1] = m.getEmailAdresses();
+        data[i][2] = m.getTelephoneNumbers();
+        data[i][3] = m.getAdress();
+        data[i][4] = m.getPostalCode();
+        data[i][5] = m.getCountry();
+    }
+
+    javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    jTable1.setModel(tableModel);
+}
+    
+    private void mailSelected() {
+    String selectedMail = (String) cbMail.getSelectedItem();
+    if (selectedMail != null && !selectedMail.isEmpty()) {
+        Customer c = findCustomerByEmail(selectedMail);
+        if (c != null) {
+            ArrayList<Customer> singleCustomer = new ArrayList<>();
+            singleCustomer.add(c);
+            updateTable(singleCustomer);
+        }
+    }
+}
+
+private void nameSelected() {
+    String selectedName = (String) cbName.getSelectedItem();
+    if (selectedName != null && !selectedName.isEmpty()) {
+        String[] nameParts = selectedName.split(" ");
+        if (nameParts.length == 2) {
+            String firstName = nameParts[0];
+            String lastName = nameParts[1];
+             Customer c = findCustomerByFullName(firstName + " " + lastName);
+            ArrayList<Customer> customers = new ArrayList<>();
+            if (c != null){
+    customers.add(c);
+}
+            updateTable(customers);
+        }
+    }
+}
+private Customer findCustomerByEmail(String email) {
+    for (Customer c : customerRegister.getAllCustomers()) {
+        for (String mail : c.getEmailAdresses()) {
+            if (mail.equalsIgnoreCase(email)) {
+                return c;
+            }
+        }
+    }
+    return null;
+}
+
+private Customer findCustomerByFullName(String fullName) {
+    for (Customer c : customerRegister.getAllCustomers()) {
+        String combinedName = c.getFirstName() + " " + c.getLastName();
+        if (combinedName.equalsIgnoreCase(fullName)) {
+            return c;
+        }
+    }
+    return null;
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -104,6 +178,7 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         lblSearchEmail = new javax.swing.JLabel();
         lblSearchName = new javax.swing.JLabel();
         btnEditCustomer = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -138,6 +213,13 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
             }
         });
 
+        btnBack.setText("Tillbaka");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -160,6 +242,8 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnBack)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnEditCustomer)))))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
@@ -174,7 +258,8 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
                     .addComponent(cbMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblSearchEmail)
                     .addComponent(lblSearchName)
-                    .addComponent(btnEditCustomer))
+                    .addComponent(btnEditCustomer)
+                    .addComponent(btnBack))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(22, 22, 22))
@@ -186,6 +271,11 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
     private void btnEditCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditCustomerActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnEditCustomerActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+       new MainMenu(userLoggedIn).setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnBackActionPerformed
 
     /**
      * @param args the command line arguments
@@ -223,6 +313,7 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
    // }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
     private javax.swing.JButton btnEditCustomer;
     private javax.swing.JComboBox<String> cbMail;
     private javax.swing.JComboBox<String> cbName;
