@@ -26,8 +26,36 @@ public class Specification extends DatabaseObject {
     private int spec_id;
     private String beskrivning;
     private int hat_id;
+    
     private String img_path;
+    private BufferedImage imgImage = null;
+    private String skiss_path;
     private BufferedImage skissImage = null;
+
+    public BufferedImage getImgImage() {
+        return imgImage;
+    }
+
+    public void setImgImage(BufferedImage imgImage) {
+        this.imgImage = imgImage;
+    }
+
+    public String getSkiss_path() {
+        return skiss_path;
+    }
+
+    public void setSkiss_path(String skiss_path) {
+        this.skiss_path = skiss_path;
+    }
+
+    public BufferedImage getSkissImage() {
+        return skissImage;
+    }
+
+    public void setSkissImage(BufferedImage skissImage) {
+        this.skissImage = skissImage;
+    }
+    
     public static final String SAVE_TO_PATH = "images/";
 
     public Specification(String specificationID) {
@@ -73,13 +101,6 @@ public class Specification extends DatabaseObject {
      */
     public static BufferedImage setFileFromUser() {
 
-        try {
-            // Set native look and feel
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
         chooser.setFileFilter(filter);
@@ -121,15 +142,26 @@ public class Specification extends DatabaseObject {
     public boolean save() {
         try {
             // Spara bild vald till fil 
-            if (skissImage != null) {
+            if (imgImage != null) {
 
                 String fileName = "specBild-hat-" + hat_id + ".png";
                 File fileToSave = new File(SAVE_TO_PATH + fileName);
                 fileToSave.getParentFile().mkdirs();
 
-                ImageIO.write(skissImage, "png", fileToSave);
+                ImageIO.write(imgImage, "png", fileToSave);
 
                 img_path = fileToSave.getPath().replace("\\", "\\\\");
+            }
+            // Spara bild vald till fil 
+            if (skissImage != null) {
+
+                String fileName = "specSkiss-hat-" + hat_id + ".png";
+                File fileToSave = new File(SAVE_TO_PATH + fileName);
+                fileToSave.getParentFile().mkdirs();
+
+                ImageIO.write(skissImage, "png", fileToSave);
+
+                skiss_path = fileToSave.getPath().replace("\\", "\\\\");
             }
             return super.save();
         } catch (IOException ex) {
