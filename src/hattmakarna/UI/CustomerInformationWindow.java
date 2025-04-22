@@ -23,6 +23,7 @@ import hattmakarna.data.Customer;
 public class CustomerInformationWindow extends javax.swing.JFrame {
     private InfDB idb;
     private CustomerRegister customerRegister;
+    private  Customer customer;
     
 
     /**
@@ -32,8 +33,8 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         
         this.idb = hattmakarna.data.Hattmakarna.idb;
         this.customerRegister = new CustomerRegister(idb);
-         fillTable();
           initComponents();
+          fillTable();
         try{
         ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
         cbMail.removeAllItems();
@@ -65,17 +66,16 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         System.out.println("fillTableKörs");
         ArrayList <Customer> customers = customerRegister.getAllCustomers();
         
-        String[] columnNames = {"name", "customerID","email", "phone", "adress", "postalCode", "country" };
-        Object[][] data = new Object[customers.size()][3];
+        String[] columnNames = {"Namn" ,"E-mail", "Nummer", "Adress", "Postnummer", "Land" };
+        Object[][] data = new Object[customers.size()][6];
         for (int i = 0; i < customers.size(); i++) {
             Customer m = customers.get(i);
             data[i][0] = m.getFullName();
-            data[i][1] = m.getCustomerID();
-            data[i][2] = m.getEmailAdresses();
-            data[i][3] = m.getTelephoneNumbers();
-            data[i][4] = m.getAdress();
-            data[i][5] = m.getPostalCode();
-            data[i][6] = m.getCountry();
+            data[i][1] = m.getEmailAdresses();
+            data[i][2] = m.getTelephoneNumbers();
+            data[i][3] = m.getAdress();
+            data[i][4] = m.getPostalCode();
+            data[i][5] = m.getCountry();
      
             
         }
@@ -185,7 +185,8 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditCustomerActionPerformed
-        // TODO add your handling code here:
+         EditCustomer editCUstomer = new EditCustomer(customer);
+        editCUstomer.setVisible(true);
     }//GEN-LAST:event_btnEditCustomerActionPerformed
 
     /**
