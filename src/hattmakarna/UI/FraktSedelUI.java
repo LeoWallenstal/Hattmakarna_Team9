@@ -4,14 +4,18 @@
  */
 package hattmakarna.UI;
 
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder;
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder.FontStyle;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import hattmakarna.data.Customer;
 import hattmakarna.data.Hat;
 import hattmakarna.data.Order;
 import java.awt.Desktop;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -136,23 +140,62 @@ public class FraktSedelUI extends javax.swing.JFrame {
      */
     private void printDeckleration() {
         
-    String selectedLanguage = cbxLang.getSelectedItem().toString();
-    Locale locale = switch (selectedLanguage) {
-        case "Engelska" -> new Locale("en");
-        case "Tyska" -> new Locale("de");
-        case "Spanska" -> new Locale("es");
-        case "Franska"     -> new Locale("fr");
-        case "Svenska" -> new Locale("sv");
-        default         -> new Locale("sv");
-    };
-        
+
+        String selectedLanguage = cbxLang.getSelectedItem().toString();
+        Locale locale = switch (selectedLanguage) {
+            case "Engelska" ->
+                new Locale("en");
+            case "Tyska" ->
+                new Locale("de");
+            case "Spanska" ->
+                new Locale("es");
+            case "Franska" ->
+                new Locale("fr");
+            case "Svenska" ->
+                new Locale("sv");
+            case "Arabiska" ->
+                new Locale("ar");
+            case "Ryska" ->
+                new Locale("ru");
+            case "Portugisiska" ->
+                new Locale("pt");
+                
+            default ->
+                new Locale("sv");
+        };
+
         ResourceBundle bundle = ResourceBundle.getBundle("resources.lang.labels", locale);
 
-        
-        
         try {
 
             String html = Files.readString(Paths.get("htmlFiles/shippingLabel.html"), StandardCharsets.UTF_8);
+
+            // Lägg till @font-face via Java från resources/fonts
+            InputStream fontStream = getClass().getClassLoader().getResourceAsStream("resources/fonts/Arial.ttf");
+            if (fontStream == null) {
+                throw new IOException("Fonten kunde inte laddas som resurs.");
+            }
+
+            // Sätt fonten till HTML via @font-face
+            String fontPath = "font://" + fontStream.toString(); // Denna sökväg kan behöva justeras baserat på PDF-renderaren
+
+            String cssFontFace = "<style>\n"
+                    + "body {\n"
+                    + "    font-family: 'Arial', sans-serif;\n"
+                    + "    font-size: 14px;\n"
+                    + "}\n"
+                    + "</style>";
+
+            // Lägg till CSS till HTML-dokumentet
+            int headEndIndex = html.indexOf("</head>");
+            if (headEndIndex != -1) {
+                html = html.substring(0, headEndIndex) + cssFontFace + html.substring(headEndIndex);
+            }
+
+            // Kontrollera och uppdatera <meta charset="UTF-8"> till självstängande <meta charset="UTF-8" />
+            if (!html.contains("<meta charset=\"UTF-8\" />")) {
+                html = html.replace("<head>", "<head>\n    <meta charset=\"UTF-8\" />");
+            }
 
             // Översättning av pdf-filen till vald locale
             html = html.replace("FROM:", bundle.getString("from"));
@@ -165,7 +208,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
             html = html.replace("Fragile?", bundle.getString("fragile"));
             html = html.replace("Contents", bundle.getString("contents"));
             html = html.replace("THANK YOU FOR YOUR ORDER", bundle.getString("thankYouForYourOrder"));
-            
+
             html = html.replace("{weight}", weight_field.getText());
             html = html.replace("{orderId}", String.valueOf(order.getOrder_id()));
             html = html.replace("{shipping}", "Postnord AB, 2 days");
@@ -192,8 +235,18 @@ public class FraktSedelUI extends javax.swing.JFrame {
 
             html = html.replace("{orderContent}", br.toString());
 
+            String css = "<style>"
+                    + "body { font-family: 'NotoSans', sans-serif; }"
+                    + // Lägg till din font
+                    "</style>";
+
+// Lägg till CSS i <head>-taggen
+            html = html.replace("<head>", "<head>" + css);
+
             try (FileOutputStream os = new FileOutputStream("output.pdf")) {
                 PdfRendererBuilder builder = new PdfRendererBuilder();
+                builder.useFont(() -> fontStream, "Arial", 400, FontStyle.NORMAL, true);
+
                 builder.useFastMode();
                 builder.withHtmlContent(html, null);
                 builder.toStream(os);
@@ -452,7 +505,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
             }
         });
 
-        cbxLang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Svenska", "Engelska", "Tyska", "Spanska", "Franska" }));
+        cbxLang.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Svenska", "Engelska", "Tyska", "Spanska", "Franska", "Arabiska", "Ryska", "Portugisiska" }));
 
         jLabel18.setText("Språk");
 
@@ -539,7 +592,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
                                     .addComponent(cbxLang, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lastname_field, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap(70, Short.MAX_VALUE))))
+                        .addContainerGap(57, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -730,7 +783,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
         total_field.setText(getTotal());
     }//GEN-LAST:event_freight_fieldKeyPressed
 
-    public  static void handleNumberStringJField(java.awt.event.KeyEvent evt) {
+    public static void handleNumberStringJField(java.awt.event.KeyEvent evt) {
         JTextField field = (JTextField) evt.getComponent();
         field.setText((field.getText() + evt.getKeyChar()).replaceAll("[^0-9,]", ""));
         evt.consume();
