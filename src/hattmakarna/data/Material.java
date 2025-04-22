@@ -18,7 +18,7 @@ public class Material extends DatabaseObject {
     public Material(String materialID) {
         super(materialID);
         
-        System.out.println(name);
+        
     }
 
     @Deprecated
