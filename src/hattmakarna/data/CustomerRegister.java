@@ -146,5 +146,16 @@ public CustomerRegister(InfDB idb){
         return false;
     }
     
+    public Customer getCustomerByEmail(String email) {
+    for (Customer aCustomer : allCustomers) {
+        for (String e : aCustomer.getEmailAdresses()) {
+            if (e.equalsIgnoreCase(email)) {
+                return aCustomer;
+            }
+        }
+    }
+    return null;
+}
+    
     
 }
