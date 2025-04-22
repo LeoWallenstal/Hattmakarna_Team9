@@ -20,7 +20,8 @@ public class Task extends DatabaseObject {
     private TaskStatus status;
     private int user_id;
     private int hat_id;
-    private String modelName;
+    private String name;
+    private int order_id;
 
     public Task() {
 
@@ -28,10 +29,6 @@ public class Task extends DatabaseObject {
 
     public Task(String taskId) {
         super(taskId);
-
-        Hat hat = new Hat(String.valueOf(hat_id));
-        Model model = new Model(hat.getModelId());
-        modelName = model.getName();
     }
 
     public Task(HashMap<String, String> taskMap) {
@@ -46,7 +43,8 @@ public class Task extends DatabaseObject {
         status = TaskStatus.valueOf(taskMap.get("status"));
         user_id = Integer.parseInt(taskMap.get("user_id"));
         hat_id = Integer.parseInt(taskMap.get("hat_id"));
-        modelName = taskMap.get("name");
+        name = taskMap.get("name");
+        order_id = Integer.parseInt(taskMap.get("order_id"));
 
     }
 
@@ -95,7 +93,11 @@ public class Task extends DatabaseObject {
     }
 
     public String getModelName() {
-        return modelName;
+        return name;
+    }
+    
+    public int getOrderId(){
+        return order_id;
     }
 
 }

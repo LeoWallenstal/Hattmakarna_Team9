@@ -133,7 +133,7 @@ public class ScheduleManager {
 
         calendarPanel.setMinimumSize(preferred);
         calendarPanel.setPreferredSize(preferred);
-        calendarPanel.setMaximumSize(preferred);       
+        calendarPanel.setMaximumSize(preferred);
     }
 
     private JPanel setupCalendarTopPanel() {
@@ -226,6 +226,11 @@ public class ScheduleManager {
                 if (n < tasksForThisDay.size()) {
                     Task task = tasksForThisDay.get(n);
                     JPanel taskPanel = createTaskPanel(task.getModelName());
+                    
+                    JLabel orderLabel = new JLabel("Order #" + task.getOrderId(), SwingConstants.CENTER);
+                    orderLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
+                    taskPanel.add(orderLabel, BorderLayout.SOUTH);
+                    
                     taskPanel.putClientProperty("task", task);
                     makeDraggable(taskPanel);
                     cell.add(taskPanel, BorderLayout.CENTER);
@@ -245,10 +250,9 @@ public class ScheduleManager {
         panel.setBackground(Color.LIGHT_GRAY);
         panel.setOpaque(true);
 
-        JLabel label = new JLabel(modelName, SwingConstants.CENTER);
-        label.setVerticalAlignment(SwingConstants.CENTER);
-        panel.add(label, BorderLayout.CENTER);
-        
+        JLabel nameLabel = new JLabel(modelName, SwingConstants.CENTER);
+        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
+        panel.add(nameLabel, BorderLayout.CENTER);
 
         URL imageUrl = getClass().getResource("/resources/icons/magician-hat.png");
         String toolTip = "<html>"
@@ -271,15 +275,20 @@ public class ScheduleManager {
             }
 
             String query = """
-                SELECT h.hat_id, m.name 
+                SELECT h.hat_id,
+                       m.name,
+                       u.first_name,
+                       u.last_name,
+                       CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
-                WHERE h.hat_id NOT IN (SELECT hat_id FROM task)
-                  AND h.order_id = """ + aOrder.getOrder_id();
+                LEFT JOIN task t ON t.hat_id = h.hat_id
+                LEFT JOIN user u ON t.user_id = u.user_id
+                WHERE h.order_id = """ + aOrder.getOrder_id();
 
             try {
                 ArrayList<HashMap<String, String>> hats = idb.fetchRows(query);
-                addOrders(listPanel, aOrder, hats);
+                addOrders(listPanel, aOrder.getOrder_id(), hats);
             } catch (InfException ex) {
                 Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -289,14 +298,14 @@ public class ScheduleManager {
 
     }
 
-    private void addOrders(JPanel parent, Order order, ArrayList<HashMap<String, String>> hats) {
+    private void addOrders(JPanel parent, int orderId, ArrayList<HashMap<String, String>> hats) {
         if (!hats.isEmpty()) {
             JPanel orderContainer = new JPanel();
             orderContainer.setLayout(new BoxLayout(orderContainer, BoxLayout.Y_AXIS));
             orderContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
             orderContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
-            String orderTitle = "Order #" + order.getOrder_id();
+            String orderTitle = "Order #" + orderId;
             JButton toggleButton = new JButton("▶ " + orderTitle);
             toggleButton.setFocusPainted(false);
             toggleButton.setContentAreaFilled(false);
@@ -313,6 +322,8 @@ public class ScheduleManager {
             for (HashMap<String, String> hat : hats) {
                 String hatId = hat.get("hat_id");
                 String hatName = hat.get("name");
+                String userName = hat.get("first_name") + " " + hat.get("last_name");
+                boolean isAssigned = "1".equals(hat.get("in_task"));
 
                 JPanel item = createTaskPanel(hatName);
                 int totalHeight = calendarPanel.getHeight();
@@ -331,10 +342,19 @@ public class ScheduleManager {
 
                 Dimension taskSize = new Dimension(slotWidth - 1, slotHeight - 1);
                 item.setPreferredSize(taskSize);
-                item.setBackground(Color.LIGHT_GRAY);
+                if (isAssigned) {
+                    item.setBackground(Color.YELLOW);
+                    JLabel workerLabel = new JLabel(userName, SwingConstants.CENTER);
+                    workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
+                    item.add(workerLabel, BorderLayout.SOUTH);
+                } else {
+                    item.setBackground(Color.LIGHT_GRAY);
+                    makeDraggable(item);
+                }
+
                 item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 item.putClientProperty("hat_id", hatId);
-                makeDraggable(item);
+
                 currentRow.add(item);
                 i++;
             }
@@ -476,13 +496,6 @@ public class ScheduleManager {
     }
 
     private void moveTask(JPanel panel, JPanel bestCell, JPanel originCell, LocalDate dropDate) {
-        bestCell.removeAll();
-        bestCell.add(panel);
-        panel.setBorder(null);
-        panel.setVisible(true);
-        bestCell.revalidate();
-        bestCell.repaint();
-        emptyCells.remove(bestCell);
 
         Task task = (Task) panel.getClientProperty("task");
 
@@ -498,14 +511,55 @@ public class ScheduleManager {
             if (task == null) {
                 task = createNewTaskFromPanel(panel, dropDate);
                 if (task != null) {
+                    replacePanelWithCopy(panel);
                     tasks.add(task);
                     panel.putClientProperty("task", task);
                 }
             }
         }
+        bestCell.removeAll();
+        bestCell.add(panel);
+        panel.setBorder(null);
+        panel.setVisible(true);
+        bestCell.revalidate();
+        bestCell.repaint();
+        emptyCells.remove(bestCell);
         taskRegister.refreshTasks();
         tasks = taskRegister.getTasks();
     }
+    
+    private void replacePanelWithCopy(JPanel originalPanel) {
+    Container parent = originalPanel.getParent();
+    if (parent == null) return;
+
+    JPanel clone = new JPanel(originalPanel.getLayout());
+    clone.setBackground(Color.YELLOW);
+    clone.setSize(originalPanel.getSize());
+    clone.setPreferredSize(originalPanel.getPreferredSize());
+    clone.setBorder(originalPanel.getBorder());
+    clone.setOpaque(true);
+
+    for (Component comp : originalPanel.getComponents()) {
+        clone.add(comp);
+    }
+
+    int index = -1;
+    Component[] siblings = parent.getComponents();
+    for (int i = 0; i < siblings.length; i++) {
+        if (siblings[i] == originalPanel) {
+            index = i;
+            break;
+        }
+    }
+
+    if (index != -1) {
+        originalPanel.setVisible(false);
+        parent.add(clone, index);
+        parent.revalidate();
+        parent.repaint();
+    }
+}
+
 
     private Task createNewTaskFromPanel(JPanel taskPanel, LocalDate dropDate) {
         String userId = userLoggedIn.getID();
@@ -563,9 +617,6 @@ public class ScheduleManager {
         tempPanel.setBorder(original.getBorder());
         for (Component comp : original.getComponents()) {
             comp.setVisible(false);
-            if (comp instanceof JLabel label) {
-                tempPanel.add(new JLabel(label.getText()));
-            }
         }
         return tempPanel;
     }
@@ -573,14 +624,14 @@ public class ScheduleManager {
     private void setupNavigationListeners(JButton backButton, JButton forwardButton, JMonthChooser monthChooser, JYearChooser yearChooser) {
         backButton.addActionListener(e -> {
             startDate = startDate.minusDays(1);
-            monthChooser.setMonth(startDate.getMonthValue()-1);
+            monthChooser.setMonth(startDate.getMonthValue() - 1);
             yearChooser.setYear(startDate.getYear());
             refreshSchedule();
         });
 
         forwardButton.addActionListener(e -> {
             startDate = startDate.plusDays(1);
-            monthChooser.setMonth(startDate.getMonthValue()-1);
+            monthChooser.setMonth(startDate.getMonthValue() - 1);
             yearChooser.setYear(startDate.getYear());
             refreshSchedule();
         });
@@ -604,7 +655,7 @@ public class ScheduleManager {
         calendarPanel.addMouseWheelListener(e -> {
             int direction = e.getWheelRotation();
             startDate = startDate.minusDays(direction);
-            monthChooser.setMonth(startDate.getMonthValue()-1);
+            monthChooser.setMonth(startDate.getMonthValue() - 1);
             yearChooser.setYear(startDate.getYear());
             refreshSchedule();
             calendarPanel.setBackground(new Color(230, 230, 230));
