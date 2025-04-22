@@ -7,7 +7,6 @@ import oru.inf.InfException;
 import hattmakarna.data.CustomerRegister;
 import java.util.ArrayList;
 import java.util.HashMap;
-import oru.inf.InfDB;
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.FillComboBox;
 import static hattmakarna.data.Hattmakarna.idb;
@@ -15,59 +14,80 @@ import hattmakarna.data.Model;
 import hattmakarna.data.ModelRegister;
 import javax.swing.JOptionPane;
 import hattmakarna.data.Customer;
+import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.data.User;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
  * @author linahanssons
  */
 public class CustomerInformationWindow extends javax.swing.JFrame {
-    private InfDB idb;
     private CustomerRegister customerRegister;
+
     private  Customer customer;
-    
+    private User userLoggedIn;
 
     /**
      * Creates new form CustomerInformationWindow
      */
-    public CustomerInformationWindow() {
-        
+    public CustomerInformationWindow(User userLoggedIn) {
+        this.userLoggedIn = userLoggedIn;
         this.idb = hattmakarna.data.Hattmakarna.idb;
         this.customerRegister = new CustomerRegister(idb);
           initComponents();
           fillTable();
           
-        try{
-        ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
-        cbMail.removeAllItems();
-        for (String mail : mailList){
-        cbMail.addItem(mail);
-        }
-        } catch (InfException e) {
-        JOptionPane.showMessageDialog(this,"kunde inte hämta mail" + e.getMessage());
-        }
-        try {
-    ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
 
-    cbName.removeAllItems();
+     
+    /**
+     * Creates new form CustomerInformationWindow
+     */
     
-
-    for (HashMap<String, String> row : customerRows) {
-        String fName = row.get("first_name");
-        String lName = row.get("last_name");
         
-        String comboText = fName + " " + lName;
-        cbName.addItem(comboText);
-    }
-     } catch (InfException e) {
-        JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
-        }
+        
+        
+        
 
+        try{
+            ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
+            cbMail.removeAllItems();
+            for (String mail : mailList){
+                cbMail.addItem(mail);
+            }
+        } 
+        catch (InfException e) {
+            JOptionPane.showMessageDialog(this,"kunde inte hämta mail" + e.getMessage());
+        }
+        
+        try {
+            ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
+            cbName.removeAllItems();
+
+            for (HashMap<String, String> row : customerRows) {
+                String fName = row.get("first_name");
+                String lName = row.get("last_name");
+
+                String comboText = fName + " " + lName;
+                cbName.addItem(comboText);
+            }
+        } catch (InfException e) {
+            JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
+        }
+        cbMail.addActionListener(e -> mailSelected());
+        cbName.addActionListener(e -> nameSelected());
     }
+    
     private void fillTable() {
+        //DEBUG
         System.out.println("fillTableKörs");
         ArrayList <Customer> customers = customerRegister.getAllCustomers();
         
-        String[] columnNames = {"ID", "Namn" ,"E-mail", "Nummer", "Adress", "Postnummer", "Land" };
+
+        
+
+        String[] columnNames = {"name", "customerID","email", "phone", "adress", "postalCode", "country" };
+    
         Object[][] data = new Object[customers.size()][7];
         for (int i = 0; i < customers.size(); i++) {
             Customer m = customers.get(i);
@@ -116,7 +136,77 @@ private void openEditCustomerWindow(String email) {
         JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
     }
 }
+    private void updateTable(ArrayList<Customer> customers) {
+    String[] columnNames = {"Namn", "E-mail", "Nummer", "Adress", "Postnummer", "Land"};
+    Object[][] data = new Object[customers.size()][6];
     
+    for (int i = 0; i < customers.size(); i++) {
+        Customer m = customers.get(i);
+        data[i][0] = m.getFullName();
+        data[i][1] = m.getEmailAdresses();
+        data[i][2] = m.getTelephoneNumbers();
+        data[i][3] = m.getAdress();
+        data[i][4] = m.getPostalCode();
+        data[i][5] = m.getCountry();
+    }
+
+    javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    jTable1.setModel(tableModel);
+}
+    
+    private void mailSelected() {
+    String selectedMail = (String) cbMail.getSelectedItem();
+    if (selectedMail != null && !selectedMail.isEmpty()) {
+        Customer c = findCustomerByEmail(selectedMail);
+        if (c != null) {
+            ArrayList<Customer> singleCustomer = new ArrayList<>();
+            singleCustomer.add(c);
+            updateTable(singleCustomer);
+        }
+    }
+}
+
+private void nameSelected() {
+    String selectedName = (String) cbName.getSelectedItem();
+    if (selectedName != null && !selectedName.isEmpty()) {
+        String[] nameParts = selectedName.split(" ");
+        if (nameParts.length == 2) {
+            String firstName = nameParts[0];
+            String lastName = nameParts[1];
+             Customer c = findCustomerByFullName(firstName + " " + lastName);
+            ArrayList<Customer> customers = new ArrayList<>();
+            if (c != null){
+    customers.add(c);
+}
+            updateTable(customers);
+        }
+    }
+}
+private Customer findCustomerByEmail(String email) {
+    for (Customer c : customerRegister.getAllCustomers()) {
+        for (String mail : c.getEmailAdresses()) {
+            if (mail.equalsIgnoreCase(email)) {
+                return c;
+            }
+        }
+    }
+    return null;
+}
+
+private Customer findCustomerByFullName(String fullName) {
+    for (Customer c : customerRegister.getAllCustomers()) {
+        String combinedName = c.getFirstName() + " " + c.getLastName();
+        if (combinedName.equalsIgnoreCase(fullName)) {
+            return c;
+        }
+    }
+    return null;
+}
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -135,6 +225,7 @@ private void openEditCustomerWindow(String email) {
         lblSearchEmail = new javax.swing.JLabel();
         lblSearchName = new javax.swing.JLabel();
         btnEditCustomer = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -169,6 +260,13 @@ private void openEditCustomerWindow(String email) {
             }
         });
 
+        btnBack.setText("Tillbaka");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -191,6 +289,8 @@ private void openEditCustomerWindow(String email) {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnBack)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnEditCustomer)))))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
@@ -205,7 +305,8 @@ private void openEditCustomerWindow(String email) {
                     .addComponent(cbMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblSearchEmail)
                     .addComponent(lblSearchName)
-                    .addComponent(btnEditCustomer))
+                    .addComponent(btnEditCustomer)
+                    .addComponent(btnBack))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(22, 22, 22))
@@ -234,6 +335,11 @@ private void openEditCustomerWindow(String email) {
 
 
     }//GEN-LAST:event_btnEditCustomerActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+       new MainMenu(userLoggedIn).setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnBackActionPerformed
 
     /**
      * @param args the command line arguments
@@ -271,6 +377,7 @@ private void openEditCustomerWindow(String email) {
    // }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
     private javax.swing.JButton btnEditCustomer;
     private javax.swing.JComboBox<String> cbMail;
     private javax.swing.JComboBox<String> cbName;

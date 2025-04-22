@@ -5,7 +5,7 @@
 package hattmakarna.UI;
 
 import hattmakarna.data.*;
-import java.util.ArrayList;
+import java.util.*;
 import javax.swing.table.DefaultTableModel;
 import oru.inf.InfDB;
 import oru.inf.InfException;
@@ -20,20 +20,20 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import static hattmakarna.data.Hattmakarna.idb;
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
 
 /**
  *
  * @author Gastinlogg
  */
 public class MaterialOrderWindow extends javax.swing.JFrame {
-    
+
     private ArrayList<HashMap<String, String>> orderAndHats;
     private HatRegister hatRegister;
     private final User userLoggedIn;
-    
+
     private HashMap<String, HashMap<String, Double>> orderData;
     HashMap<String, Double> totalMaterial;
-    
 
     /**
      * Creates new form MaterialOrderWindow
@@ -43,15 +43,15 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         this.hatRegister = new HatRegister(idb);
         this.orderAndHats = null;
         this.userLoggedIn = userLoggedIn;
-        initHats();
+        initHats(null, null);
         totalMaterial = new HashMap<>();
         orderData = getOrderMaterialData();
-        
+
         initTable();
         setLocationRelativeTo(null);
     }
-    
-    private void initTable(){
+
+    private void initTable() {
         paneOrderInfo.setLayout(new BoxLayout(paneOrderInfo, BoxLayout.Y_AXIS));
         fillTable();
         // Let scroll pane control the visible size
@@ -64,82 +64,95 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         // Refresh UI
         paneOrderInfo.revalidate();
     }
-    
+
     private HashMap<String, HashMap<String, Double>> getOrderMaterialData() {
-    HashMap<String, HashMap<String, Double>> orderData = new HashMap<>();
-
-    for (HashMap<String, String> order : orderAndHats) {
-        String orderId = order.get("order_id");
-        Order aOrder = new Order(orderId);
-
-        if (aOrder.getMaterialOrdered()) continue;
-
-        HashMap<String, Double> orderMaterial = new HashMap<>();
-
-        for (Hat hat : hatRegister.getAllHats()) {
-            
-            if (!hat.getOrderId().equals(orderId) || !hat.isSpecial()) continue;
-
-            MaterialOrder mo = new MaterialOrder(hat.gethatId());
-
-            for (HashMap<String, String> row : mo.getMaterialList()) {
-                String materialId = row.get("material_id");
-                String color = row.get("color");
-                double amount = safeParseDouble(row.get("amount"));
-                String key = materialId + " " + color;
-
-                orderMaterial.merge(key, amount, Double::sum);
-                totalMaterial.merge(key, amount, Double::sum);
-            }
-            orderData.put(orderId, orderMaterial);
-        }
-
+        HashMap<String, HashMap<String, Double>> orderData = new HashMap<>();
         
-    }
-    return orderData;
-}
+        if(orderAndHats == null){
+                return orderData;
+            }
+        
+        for (HashMap<String, String> order : orderAndHats) {
+            String orderId = order.get("order_id");
+            Order aOrder = new Order(orderId);
 
+            if (aOrder.getMaterialOrdered()) {
+                continue;
+            }
 
-    public void initHats() {
+            HashMap<String, Double> orderMaterial = new HashMap<>();
 
-        try {
-            String sqlFraga = "SELECT sales_order.order_id, count(hat.hat_id) as hats FROM sales_order"
-                    + " JOIN hat on sales_order.order_id = hat.order_id "
-                    + "GROUP BY sales_order.order_id";
+            for (Hat hat : hatRegister.getAllHats()) {
 
-            orderAndHats = idb.fetchRows(sqlFraga);
-        } catch (InfException ex) {
-            System.out.println(ex.getMessage() + "???");
+                if (!hat.getOrderId().equals(orderId) || !hat.isSpecial()) {
+                    continue;
+                }
+
+                MaterialOrder mo = new MaterialOrder(hat.gethatId());
+
+                for (HashMap<String, String> row : mo.getMaterialList()) {
+                    String materialId = row.get("material_id");
+                    String color = row.get("color");
+                    double amount = safeParseDouble(row.get("amount"));
+                    String key = materialId + " " + color;
+
+                    orderMaterial.merge(key, amount, Double::sum);
+                    totalMaterial.merge(key, amount, Double::sum);
+                }
+                orderData.put(orderId, orderMaterial);
+            }
+
         }
+        return orderData;
+    }
+
+    public void initHats(Date fromDate, Date toDate) {
+        orderAndHats = MaterialOrder.getOrdersWithMaterials(fromDate, toDate);
     }
 
     public void fillTable() {
         for (String orderId : orderData.keySet()) {
-        paneOrderInfo.add(new JLabel("Order: " + orderId));
+            paneOrderInfo.add(new JLabel("Order: " + orderId));
 
-        HashMap<String, Double> materials = orderData.get(orderId);
+            HashMap<String, Double> materials = orderData.get(orderId);
 
-        for (String key : materials.keySet()) {
-            double amount = materials.get(key);
+            for (String key : materials.keySet()) {
+                double amount = materials.get(key);
 
-            // Split materialId and color (optional)
-            String[] parts = key.split(" ");
-            String materialId = parts[0];
-            String color = parts.length > 1 ? parts[1] : "";
+                // Split materialId and color (optional)
+                String[] parts = key.split(" ");
+                String materialId = parts[0];
+                String color = parts.length > 1 ? parts[1] : "";
 
-            Material material = new Material(materialId);
-            String name = material.getName();
-            String unit = material.getUnit();
+                Material material = new Material(materialId);
+                String name = material.getName();
+                String unit = material.getUnit();
 
-            paneOrderInfo.add(new JLabel("  Material: " + name + ", " + color + ", " + amount + " " + unit));
-        }
+                paneOrderInfo.add(new JLabel("  Material: " + name + ", " + color + ", " + amount + " " + unit));
+            }
 
-        paneOrderInfo.add(Box.createVerticalStrut(10)); // Blank line between orders
+            paneOrderInfo.add(Box.createVerticalStrut(10)); // Blank line between orders
         }
         boolean hasSomethingToPrint = !orderData.isEmpty();
 
         jButton1.setEnabled(hasSomethingToPrint);
     }
+
+    private void updateFilteredOrders() {
+        Date from = dcFromDate.getDate();
+        Date to = dcToDate.getDate();
+
+        initHats(from, to);
+
+        totalMaterial.clear();
+        orderData = getOrderMaterialData();
+
+        paneOrderInfo.removeAll();
+        fillTable();
+        paneOrderInfo.revalidate();
+        paneOrderInfo.repaint();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -149,12 +162,18 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jButton1 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         scrollOrderInfo = new javax.swing.JScrollPane();
         paneOrderInfo = new javax.swing.JPanel();
         btnBack = new javax.swing.JButton();
+        dcFromDate = new com.toedter.calendar.JDateChooser();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        dcToDate = new com.toedter.calendar.JDateChooser();
+        btnClearDate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -189,6 +208,29 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             }
         });
 
+        dcFromDate.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dcFromDatePropertyChange(evt);
+            }
+        });
+
+        jLabel3.setText("Från datum:");
+
+        jLabel4.setText("Till datum:");
+
+        dcToDate.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dcToDatePropertyChange(evt);
+            }
+        });
+
+        btnClearDate.setText("Rensa datum");
+        btnClearDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearDateActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -201,15 +243,22 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton1))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addComponent(jLabel2))
-                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(scrollOrderInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(scrollOrderInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(51, 51, 51)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(dcToDate, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                            .addComponent(dcFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnClearDate)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(44, 44, 44)
-                        .addComponent(jLabel1)))
-                .addContainerGap(294, Short.MAX_VALUE))
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(jLabel2)))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -218,8 +267,21 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollOrderInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(scrollOrderInfo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(8, 8, 8)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dcFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(dcToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnClearDate)))
                 .addGap(31, 31, 31)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBack)
@@ -237,10 +299,28 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        // TODO add your handling code here
         this.setVisible(false);
         new MainMenu(userLoggedIn).setVisible(true);
     }//GEN-LAST:event_btnBackActionPerformed
+
+    private void dcFromDatePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dcFromDatePropertyChange
+        if ("date".equals(evt.getPropertyName())) {
+            updateFilteredOrders();
+        }
+    }//GEN-LAST:event_dcFromDatePropertyChange
+
+    private void dcToDatePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dcToDatePropertyChange
+        if ("date".equals(evt.getPropertyName())) {
+            updateFilteredOrders();
+        }
+    }//GEN-LAST:event_dcToDatePropertyChange
+
+    private void btnClearDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearDateActionPerformed
+        dcFromDate.setDate(null);
+        dcToDate.setDate(null);
+        updateFilteredOrders();
+    }//GEN-LAST:event_btnClearDateActionPerformed
+
 
     private void exportToPDF() {
 
@@ -250,11 +330,11 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             PDPage page = new PDPage();
             document.addPage(page);
 
-            //kodrad 169 möjliggör att text och grafik genereras på sidan
+            //möjliggör att text och grafik genereras på sidan
             //teckensnitt, srtl och radavstånd sätts samt startposition anges
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
             contentStream.beginText();
-            contentStream.setFont(PDType1Font.HELVETICA,12);
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
             contentStream.setLeading(14.5f);
             contentStream.newLineAtOffset(50, 700);
 
@@ -264,7 +344,6 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             contentStream.newLine();
 
             //lista som sammanställer ordrarnas material
-
             writeOrdersInPDF(contentStream);
             writeTotalSummaryPDF(contentStream);
 
@@ -296,38 +375,37 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         }
     }
 
-private void writeOrdersInPDF(PDPageContentStream contentStream) {
-    try {
-        for (String orderId : orderData.keySet()) {
-            contentStream.showText("Order: " + orderId);
-            contentStream.newLine();
-
-            HashMap<String, Double> orderMaterial = orderData.get(orderId);
-
-            for (String key : orderMaterial.keySet()) {
-                String id = key.replaceAll("[^0-9]", "");
-                String color = key.replaceAll("[0-9]", "");
-                Material material = new Material(id);
-                String unit = material.getUnit();
-                String name = material.getName();
-
-                double amount = orderMaterial.get(key);
-                contentStream.showText("Material: " + name + "," + color + ", " + amount + " " + unit);
+    private void writeOrdersInPDF(PDPageContentStream contentStream) {
+        try {
+            for (String orderId : orderData.keySet()) {
+                contentStream.showText("Order: " + orderId);
                 contentStream.newLine();
+
+                HashMap<String, Double> orderMaterial = orderData.get(orderId);
+
+                for (String key : orderMaterial.keySet()) {
+                    String id = key.replaceAll("[^0-9]", "");
+                    String color = key.replaceAll("[0-9]", "");
+                    Material material = new Material(id);
+                    String unit = material.getUnit();
+                    String name = material.getName();
+
+                    double amount = orderMaterial.get(key);
+                    contentStream.showText("Material: " + name + "," + color + ", " + amount + " " + unit);
+                    contentStream.newLine();
+                }
+
+                contentStream.newLine(); // space between orders
+
+                // Optional: update material ordered flag
+                Order aOrder = new Order(orderId);
+                aOrder.setMaterialOrdered(true);
+                aOrder.save();
             }
-
-            contentStream.newLine(); // space between orders
-
-            // Optional: update material ordered flag
-            Order aOrder = new Order(orderId);
-            aOrder.setMaterialOrdered(true);
-            aOrder.save();
+        } catch (IOException e) {
+            System.out.println("Fel vid utskrift av ordrar");
         }
-    } catch (IOException e) {
-        System.out.println("Fel vid utskrift av ordrar");
     }
-}
-
 
     private void writeTotalSummaryPDF(PDPageContentStream contentStream) {
 
@@ -405,9 +483,15 @@ private void writeOrdersInPDF(PDPageContentStream contentStream) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnClearDate;
+    private com.toedter.calendar.JDateChooser dcFromDate;
+    private com.toedter.calendar.JDateChooser dcToDate;
     private javax.swing.JButton jButton1;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel paneOrderInfo;
     private javax.swing.JScrollPane scrollOrderInfo;
     // End of variables declaration//GEN-END:variables
