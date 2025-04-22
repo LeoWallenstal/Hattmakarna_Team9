@@ -12,6 +12,7 @@ import java.awt.Color;
  */
 public class MaterialHat extends DatabaseObject {
 
+    private int material_hat_id;
     private int material_id;
     private int hat_id;
     private int amount;
@@ -25,7 +26,7 @@ public class MaterialHat extends DatabaseObject {
     }
 
     public int getMaterial_hat_id() {
-        return material_id;
+        return material_hat_id;
     }
 
     public int getMaterial_id() {
@@ -76,12 +77,12 @@ public class MaterialHat extends DatabaseObject {
 
     @Override
     protected String getIdString() {
-        return String.valueOf(material_id);
+        return String.valueOf(material_hat_id);
     }
 
     @Override
     protected void setIdString(String id) {
-        material_id = Integer.parseInt(id);
+        material_hat_id = Integer.parseInt(id);
     }
 
 }

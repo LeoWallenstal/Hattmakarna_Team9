@@ -61,7 +61,7 @@ public abstract class DatabaseObject {
             // Mappa objektet
             DatabaseObjectMapper(this, Hattmakarna.idb
                     .fetchRow("select * from " + getTabelName() + " where " + getIdAttributeName() + " = " + id));
-            System.out.println("select * from " + getTabelName() + " where " + getIdAttributeName() + " = " + id);
+
             hasId = true;
         } catch (InfException e) {
             e.printStackTrace();
