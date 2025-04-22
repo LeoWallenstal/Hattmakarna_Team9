@@ -24,16 +24,31 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CustomerInformationWindow extends javax.swing.JFrame {
     private CustomerRegister customerRegister;
-     private User userLoggedIn;
+
+    private  Customer customer;
+    private User userLoggedIn;
+
     /**
      * Creates new form CustomerInformationWindow
      */
     public CustomerInformationWindow(User userLoggedIn) {
         this.userLoggedIn = userLoggedIn;
-        this.customerRegister = new CustomerRegister();
-        initComponents();
-         fillTable();
+        this.idb = hattmakarna.data.Hattmakarna.idb;
+        this.customerRegister = new CustomerRegister(idb);
+          initComponents();
+          fillTable();
+          
+
+     
+    /**
+     * Creates new form CustomerInformationWindow
+     */
+    
         
+        
+        
+        
+
         try{
             ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
             cbMail.removeAllItems();
@@ -68,12 +83,16 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
         System.out.println("fillTableKörs");
         ArrayList <Customer> customers = customerRegister.getAllCustomers();
         
+
+        
+
         String[] columnNames = {"name", "customerID","email", "phone", "adress", "postalCode", "country" };
+    
         Object[][] data = new Object[customers.size()][7];
         for (int i = 0; i < customers.size(); i++) {
             Customer m = customers.get(i);
-            data[i][0] = m.getFullName();
-            data[i][1] = m.getCustomerID();
+            data[i][0] = m.getCustomerID();
+            data[i][1] = m.getFullName();
             data[i][2] = m.getEmailAdresses();
             data[i][3] = m.getTelephoneNumbers();
             data[i][4] = m.getAdress();
@@ -83,13 +102,40 @@ public class CustomerInformationWindow extends javax.swing.JFrame {
             
         }
         
-        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
         jTable1.setModel(tableModel);
+        
+         jTable1.getColumnModel().getColumn(0).setMinWidth(0);
+         jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
+         jTable1.getColumnModel().getColumn(0).setWidth(0);
+    
+    jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+        if (evt.getClickCount() == 2) { //dubbelklick
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow != -1) {
+        String email = (String) jTable1.getValueAt(selectedRow, 1);
+        openEditCustomerWindow(email);
     }
+      }
+         }
+            });
+    
+    }
+    
+private void openEditCustomerWindow(String email) {
+    Customer selectedCustomer = customerRegister.getCustomerByEmail(email);
+    if (selectedCustomer != null) {
+        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+        editWindow.setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+    }
+}
     private void updateTable(ArrayList<Customer> customers) {
     String[] columnNames = {"Namn", "E-mail", "Nummer", "Adress", "Postnummer", "Land"};
     Object[][] data = new Object[customers.size()][6];
@@ -161,6 +207,7 @@ private Customer findCustomerByFullName(String fullName) {
     return null;
 }
 
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -180,7 +227,7 @@ private Customer findCustomerByFullName(String fullName) {
         btnEditCustomer = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -269,7 +316,24 @@ private Customer findCustomerByFullName(String fullName) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditCustomerActionPerformed
-        // TODO add your handling code here:
+                                               
+    int selectedRow = jTable1.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Välj en kund i tabellen först.");
+        return;
+    }
+
+    String customerID = jTable1.getValueAt(selectedRow, 0).toString(); // Hämta från kolumn 0 (ID)
+
+    Customer selectedCustomer = customerRegister.getCustomer(customerID);
+    if (selectedCustomer != null) {
+        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+        editWindow.setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+    }
+
+
     }//GEN-LAST:event_btnEditCustomerActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
