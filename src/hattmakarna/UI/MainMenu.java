@@ -200,7 +200,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnHatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHatActionPerformed
         // TODO add your handling code here:
-        new HattWindow().setVisible(true);
+        new HattWindow(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnHatActionPerformed
 
