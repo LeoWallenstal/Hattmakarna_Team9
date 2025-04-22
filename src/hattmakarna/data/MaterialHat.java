@@ -84,5 +84,16 @@ public class MaterialHat extends DatabaseObject {
     protected void setIdString(String id) {
         material_hat_id = Integer.parseInt(id);
     }
+    @Override
+public MaterialHat clone() {
+    MaterialHat copy = new MaterialHat();
+    copy.material_hat_id = this.material_hat_id; // Optional: set to 0 if it's a new DB entry
+    copy.material_id = this.material_id;
+    copy.hat_id = this.hat_id;
+    copy.amount = this.amount;
+    copy.Color = this.Color;
+    return copy;
+}
+
 
 }

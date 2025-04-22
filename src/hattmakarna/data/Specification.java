@@ -26,7 +26,7 @@ public class Specification extends DatabaseObject {
     private int spec_id;
     private String beskrivning;
     private int hat_id;
-    
+
     private String img_path;
     private BufferedImage imgImage = null;
     private String skiss_path;
@@ -55,7 +55,7 @@ public class Specification extends DatabaseObject {
     public void setSkissImage(BufferedImage skissImage) {
         this.skissImage = skissImage;
     }
-    
+
     public static final String SAVE_TO_PATH = "images/";
 
     public Specification(String specificationID) {
@@ -175,4 +175,34 @@ public class Specification extends DatabaseObject {
         this.spec_id = Integer.parseInt(id);
     }
 
+    @Override
+    public Specification clone() {
+        Specification copy = new Specification();
+        copy.spec_id = this.spec_id;  // Consider omitting or resetting this depending on DB usage
+        copy.beskrivning = this.beskrivning;
+        copy.hat_id = this.hat_id;
+        copy.img_path = this.img_path;
+        copy.skiss_path = this.skiss_path;
+
+        // Deep copy images if present
+        if (this.imgImage != null) {
+            copy.imgImage = deepCopyBufferedImage(this.imgImage);
+        }
+
+        if (this.skissImage != null) {
+            copy.skissImage = deepCopyBufferedImage(this.skissImage);
+        }
+
+        return copy;
+    }
+
+    private static BufferedImage deepCopyBufferedImage(BufferedImage original) {
+        BufferedImage copy = new BufferedImage(
+                original.getWidth(),
+                original.getHeight(),
+                original.getType()
+        );
+        copy.setData(original.getData());
+        return copy;
+    }
 }

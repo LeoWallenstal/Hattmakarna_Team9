@@ -99,5 +99,18 @@ public class MaterialOrder {
         return orders;
     }
 
+    @Override
+    public MaterialOrder clone() {
+        MaterialOrder clone = new MaterialOrder(this.hatID);
+
+        // Clear the list loaded from DB in constructor and add cloned entries
+        clone.materialList.clear();
+        for (HashMap<String, String> originalMap : this.materialList) {
+            HashMap<String, String> copiedMap = new HashMap<>(originalMap);
+            clone.materialList.add(copiedMap);
+        }
+
+        return clone;
+    }
 
 }
