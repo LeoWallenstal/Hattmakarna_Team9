@@ -53,7 +53,7 @@ public class Hat extends DatabaseObject {
 
             materials = new ArrayList<>();
             // Hämta material
-            Hattmakarna.idb.fetchColumn("select material_hat_id from hat_material where hat_id = " + hatId).forEach(e -> {
+            Hattmakarna.idb.fetchColumn("select material_id from hat_material where hat_id = " + hatId).forEach(e -> {
                 materials.add(new MaterialHat(e));
             });
 
