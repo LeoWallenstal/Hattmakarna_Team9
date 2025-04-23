@@ -203,8 +203,11 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomerActionPerformed
         // TODO add your handling code here:
-        //new CustomerInformationWindow().setVisible(true);
-        //this.setVisible(false);
+
+        new CustomerInformationWindow(userLoggedIn).setVisible(true);
+        this.setVisible(false);
+
+      
     }//GEN-LAST:event_btnCustomerActionPerformed
 
     private void btnMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMaterialActionPerformed
@@ -215,7 +218,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnHatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHatActionPerformed
         // TODO add your handling code here:
-        new HattWindow().setVisible(true);
+        new HattWindow(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnHatActionPerformed
 

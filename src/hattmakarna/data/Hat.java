@@ -77,14 +77,8 @@ public class Hat extends DatabaseObject {
         super(hatId);
 
         try {
-            String specId = Hattmakarna.idb.fetchSingle("select spec_id from hat_spec where hat_id = " + hatId);
-
-            if (specId != null && specId.isEmpty()) {
-                specification = new Specification(specId);
-                isSpecial = true;
-            } else {
-                isSpecial = false;
-            }
+            
+            setSpecial();
 
             materials = new ArrayList<>();
             // Hämta material
@@ -131,6 +125,9 @@ public class Hat extends DatabaseObject {
             String specialId = idb.fetchSingle(query);
             if (String.valueOf(model_id).equals(specialId)) {
                 isSpecial = true;
+            }
+            else{
+                isSpecial = false;
             }
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
@@ -257,4 +254,42 @@ public class Hat extends DatabaseObject {
 
         return true;
     }
+    
+    @Override
+public Hat clone() {
+    Hat clone = new Hat();
+    clone.setHat_id(this.hat_id); // depending on your logic, you might want a new hat_id
+    clone.setModel_id(this.model_id);
+    clone.setOrder_id(this.order_id);
+    clone.setPrice(this.price);
+    clone.setSize(this.size);
+    clone.setIsExpress(this.isExpress);
+    clone.setIsSpecial(this.isSpecial);
+
+    // Clone specification if it exists
+    if (this.specification != null) {
+        clone.specification =(Specification) this.specification.clone();
+    }
+
+    // Clone material list
+    if (this.materials != null) {
+        List<MaterialHat> clonedMaterials = new ArrayList<>();
+        for (MaterialHat mat : this.materials) {
+            clonedMaterials.add((MaterialHat)mat.clone());
+        }
+        clone.materials = clonedMaterials;
+    }
+
+    // Clone deprecated materialBehov
+    if (this.materialBehov != null) {
+        ArrayList<MaterialOrder> clonedMaterialBehov = new ArrayList<>();
+        for (MaterialOrder order : this.materialBehov) {
+            clonedMaterialBehov.add(order.clone());
+        }
+        clone.materialBehov = clonedMaterialBehov;
+    }
+
+    return clone;
+}
+
 }

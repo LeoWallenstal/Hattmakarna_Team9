@@ -34,15 +34,27 @@
                       <Component id="lblOverview" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="199" max="-2" attributes="0"/>
+                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnReturn" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="-2" pref="199" max="-2" attributes="0"/>
-                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
+                      <Component id="lblDateFrom" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="dcDateFrom" min="-2" pref="102" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="lblDateTo" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="dcDateTo" min="-2" pref="107" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="btnClearDate" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace pref="107" max="32767" attributes="0"/>
+              <EmptySpace pref="66" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -55,7 +67,15 @@
               <Component id="jButton1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="221" max="-2" attributes="0"/>
-              <EmptySpace pref="26" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                  <Component id="dcDateFrom" max="32767" attributes="0"/>
+                  <Component id="lblDateFrom" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="dcDateTo" alignment="1" max="32767" attributes="0"/>
+                  <Component id="lblDateTo" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnClearDate" alignment="1" pref="0" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace pref="38" max="32767" attributes="0"/>
               <Component id="btnReturn" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
           </Group>
@@ -130,6 +150,34 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnReturnActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="com.toedter.calendar.JDateChooser" name="dcDateFrom">
+      <Events>
+        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="dcDateFromPropertyChange"/>
+      </Events>
+    </Component>
+    <Component class="com.toedter.calendar.JDateChooser" name="dcDateTo">
+      <Events>
+        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="dcDateToPropertyChange"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblDateFrom">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Fr&#xe5;n datum:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblDateTo">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Till datum:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnClearDate">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Rensa datum"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearDateActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
