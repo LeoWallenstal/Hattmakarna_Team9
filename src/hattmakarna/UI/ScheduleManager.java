@@ -226,7 +226,7 @@ public class ScheduleManager {
 
                 if (n < tasksForThisDay.size()) {
                     Task task = tasksForThisDay.get(n);
-                    JPanel taskPanel = createTaskPanel(task.getModelName());
+                    JPanel taskPanel = createTaskPanel(task.getModelName(), String.valueOf(task.getHatId()));
 
                     JLabel orderLabel = new JLabel("Order #" + task.getOrderId(), SwingConstants.CENTER);
                     orderLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -246,7 +246,7 @@ public class ScheduleManager {
         return daysPanel;
     }
 
-    private JPanel createTaskPanel(String modelName) {
+    private JPanel createTaskPanel(String modelName, String hatId) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(Color.LIGHT_GRAY);
         panel.setOpaque(true);
@@ -255,14 +255,43 @@ public class ScheduleManager {
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
         panel.add(nameLabel, BorderLayout.CENTER);
 
-        URL imageUrl = getClass().getResource("/resources/icons/magician-hat.png");
-        String toolTip = "<html>"
-                + "<img src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>"
-                + "Placeholder för tooltip.<br>"
-                + "Kanske lägga till någon beskrivning här? :)<br>"
-                + "</html>";
+        Hat hat = new Hat(hatId);
+        if (hat.isSpecial()) {
+            System.out.println("Körs special");
+            String sqlQuery = "SELECT spec_id FROM hat_spec WHERE hat_id = " + hatId;
+            try {
+                String specId = idb.fetchSingle(sqlQuery);
+                Specification spec = new Specification(specId);
+                String imagePath = spec.getImagePath();
+                String toolTip = "<html>";
+                if (imagePath != null) {
+                    System.out.println(imagePath);
+                    imagePath = imagePath.trim();
+                    URL imageUrl = getClass().getResource(imagePath);
+                    System.out.println(imageUrl);
+                    if (imageUrl != null) {
+                        toolTip += "<img src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>";
+                    } else {
+                        System.err.println("Kunde inte hitta bilden på: ");
+                    }
 
-        panel.setToolTipText(toolTip);
+                }
+                String desc = spec.getDescription();
+                if (desc != null) {
+                    toolTip += desc;
+                } else {
+                    toolTip += "Finns ingen beskrivning...";
+                }
+
+                toolTip += "<br> </html>";
+                System.out.println(toolTip);
+                panel.setToolTipText(toolTip);
+            } catch (InfException ex) {
+                Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
+
         return panel;
     }
 
@@ -281,7 +310,11 @@ public class ScheduleManager {
                        u.first_name,
                        u.last_name,
                        CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
-                       CASE WHEN t.status = 'KLAR' THEN 1 ELSE 0 END AS done
+                       CASE 
+                           WHEN h.model_id != 1 THEN 1
+                           WHEN t.status = 'KLAR' THEN 1
+                           ELSE 0
+                       END AS done
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
@@ -300,8 +333,10 @@ public class ScheduleManager {
             try {
                 ArrayList<HashMap<String, String>> hats = idb.fetchRows(query);
                 addOrders(listPanel, aOrder.getOrder_id(), hats);
+
             } catch (InfException ex) {
-                Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ScheduleManager.class
+                        .getName()).log(Level.SEVERE, null, ex);
             }
         }
         scrollOrders.setViewportView(listPanel);
@@ -337,7 +372,7 @@ public class ScheduleManager {
                 boolean isAssigned = "1".equals(hat.get("in_task"));
                 boolean isDone = "1".equals(hat.get("done"));
 
-                JPanel item = createTaskPanel(hatName);
+                JPanel item = createTaskPanel(hatName, hatId);
                 int totalHeight = calendarPanel.getHeight();
                 int totalWidth = calendarPanel.getWidth();
                 int slotHeight = totalHeight / 8;
@@ -354,15 +389,13 @@ public class ScheduleManager {
 
                 Dimension taskSize = new Dimension(slotWidth - 1, slotHeight - 1);
                 item.setPreferredSize(taskSize);
-                if (isAssigned) {
+                if (isDone) {
+                    item.setBackground(Color.GREEN);
+                } else if (isAssigned) {
                     JLabel workerLabel = new JLabel(userName, SwingConstants.CENTER);
                     workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
                     item.add(workerLabel, BorderLayout.SOUTH);
-                    if (isDone) {
-                        item.setBackground(Color.GREEN);
-                    } else {
-                        item.setBackground(Color.YELLOW);
-                    }
+                    item.setBackground(Color.YELLOW);
                 } else {
                     item.setBackground(Color.LIGHT_GRAY);
                     makeDraggable(item);
@@ -427,6 +460,7 @@ public class ScheduleManager {
                     frame.setCursor(Cursor.HAND_CURSOR);
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
                     System.out.println("Högerklick");
+
                 }
             }
 
@@ -435,14 +469,37 @@ public class ScheduleManager {
                 if (tempPanel[0] == null) {
                     return;
                 }
+                Point droppedLocation = new Point();
+                droppedLocation.setLocation(e.getLocationOnScreen());
+                frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+
+                Point scrollLocationOnScreen = scrollOrders.getLocationOnScreen();
+                Dimension scrollSize = scrollOrders.getSize();
+                Rectangle scrollBounds = new Rectangle(scrollLocationOnScreen, scrollSize);
+                if (scrollBounds.contains(droppedLocation)) {
+                    System.out.println("Släppt i scrollen");
+                    Task task = (Task) panel.getClientProperty("task");
+                    if (task != null) {
+                        System.out.println(task.getTaskId());
+
+                        task.delete();
+                        taskRegister.refreshTasks();
+                        tasks = taskRegister.getTasks();
+                        refreshSchedule();
+                        initOrders();
+                    }
+
+                }
 
                 JComponent glassPane = (JComponent) frame.getGlassPane();
                 Rectangle tempBounds = tempPanel[0].getBounds();
+
                 tempBounds.setLocation(tempPanel[0].getLocationOnScreen());
 
                 JPanel bestCell = findBestEmptyCell(tempBounds);
 
-                if (bestCell != null) {
+                if (bestCell
+                        != null) {
                     int dropX = bestCell.getLocationOnScreen().x;
                     int calendarX = calendarPanel.getLocationOnScreen().x;
                     int totalWidth = calendarPanel.getWidth();
@@ -453,30 +510,40 @@ public class ScheduleManager {
                 }
 
                 glassPane.removeAll();
+
                 glassPane.repaint();
-                glassPane.setVisible(false);
+
+                glassPane.setVisible(
+                        false);
                 tempPanel[0] = null;
                 frame.setCursor(Cursor.DEFAULT_CURSOR);
-                panel.setOpaque(true);
+
+                panel.setOpaque(
+                        true);
                 panel.setBackground(Color.LIGHT_GRAY);
 
-                for (Component comp : panel.getComponents()) {
+                for (Component comp
+                        : panel.getComponents()) {
                     if (comp instanceof JLabel) {
                         comp.setVisible(true);
                     }
                 }
 
-                if (highlightedCell != null) {
+                if (highlightedCell
+                        != null) {
                     resetHighlightedCellBorder(highlightedCell);
                     highlightedCell = null;
                 }
 
             }
-        });
+        }
+        );
 
-        panel.addMouseMotionListener(new MouseMotionAdapter() {
+        panel.addMouseMotionListener(
+                new MouseMotionAdapter() {
             @Override
-            public void mouseDragged(MouseEvent e) {
+            public void mouseDragged(MouseEvent e
+            ) {
                 JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
                 JComponent glassPane = (JComponent) frame.getGlassPane();
                 Point cursor = SwingUtilities.convertPoint(panel, e.getPoint(), glassPane);
@@ -500,7 +567,8 @@ public class ScheduleManager {
 
                 glassPane.repaint();
             }
-        });
+        }
+        );
 
     }
 
@@ -609,8 +677,10 @@ public class ScheduleManager {
             String taskId = idb.getAutoIncrement("task", "task_id");
             idb.insert(query);
             return new Task(taskId);
+
         } catch (InfException ex) {
-            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ScheduleManager.class
+                    .getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
