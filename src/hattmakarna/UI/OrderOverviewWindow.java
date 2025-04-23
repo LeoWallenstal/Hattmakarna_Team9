@@ -41,6 +41,8 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
         table.setRowCount(0);
 
         orders = new OrderRegister().getOrders();
+        
+        orders.sort(Comparator.comparingInt(Order::getOrder_id));
 
         for (Order aOrder : orders) {
             int id = aOrder.getOrder_id();
@@ -76,6 +78,8 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
             calTo.set(Calendar.MILLISECOND, 999);
             to = calTo.getTime();
         }
+        
+        orders.sort(Comparator.comparingInt(Order::getOrder_id));
 
         if (from == null && to == null) {
             for (Order aOrder : orders) {
