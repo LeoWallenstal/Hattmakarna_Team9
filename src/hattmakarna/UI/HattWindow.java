@@ -21,17 +21,20 @@ public class HattWindow extends javax.swing.JFrame {
 private Model model;
 private HatRegister hatRegister;
 private ModelRegister modelRegister;
+ private User userLoggedIn;
 
     /**
      * Creates new form HattWindow
      */
     public HattWindow( Model model) {
+        this.userLoggedIn = userLoggedIn;
         this.model = null;
         this.modelRegister = new ModelRegister();
         initComponents();
         fillTable();
     }
-    public HattWindow(){
+    public HattWindow(User userLoggedIn){
+        this.userLoggedIn = userLoggedIn;
         this.model = null;
         this.modelRegister = new ModelRegister(idb);
         initComponents();
@@ -54,6 +57,7 @@ private ModelRegister modelRegister;
         jTable1 = new javax.swing.JTable();
         btnRedigering = new javax.swing.JButton();
         btnUpdate = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
@@ -98,6 +102,13 @@ private ModelRegister modelRegister;
             }
         });
 
+        btnBack.setText("Tillbaka");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,7 +120,9 @@ private ModelRegister modelRegister;
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnRedigering)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnUpdate))
+                        .addComponent(btnUpdate)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnBack))
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
@@ -121,7 +134,8 @@ private ModelRegister modelRegister;
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRedigering)
-                    .addComponent(btnUpdate))
+                    .addComponent(btnUpdate)
+                    .addComponent(btnBack))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(23, Short.MAX_VALUE))
@@ -139,11 +153,16 @@ private ModelRegister modelRegister;
        System.out.println("knapp tryckt");
         fillTable();
     }//GEN-LAST:event_btnUpdateActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+         new MainMenu(userLoggedIn).setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_btnBackActionPerformed
     private void fillTable() {
         System.out.println("fillTableKörs");
         ArrayList <Model> models = modelRegister.getAllHats();
         
-        String[] columnNames = {"model_id", "name", "price"};
+        String[] columnNames = {"model_id", "Namn", "Pris"};
         Object[][] data = new Object[models.size()][3];
         for (int i = 0; i < models.size(); i++) {
             Model m = models.get(i);
@@ -158,6 +177,9 @@ private ModelRegister modelRegister;
             }
         };
         jTable1.setModel(tableModel);
+        jTable1.getColumnModel().getColumn(0).setMinWidth(0);
+         jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
+         jTable1.getColumnModel().getColumn(0).setWidth(0);
     }
 
     /**
@@ -196,6 +218,7 @@ private ModelRegister modelRegister;
    // }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
     private javax.swing.JButton btnRedigering;
     private javax.swing.JButton btnUpdate;
     private javax.swing.JDialog jDialog1;

@@ -25,8 +25,41 @@ public class Hat extends DatabaseObject {
     private int hat_id;
     private int model_id;
     private int order_id;
+
+    public int getHat_id() {
+        return hat_id;
+    }
+
+    public void setHat_id(int hat_id) {
+        this.hat_id = hat_id;
+    }
+
+    public int getModel_id() {
+        return model_id;
+    }
+
+    public void setModel_id(int model_id) {
+        this.model_id = model_id;
+    }
+
+    public int getOrder_id() {
+        return order_id;
+    }
+
+    public void setOrder_id(int order_id) {
+        this.order_id = order_id;
+    }
     private double price;
     private String size;
+    private boolean isExpress;
+
+    public boolean isIsExpress() {
+        return isExpress;
+    }
+
+    public void setIsExpress(boolean isExpress) {
+        this.isExpress = isExpress;
+    }
 
     @Deprecated
     private ArrayList<MaterialOrder> materialBehov;
@@ -37,7 +70,6 @@ public class Hat extends DatabaseObject {
     private Specification specification;
 
     public Hat() {
-        specification = new Specification();
         materials = new ArrayList<>();
     }
 
@@ -45,11 +77,8 @@ public class Hat extends DatabaseObject {
         super(hatId);
 
         try {
-            String specId = Hattmakarna.idb.fetchSingle("select spec_id from hat_spec where hat_id = " + hatId);
-
-            if (specId != null && specId.isEmpty()) {
-                specification = new Specification(specId);
-            }
+            
+            setSpecial();
 
             materials = new ArrayList<>();
             // Hämta material
@@ -71,6 +100,10 @@ public class Hat extends DatabaseObject {
     }
 
     public Specification getSpecification() {
+        if (specification == null) {
+            specification = new Specification();
+        }
+
         return specification;
     }
 
@@ -92,6 +125,9 @@ public class Hat extends DatabaseObject {
             String specialId = idb.fetchSingle(query);
             if (String.valueOf(model_id).equals(specialId)) {
                 isSpecial = true;
+            }
+            else{
+                isSpecial = false;
             }
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);
@@ -134,10 +170,12 @@ public class Hat extends DatabaseObject {
             return false;
         }
 
+        if (!isSpecial) {
+            return true;
+        }
+
         Hat h = (Hat) e;
-
         return h.getHatId() == this.getHatId();
-
     }
 
     public String getHatId() {
@@ -166,10 +204,11 @@ public class Hat extends DatabaseObject {
 
     @Override
     public int hashCode() {
+
         if (!isSpecial) {
-            return Objects.hash(hat_id, model_id, 0);
+            return Objects.hash(hat_id, model_id, 0, isExpress);
         } else {
-            return Objects.hash(hat_id, model_id, id);
+            return Objects.hash(hat_id, model_id, id, isExpress);
         }
     }
 
@@ -200,4 +239,57 @@ public class Hat extends DatabaseObject {
     protected void setIdString(String id) {
         this.hat_id = Integer.parseInt(id);
     }
+
+    @Override
+    public boolean save() {
+
+        if (!super.save()) {
+            return false;
+        }
+
+        if (specification != null) {
+            specification.setHatId(hat_id);
+            return specification.save();
+        }
+
+        return true;
+    }
+    
+    @Override
+public Hat clone() {
+    Hat clone = new Hat();
+    clone.setHat_id(this.hat_id); // depending on your logic, you might want a new hat_id
+    clone.setModel_id(this.model_id);
+    clone.setOrder_id(this.order_id);
+    clone.setPrice(this.price);
+    clone.setSize(this.size);
+    clone.setIsExpress(this.isExpress);
+    clone.setIsSpecial(this.isSpecial);
+
+    // Clone specification if it exists
+    if (this.specification != null) {
+        clone.specification =(Specification) this.specification.clone();
+    }
+
+    // Clone material list
+    if (this.materials != null) {
+        List<MaterialHat> clonedMaterials = new ArrayList<>();
+        for (MaterialHat mat : this.materials) {
+            clonedMaterials.add((MaterialHat)mat.clone());
+        }
+        clone.materials = clonedMaterials;
+    }
+
+    // Clone deprecated materialBehov
+    if (this.materialBehov != null) {
+        ArrayList<MaterialOrder> clonedMaterialBehov = new ArrayList<>();
+        for (MaterialOrder order : this.materialBehov) {
+            clonedMaterialBehov.add(order.clone());
+        }
+        clone.materialBehov = clonedMaterialBehov;
+    }
+
+    return clone;
+}
+
 }

@@ -18,7 +18,7 @@ public class Material extends DatabaseObject {
     public Material(String materialID) {
         super(materialID);
         
-        System.out.println(name);
+        
     }
 
     @Deprecated
@@ -100,4 +100,14 @@ public class Material extends DatabaseObject {
     protected void setIdString(String id) {
         this.material_id = Integer.parseInt(id);
     }
+    
+    @Override
+public Material clone() {
+    Material copy = new Material();
+    copy.material_id = this.material_id; // Optional: reset if creating a new DB entry
+    copy.name = this.name;
+    copy.unit = this.unit;
+    return copy;
+}
+
 }
