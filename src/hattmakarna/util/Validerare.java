@@ -16,7 +16,7 @@ public class Validerare {
         return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
     
-    //'-' tillåtet, mellanslag inte tillåtet, inte heller tom String.
+    //'-' inte stillåtet, mellanslag inte tillåtet, inte heller tom String.
     public static boolean validatePhoneNumber(String number){
         return number.matches("^\\d{10}$");
     }
