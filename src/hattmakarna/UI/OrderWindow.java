@@ -1296,6 +1296,7 @@ public class OrderWindow extends javax.swing.JFrame {
 
             ((DefaultTableModel) tblSeeOrder.getModel()).addRow(new Object[]{
                 e.left.getModel().getName() + (e.left.isIsSpecial() ? "(Special)" : ""), // Model namn
+
                 e.left.getSize(), // Storlek
                 materialListString.toString(), // Material lista
                 e.right, // Antal

@@ -77,14 +77,8 @@ public class Hat extends DatabaseObject {
         super(hatId);
 
         try {
-            String specId = Hattmakarna.idb.fetchSingle("select spec_id from hat_spec where hat_id = " + hatId);
-
-            if (specId != null && specId.isEmpty()) {
-                specification = new Specification(specId);
-                isSpecial = true;
-            } else {
-                isSpecial = false;
-            }
+            
+            setSpecial();
 
             materials = new ArrayList<>();
             // Hämta material
@@ -131,6 +125,9 @@ public class Hat extends DatabaseObject {
             String specialId = idb.fetchSingle(query);
             if (String.valueOf(model_id).equals(specialId)) {
                 isSpecial = true;
+            }
+            else{
+                isSpecial = false;
             }
         } catch (InfException ex) {
             Logger.getLogger(Hat.class.getName()).log(Level.SEVERE, null, ex);

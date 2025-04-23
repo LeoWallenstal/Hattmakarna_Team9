@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import oru.inf.InfException;
 import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.util.PrintDebugger;
+import java.util.Comparator;
+import java.util.function.Function;
 
 /**
  *
@@ -17,13 +20,14 @@ import static hattmakarna.data.Hattmakarna.idb;
 public class CustomerRegister {
     private final ArrayList<Customer> allCustomers;
     
+    /**
+     * Fetches from DB and initializes an ArrayList of customers.
+     */
     public CustomerRegister(){
         allCustomers = initAllCustomers();
     }
 
     private ArrayList<Customer> initAllCustomers(){
-
-        
         String sqlQuery = "SELECT * FROM customer";
         
         ArrayList<HashMap<String, String>> customerMaps = new ArrayList<>();
@@ -83,13 +87,52 @@ public class CustomerRegister {
         return searchResult;
     }
     
+    public ArrayList<Customer> searchByCountry(String countrySearch){
+        ArrayList<Customer> searchResult = new ArrayList<>();
+        
+        for(Customer aCustomer : allCustomers){
+            if(aCustomer.getCountry().startsWith(countrySearch)){
+                searchResult.add(aCustomer);
+            }
+        }
+        return searchResult;
+    }
+    
+    public ArrayList<Customer> searchByPostalCode(String postalCodeSearch){
+        ArrayList<Customer> searchResult = new ArrayList<>();
+        
+        for(Customer aCustomer : allCustomers){
+            if(aCustomer.getPostalCode().startsWith(postalCodeSearch)){
+                searchResult.add(aCustomer);
+            }
+        }
+        return searchResult;
+    }
+    
+    
+    /**
+     * A generalized function to sort a list of customers.
+     * @param fieldExtractor The function which gets the field to compare; e.g. Customer::getFirstName, Customer::getTelephoneNumber.
+     * @param ascending toggles ascending or descending.
+     * @return Returns the sorted list.
+     */
+    public ArrayList<Customer> sortBy(Function<Customer, String> fieldExtractor, boolean ascending) {
+        ArrayList<Customer> sorted = new ArrayList<>(allCustomers);
+        Comparator<Customer> comparator = Comparator.comparing(fieldExtractor, String.CASE_INSENSITIVE_ORDER);
+        if (!ascending) {
+            comparator = comparator.reversed();
+        }
+        sorted.sort(comparator);
+        return sorted;
+    }
+    
     public Customer getCustomer(String customerID){
         for(Customer aCustomer : allCustomers){
             if(customerID.equals(aCustomer.getCustomerID())){
                 return aCustomer;
             }
         }
-        System.out.println("getCustomer(), in CustomerRegister.java returned NULL! :(");
+        PrintDebugger.error(("This function with parameter (customerID): " + customerID + " returned null!"));
         return null;
     }
     
@@ -97,7 +140,7 @@ public class CustomerRegister {
         if(indexPos >= 0 && indexPos < allCustomers.size()){
             return allCustomers.get(indexPos);
         }
-        System.out.println("getCustomer(int), in CustomerRegister.java returned NULL! :(");
+        PrintDebugger.error(("This function with parameter (indexPos): " + indexPos + " returned null!"));
         return null;
     }
     
@@ -127,8 +170,6 @@ public class CustomerRegister {
     
     public void add(Customer aCustomer){
         if(!customerExists(aCustomer)){
-            //Debug
-            System.out.println(aCustomer + " was added");
             allCustomers.add(aCustomer);
         }
     }
@@ -142,5 +183,15 @@ public class CustomerRegister {
         return false;
     }
     
-    
+    public Customer getCustomerByEmail(String email) {
+      for (Customer aCustomer : allCustomers) {
+          for (String e : aCustomer.getEmailAdresses()) {
+              if (e.equalsIgnoreCase(email)) {
+                  return aCustomer;
+              }
+          }
+      }
+      return null;
+    }
+   
 }

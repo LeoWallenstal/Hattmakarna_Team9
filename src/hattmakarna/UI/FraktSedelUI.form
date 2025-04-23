@@ -145,7 +145,7 @@
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace pref="70" max="32767" attributes="0"/>
+                      <EmptySpace pref="57" max="32767" attributes="0"/>
                   </Group>
               </Group>
           </Group>
@@ -494,12 +494,15 @@
     <Component class="javax.swing.JComboBox" name="cbxLang">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-          <StringArray count="5">
+          <StringArray count="8">
             <StringItem index="0" value="Svenska"/>
             <StringItem index="1" value="Engelska"/>
             <StringItem index="2" value="Tyska"/>
             <StringItem index="3" value="Spanska"/>
             <StringItem index="4" value="Franska"/>
+            <StringItem index="5" value="Arabiska"/>
+            <StringItem index="6" value="Ryska"/>
+            <StringItem index="7" value="Portugisiska"/>
           </StringArray>
         </Property>
       </Properties>

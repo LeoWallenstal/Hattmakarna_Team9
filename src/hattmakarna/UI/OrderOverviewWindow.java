@@ -3,17 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
+
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import javax.swing.SwingUtilities;
 
 /**
  *
  * @author Gastinlogg
  */
 public class OrderOverviewWindow extends javax.swing.JFrame {
+
     private DefaultTableModel table;
     private User userLoggedIn;
     private ArrayList<Order> orders;
@@ -23,27 +26,105 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
      */
     public OrderOverviewWindow(User userLoggedIn) {
         initComponents();
-        this.table = (DefaultTableModel) tblOrders.getModel();
         this.userLoggedIn = userLoggedIn;
-        fillTable();
-        
         setLocationRelativeTo(null);
+
+        if (tblOrders != null) {
+            this.table = (DefaultTableModel) tblOrders.getModel();
+            initTable();
+        } else {
+            System.err.println("tblOrders är null – kontrollera initComponents()");
+        }
     }
-    
-    public void fillTable(){
+
+    public void initTable() {
         table.setRowCount(0);
-        
+
         orders = new OrderRegister().getOrders();
         
-        for(Order aOrder : orders ){
+        orders.sort(Comparator.comparingInt(Order::getOrder_id));
+
+        for (Order aOrder : orders) {
             int id = aOrder.getOrder_id();
-            
+
             String status = aOrder.getStatus().toString();
             Date date = aOrder.getRecived_data();
             SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
             String formattedDate = dateF.format(date);
-            table.addRow(new Object[] {id,formattedDate,status});
-            
+            table.addRow(new Object[]{id, formattedDate, status});
+        }
+    }
+
+    public void filterTable(Date from, Date to) {
+
+        table.setRowCount(0);
+
+        if (from != null) {
+            Calendar calFrom = Calendar.getInstance();
+            calFrom.setTime(from);
+            calFrom.set(Calendar.HOUR_OF_DAY, 0);
+            calFrom.set(Calendar.MINUTE, 0);
+            calFrom.set(Calendar.SECOND, 0);
+            calFrom.set(Calendar.MILLISECOND, 0);
+            from = calFrom.getTime();
+        }
+
+        if (to != null) {
+            Calendar calTo = Calendar.getInstance();
+            calTo.setTime(to);
+            calTo.set(Calendar.HOUR_OF_DAY, 23);
+            calTo.set(Calendar.MINUTE, 59);
+            calTo.set(Calendar.SECOND, 59);
+            calTo.set(Calendar.MILLISECOND, 999);
+            to = calTo.getTime();
+        }
+        
+        orders.sort(Comparator.comparingInt(Order::getOrder_id));
+
+        if (from == null && to == null) {
+            for (Order aOrder : orders) {
+                int id = aOrder.getOrder_id();
+
+                String status = aOrder.getStatus().toString();
+                Date date = aOrder.getRecived_data();
+                SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
+                String formattedDate = dateF.format(date);
+                table.addRow(new Object[]{id, formattedDate, status});
+            }
+        } else if (from != null && to != null) {
+            for (Order aOrder : orders) {
+                Date recivedDate = aOrder.getRecived_data();
+                if ((recivedDate.equals(from) || recivedDate.after(from))
+                        && (recivedDate.equals(to) || recivedDate.before(to))) {
+                    int id = aOrder.getOrder_id();
+                    String status = aOrder.getStatus().toString();
+                    SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
+                    String formattedDate = dateF.format(recivedDate);
+                    table.addRow(new Object[]{id, formattedDate, status});
+                }
+            }
+        } else if (from != null && to == null) {
+            for (Order aOrder : orders) {
+                Date recivedDate = aOrder.getRecived_data();
+                if ((recivedDate.equals(from) || recivedDate.after(from))) {
+                    int id = aOrder.getOrder_id();
+                    String status = aOrder.getStatus().toString();
+                    SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
+                    String formattedDate = dateF.format(recivedDate);
+                    table.addRow(new Object[]{id, formattedDate, status});
+                }
+            }
+        } else if (from == null && to != null) {
+            for (Order aOrder : orders) {
+                Date recivedDate = aOrder.getRecived_data();
+                if ((recivedDate.equals(to) || recivedDate.before(to))) {
+                    int id = aOrder.getOrder_id();
+                    String status = aOrder.getStatus().toString();
+                    SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
+                    String formattedDate = dateF.format(recivedDate);
+                    table.addRow(new Object[]{id, formattedDate, status});
+                }
+            }
         }
     }
 
@@ -61,6 +142,11 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
         lblOverview = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         btnReturn = new javax.swing.JButton();
+        dcDateFrom = new com.toedter.calendar.JDateChooser();
+        dcDateTo = new com.toedter.calendar.JDateChooser();
+        lblDateFrom = new javax.swing.JLabel();
+        lblDateTo = new javax.swing.JLabel();
+        btnClearDate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -109,6 +195,29 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
             }
         });
 
+        dcDateFrom.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dcDateFromPropertyChange(evt);
+            }
+        });
+
+        dcDateTo.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                dcDateToPropertyChange(evt);
+            }
+        });
+
+        lblDateFrom.setText("Från datum:");
+
+        lblDateTo.setText("Till datum:");
+
+        btnClearDate.setText("Rensa datum");
+        btnClearDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClearDateActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -122,12 +231,23 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
                         .addGap(224, 224, 224)
                         .addComponent(lblOverview))
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(199, 199, 199)
+                        .addComponent(jButton1))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(btnReturn))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(199, 199, 199)
-                        .addComponent(jButton1)))
-                .addContainerGap(107, Short.MAX_VALUE))
+                        .addGap(43, 43, 43)
+                        .addComponent(lblDateFrom)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dcDateFrom, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblDateTo)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dcDateTo, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnClearDate)))
+                .addContainerGap(66, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -138,7 +258,14 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(dcDateFrom, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblDateFrom)
+                    .addComponent(dcDateTo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblDateTo)
+                    .addComponent(btnClearDate, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                 .addComponent(btnReturn)
                 .addGap(15, 15, 15))
         );
@@ -149,22 +276,44 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
         new MainMenu(userLoggedIn).setVisible(true);
         this.setVisible(false);
-        
+
     }//GEN-LAST:event_btnReturnActionPerformed
 
     private void orderTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_orderTableMouseClicked
         int row = tblOrders.rowAtPoint(evt.getPoint());
-        
+
         Order order = orders.get(row);
-        
-        new OrderInfoWindow(this,order).setVisible(true);
-        
+
+        new OrderInfoWindow(this, order).setVisible(true);
+
     }//GEN-LAST:event_orderTableMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         new OrderWindow(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnClearDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearDateActionPerformed
+        dcDateTo.setDate(null);
+        dcDateFrom.setDate(null);
+        filterTable(null, null);
+    }//GEN-LAST:event_btnClearDateActionPerformed
+
+    private void dcDateFromPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dcDateFromPropertyChange
+        if ("date".equals(evt.getPropertyName())) {
+            Date from = dcDateFrom.getDate();
+            Date to = dcDateTo.getDate();
+            filterTable(from, to);
+        }
+    }//GEN-LAST:event_dcDateFromPropertyChange
+
+    private void dcDateToPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_dcDateToPropertyChange
+        if ("date".equals(evt.getPropertyName())) {
+            Date from = dcDateFrom.getDate();
+            Date to = dcDateTo.getDate();
+            filterTable(from, to);
+        }
+    }//GEN-LAST:event_dcDateToPropertyChange
 
     /**
      * @param args the command line arguments
@@ -180,16 +329,24 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(OrderOverviewWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(OrderOverviewWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(OrderOverviewWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(OrderOverviewWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(OrderOverviewWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(OrderOverviewWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(OrderOverviewWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(OrderOverviewWindow.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -202,9 +359,14 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnClearDate;
     private javax.swing.JButton btnReturn;
+    private com.toedter.calendar.JDateChooser dcDateFrom;
+    private com.toedter.calendar.JDateChooser dcDateTo;
     private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblDateFrom;
+    private javax.swing.JLabel lblDateTo;
     private javax.swing.JLabel lblOverview;
     private javax.swing.JTable tblOrders;
     // End of variables declaration//GEN-END:variables
