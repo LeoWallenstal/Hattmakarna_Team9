@@ -30,6 +30,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.multi.MultiLookAndFeel;
 import hattmakarna.UI.OrderWindow;
+import hattmakarna.util.PrintDebugger;
 
 import oru.inf.InfDB;
 import oru.inf.InfException;
@@ -51,6 +52,9 @@ public class Hattmakarna {
      */
     public static void main(String[] args) {
 
+        //För att toggla printdebuggern av/på
+        PrintDebugger.enabled = true;
+        
         try {
             IntelliJTheme.setup(new FileInputStream("themes/theme1.properties"));
         // FlatLaf.setup(new FlatMacLightLaf());
