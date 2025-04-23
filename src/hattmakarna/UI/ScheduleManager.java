@@ -51,10 +51,8 @@ public class ScheduleManager {
         emptyCells = new ArrayList<>();
 
         initSchedule();
-        initOrders();       
-        
-        
-       
+        initOrders();
+
     }
 
     public void refreshSchedule() {
@@ -288,17 +286,16 @@ public class ScheduleManager {
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
                 LEFT JOIN user u ON t.user_id = u.user_id
-                WHERE h.order_id = """ + aOrder.getOrder_id()  
-//                   + """
-//                  AND (
-//                        SELECT COUNT(*) 
-//                        FROM task t2
-//                        JOIN hat h2 ON t2.hat_id = h2.hat_id
-//                        WHERE h2.order_id = h.order_id
-//                          AND t2.status <> 'KLAR'
-//                      ) > 0
-//                """
-            ;
+                WHERE h.order_id = """ + aOrder.getOrder_id() //                   + """
+                    //                  AND (
+                    //                        SELECT COUNT(*) 
+                    //                        FROM task t2
+                    //                        JOIN hat h2 ON t2.hat_id = h2.hat_id
+                    //                        WHERE h2.order_id = h.order_id
+                    //                          AND t2.status <> 'KLAR'
+                    //                      ) > 0
+                    //                """
+                    ;
 
             try {
                 ArrayList<HashMap<String, String>> hats = idb.fetchRows(query);
@@ -402,29 +399,35 @@ public class ScheduleManager {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                initialClick.setLocation(e.getPoint());
-                frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    System.out.println("Vänsterklick");
 
-                Point calendarLocationOnScreen = calendarPanel.getLocationOnScreen();
-                Dimension calendarSize = calendarPanel.getSize();
-                Rectangle calendarBounds = new Rectangle(calendarLocationOnScreen, calendarSize);
-                if (calendarBounds.contains(panel.getLocationOnScreen())) {
-                    originCell[0] = (JPanel) panel.getParent();
+                    initialClick.setLocation(e.getPoint());
+                    frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
+
+                    Point calendarLocationOnScreen = calendarPanel.getLocationOnScreen();
+                    Dimension calendarSize = calendarPanel.getSize();
+                    Rectangle calendarBounds = new Rectangle(calendarLocationOnScreen, calendarSize);
+                    if (calendarBounds.contains(panel.getLocationOnScreen())) {
+                        originCell[0] = (JPanel) panel.getParent();
+                    }
+                    tempPanel[0] = clonePanel(panel, false, panel.getBackground());
+                    tempPanel[0].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+                    Point panelPosInGlass = SwingUtilities.convertPoint(panel.getParent(), panel.getLocation(), frame.getGlassPane());
+
+                    JComponent glassPane = (JComponent) frame.getGlassPane();
+                    glassPane.setLayout(null);
+                    glassPane.setVisible(true);
+                    tempPanel[0].setBounds(panelPosInGlass.x, panelPosInGlass.y, panel.getWidth(), panel.getHeight());
+                    glassPane.add(tempPanel[0]);
+                    glassPane.repaint();
+
+                    panel.setOpaque(false);
+                    frame.setCursor(Cursor.HAND_CURSOR);
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    System.out.println("Högerklick");
                 }
-                tempPanel[0] = clonePanel(panel, false, panel.getBackground());
-                tempPanel[0].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-                Point panelPosInGlass = SwingUtilities.convertPoint(panel.getParent(), panel.getLocation(), frame.getGlassPane());
-
-                JComponent glassPane = (JComponent) frame.getGlassPane();
-                glassPane.setLayout(null);
-                glassPane.setVisible(true);
-                tempPanel[0].setBounds(panelPosInGlass.x, panelPosInGlass.y, panel.getWidth(), panel.getHeight());
-                glassPane.add(tempPanel[0]);
-                glassPane.repaint();
-
-                panel.setOpaque(false);
-                frame.setCursor(Cursor.HAND_CURSOR);
             }
 
             @Override
