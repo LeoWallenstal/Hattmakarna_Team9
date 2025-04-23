@@ -26,7 +26,8 @@ public class TaskRegister {
         String sqlQuery = """
             SELECT 
             t.*, 
-            m.name AS model_name
+            m.name,
+            h.order_id
             FROM task t
             JOIN hat h ON t.hat_id = h.hat_id
             JOIN hat_model m ON h.model_id = m.model_id
