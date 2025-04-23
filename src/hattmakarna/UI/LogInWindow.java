@@ -28,6 +28,8 @@ public class LogInWindow extends javax.swing.JFrame {
         
         txtEmail.addActionListener(e -> btnLogIn.doClick());
         pwdPassword.addActionListener(e -> btnLogIn.doClick());
+        
+        this.setTitle("Logga in");
     }
 
     /**

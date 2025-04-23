@@ -24,92 +24,131 @@ import javax.swing.table.DefaultTableModel;
  */
 public class CustomerInformationWindow extends javax.swing.JFrame {
     private CustomerRegister customerRegister;
-     private User userLoggedIn;
+
+    private  Customer customer;
+    private User userLoggedIn;
+
     /**
      * Creates new form CustomerInformationWindow
      */
-    public CustomerInformationWindow(User userLoggedIn) {
-        this.userLoggedIn = userLoggedIn;
-        this.customerRegister = new CustomerRegister();
-        initComponents();
-         fillTable();
-        
-        try{
-            ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
-            cbMail.removeAllItems();
-            for (String mail : mailList){
-                cbMail.addItem(mail);
-            }
-        } 
-        catch (InfException e) {
-            JOptionPane.showMessageDialog(this,"kunde inte hämta mail" + e.getMessage());
-        }
-        
-        try {
-            ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
-            cbName.removeAllItems();
+public CustomerInformationWindow(User userLoggedIn) {
+    this.userLoggedIn = userLoggedIn;
+    this.customerRegister = new CustomerRegister();
 
-            for (HashMap<String, String> row : customerRows) {
-                String fName = row.get("first_name");
-                String lName = row.get("last_name");
+    initComponents();
+    fillTable();
 
-                String comboText = fName + " " + lName;
-                cbName.addItem(comboText);
-            }
-        } catch (InfException e) {
-            JOptionPane.showMessageDialog(this,"kunde inte hämta namn" + e.getMessage());
+    try {
+        ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
+        cbMail.removeAllItems();
+        for (String mail : mailList) {
+            cbMail.addItem(mail);
         }
-        cbMail.addActionListener(e -> mailSelected());
-        cbName.addActionListener(e -> nameSelected());
+    } catch (InfException e) {
+        JOptionPane.showMessageDialog(this, "Kunde inte hämta mail: " + e.getMessage());
     }
-    
-    private void fillTable() {
-        //DEBUG
-        System.out.println("fillTableKörs");
-        ArrayList <Customer> customers = customerRegister.getAllCustomers();
-        
-        String[] columnNames = {"name", "customerID","email", "phone", "adress", "postalCode", "country" };
-        Object[][] data = new Object[customers.size()][7];
-        for (int i = 0; i < customers.size(); i++) {
-            Customer m = customers.get(i);
-            data[i][0] = m.getFullName();
-            data[i][1] = m.getCustomerID();
-            data[i][2] = m.getEmailAdresses();
-            data[i][3] = m.getTelephoneNumbers();
-            data[i][4] = m.getAdress();
-            data[i][5] = m.getPostalCode();
-            data[i][6] = m.getCountry();
-     
-            
+
+    try {
+        ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
+        cbName.removeAllItems();
+        for (HashMap<String, String> row : customerRows) {
+            String fName = row.get("first_name");
+            String lName = row.get("last_name");
+            cbName.addItem(fName + " " + lName);
         }
-        
-        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-        jTable1.setModel(tableModel);
+    } catch (InfException e) {
+        JOptionPane.showMessageDialog(this, "Kunde inte hämta namn: " + e.getMessage());
     }
-    private void updateTable(ArrayList<Customer> customers) {
-    String[] columnNames = {"Namn", "E-mail", "Nummer", "Adress", "Postnummer", "Land"};
-    Object[][] data = new Object[customers.size()][6];
+
+    cbMail.addActionListener(e -> mailSelected());
+    cbName.addActionListener(e -> nameSelected());
+}
     
+private void fillTable() {
+    System.out.println("fillTableKörs");
+    ArrayList<Customer> customers = customerRegister.getAllCustomers();
+
+    String[] columnNames = {"ID", "Namn", "E-mail", "Telefon", "Adress", "Postnummer", "Land"};
+    Object[][] data = new Object[customers.size()][7];
+
     for (int i = 0; i < customers.size(); i++) {
         Customer m = customers.get(i);
-        data[i][0] = m.getFullName();
-        data[i][1] = m.getEmailAdresses();
-        data[i][2] = m.getTelephoneNumbers();
-        data[i][3] = m.getAdress();
-        data[i][4] = m.getPostalCode();
-        data[i][5] = m.getCountry();
+        data[i][0] = m.getCustomerID();
+        data[i][1] = m.getFullName();
+        data[i][2] = String.join(", ", m.getEmailAdresses());
+        data[i][3] = String.join(", ", m.getTelephoneNumbers());
+        data[i][4] = m.getAdress();
+        data[i][5] = m.getPostalCode();
+        data[i][6] = m.getCountry();
     }
 
-    javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+    DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+
+    jTable1.setModel(tableModel);
+
+    // Göm ID-kolumnen
+    jTable1.getColumnModel().getColumn(0).setMinWidth(0);
+    jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
+    jTable1.getColumnModel().getColumn(0).setWidth(0);
+
+    jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            if (evt.getClickCount() == 2) {
+                int selectedRow = jTable1.getSelectedRow();
+                if (selectedRow != -1) {
+                    String customerID = jTable1.getValueAt(selectedRow, 0).toString();
+                    Customer selectedCustomer = customerRegister.getCustomer(customerID);
+                    if (selectedCustomer != null) {
+                        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+                        editWindow.setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Kunden kunde inte hittas.");
+                    }
+                }
+            }
+        }
+    });
+}
+    
+private void openEditCustomerWindow(String email) {
+    Customer selectedCustomer = customerRegister.getCustomerByEmail(email);
+    if (selectedCustomer != null) {
+        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+        editWindow.setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+    }
+}
+private void updateTable(ArrayList<Customer> customers) {
+    String[] columnNames = {"ID", "Namn", "E-mail", "Telefon", "Adress", "Postnummer", "Land"};
+    Object[][] data = new Object[customers.size()][7];
+
+    for (int i = 0; i < customers.size(); i++) {
+        Customer m = customers.get(i);
+        data[i][0] = m.getCustomerID();
+        data[i][1] = m.getFullName();
+        data[i][2] = String.join(", ", m.getEmailAdresses());
+        data[i][3] = String.join(", ", m.getTelephoneNumbers());
+        data[i][4] = m.getAdress();
+        data[i][5] = m.getPostalCode();
+        data[i][6] = m.getCountry();
+    }
+
+    DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
         public boolean isCellEditable(int row, int column) {
             return false;
         }
     };
     jTable1.setModel(tableModel);
+
+    // Dölj ID-kolumnen
+    jTable1.getColumnModel().getColumn(0).setMinWidth(0);
+    jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
+    jTable1.getColumnModel().getColumn(0).setWidth(0);
 }
     
     private void mailSelected() {
@@ -161,6 +200,7 @@ private Customer findCustomerByFullName(String fullName) {
     return null;
 }
 
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -179,8 +219,9 @@ private Customer findCustomerByFullName(String fullName) {
         lblSearchName = new javax.swing.JLabel();
         btnEditCustomer = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
+        btnRefresh = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -206,7 +247,7 @@ private Customer findCustomerByFullName(String fullName) {
 
         lblSearchName.setText("Sök på namn: ");
 
-        btnEditCustomer.setText("Redigera kund");
+        btnEditCustomer.setText("Redigera");
         btnEditCustomer.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEditCustomerActionPerformed(evt);
@@ -220,15 +261,19 @@ private Customer findCustomerByFullName(String fullName) {
             }
         });
 
+        btnRefresh.setText("Lista alla kunder");
+        btnRefresh.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefreshActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(25, 25, 25)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -237,45 +282,75 @@ private Customer findCustomerByFullName(String fullName) {
                                 .addComponent(lblSearchName)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblSearchEmail)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnBack)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnEditCustomer)))))
-                .addContainerGap(24, Short.MAX_VALUE))
+                                .addComponent(btnRefresh))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(btnBack)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEditCustomer)))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(27, Short.MAX_VALUE)
+                .addGap(25, 25, 25)
                 .addComponent(lblCustomerInfo)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblSearchEmail)
                     .addComponent(lblSearchName)
-                    .addComponent(btnEditCustomer)
-                    .addComponent(btnBack))
+                    .addComponent(btnRefresh))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 291, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBack)
+                    .addComponent(btnEditCustomer))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEditCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditCustomerActionPerformed
-        // TODO add your handling code here:
+                                               
+    int selectedRow = jTable1.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Välj en kund i tabellen först.");
+        return;
+    }
+
+    String customerID = jTable1.getValueAt(selectedRow, 0).toString(); // Hämta från kolumn 0 (ID)
+
+    Customer selectedCustomer = customerRegister.getCustomer(customerID);
+    if (selectedCustomer != null) {
+        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+        editWindow.setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+    }
+
+
     }//GEN-LAST:event_btnEditCustomerActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
        new MainMenu(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnBackActionPerformed
+
+    private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
+        fillTable();
+    }//GEN-LAST:event_btnRefreshActionPerformed
 
     /**
      * @param args the command line arguments
@@ -315,6 +390,7 @@ private Customer findCustomerByFullName(String fullName) {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnEditCustomer;
+    private javax.swing.JButton btnRefresh;
     private javax.swing.JComboBox<String> cbMail;
     private javax.swing.JComboBox<String> cbName;
     private javax.swing.JScrollPane jScrollPane1;
