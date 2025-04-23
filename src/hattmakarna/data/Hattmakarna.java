@@ -30,6 +30,16 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.multi.MultiLookAndFeel;
 import hattmakarna.UI.OrderWindow;
+import java.awt.AWTEvent;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 import oru.inf.InfDB;
 import oru.inf.InfException;
@@ -50,7 +60,29 @@ public class Hattmakarna {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
+        //Loading icons
+        List<Image> icons = List.of(
+            Toolkit.getDefaultToolkit().getImage(Hattmakarna.class.getResource("/resources/icons/appIcon16.png")),
+            Toolkit.getDefaultToolkit().getImage(Hattmakarna.class.getResource("/resources/icons/appIcon32.png")),
+            Toolkit.getDefaultToolkit().getImage(Hattmakarna.class.getResource("/resources/icons/appIcon64.png")),
+            Toolkit.getDefaultToolkit().getImage(Hattmakarna.class.getResource("/resources/icons/appIcon256.png"))
+        );
 
+        Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
+            if (event instanceof WindowEvent we && we.getID() == WindowEvent.WINDOW_OPENED) {
+                Window w = we.getWindow();
+                if (w instanceof JFrame jf) {
+                    // instead of jf.setIconImage(icon);
+                    jf.setIconImages(icons);
+                }
+                if(w instanceof JDialog jd){
+                    jd.setIconImages(icons);
+                }
+            }
+        }, AWTEvent.WINDOW_EVENT_MASK);
+
+        
         try {
             IntelliJTheme.setup(new FileInputStream("themes/theme1.properties"));
         // FlatLaf.setup(new FlatMacLightLaf());
