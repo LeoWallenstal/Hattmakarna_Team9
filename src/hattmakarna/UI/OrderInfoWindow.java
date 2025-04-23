@@ -56,11 +56,9 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         lblDate.setText("Datum: " + formattedDate);
         lblPrice.setText("Pris: " + currentOrder.getTotalPris());
         String id = "" + currentOrder.getCustomer_id();
-
         Customer customer = new Customer(id);
         lblCustomer.setText("Kund: " + id + ", " + customer.getFullName());
 
-        
         if (currentOrder.getStatus().toString().equals("MOTTAGEN")) {
             btnDeleteOrder.setVisible(true);
         }
@@ -97,10 +95,22 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }
 
     public void setStatusMaterialOrder() {
-        if (currentOrder.getMaterialOrdered()) {
-            cbMaterialOrder.setSelectedItem("BESTÄLLT");
+        boolean special = false;
+        for (Hat aHat : currentOrder.getHattarObjects()) {
+            if (aHat.isIsSpecial()) {
+                special = true;
+                break;
+            }
+        }
+        if (special) {
+            if (currentOrder.getMaterialOrdered()) {
+                cbMaterialOrder.setSelectedItem("BESTÄLLT");
+            } else {
+                cbMaterialOrder.setSelectedItem("EJ BESTÄLLT");
+            }
         } else {
-            cbMaterialOrder.setSelectedItem("EJ BESTÄLLT");
+            lblMaterial.setVisible(false);
+            cbMaterialOrder.setVisible(false);
         }
     }
 
@@ -119,7 +129,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         lblPrice = new javax.swing.JLabel();
         lblCustomer = new javax.swing.JLabel();
         cbMaterialOrder = new javax.swing.JComboBox<>();
-        jLabel3 = new javax.swing.JLabel();
+        lblMaterial = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblHats = new javax.swing.JTable();
@@ -159,7 +169,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel3.setText("Material:");
+        lblMaterial.setText("Material:");
 
         jLabel4.setText("Orderstatus:");
 
@@ -227,7 +237,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(layout.createSequentialGroup()
                                     .addGap(6, 6, 6)
-                                    .addComponent(jLabel3))
+                                    .addComponent(lblMaterial))
                                 .addComponent(cbMaterialOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -252,7 +262,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbStatus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3)
+                        .addComponent(lblMaterial)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cbMaterialOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(18, 18, 18)
@@ -274,7 +284,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         }
         currentOrder.setStatus(Status.valueOf(cbStatus.getSelectedItem().toString()));
         currentOrder.save();
-        window.fillTable();
+        window.initTable();
 
         if (cbStatus.getSelectedItem().toString().equals("MOTTAGEN")) {
             btnDeleteOrder.setVisible(true);
@@ -310,12 +320,12 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_cbStatusActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        window.fillTable();
+        window.initTable();
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String id = Integer.toString(currentOrder.getOrder_id());
-        
+
         new FraktSedelUI(this, id).setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -359,11 +369,11 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cbMaterialOrder;
     private javax.swing.JComboBox<String> cbStatus;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCustomer;
     private javax.swing.JLabel lblDate;
+    private javax.swing.JLabel lblMaterial;
     private javax.swing.JLabel lblOrderNr;
     private javax.swing.JLabel lblPrice;
     private javax.swing.JLabel lblSuccessFailed;
