@@ -78,6 +78,11 @@ public class Hattmakarna {
                 if (w instanceof JFrame jf) {
                     // instead of jf.setIconImage(icon);
                     jf.setIconImages(icons);
+                    
+                    //Sätter defaulttitel till "Hattmakarna - " + det som redan finns i de andra fönstrena
+                    String existingTitle = jf.getTitle();
+                    String title = existingTitle.isBlank() ? "Hattmakarna - " : "Hattmakarna - " + existingTitle;
+                    jf.setTitle(title);
                 }
                 if(w instanceof JDialog jd){
                     jd.setIconImages(icons);

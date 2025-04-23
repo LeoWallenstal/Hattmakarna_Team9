@@ -34,6 +34,7 @@ public class MainMenu extends javax.swing.JFrame {
         } else {
             btnUsers.setVisible(false);
         }
+        this.setTitle("Huvudmeny");
     }
 
     /**
