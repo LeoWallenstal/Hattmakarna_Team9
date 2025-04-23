@@ -34,13 +34,6 @@ public class MainMenu extends javax.swing.JFrame {
         } else {
             btnUsers.setVisible(false);
         }
-
-        ArrayList<Image> icons = new ArrayList<>();
-        icons.add(new ImageIcon(getClass().getResource("/resources/icons/appIcon16.png")).getImage());
-        icons.add(new ImageIcon(getClass().getResource("/resources/icons/appIcon32.png")).getImage());
-        icons.add(new ImageIcon(getClass().getResource("/resources/icons/appIcon64.png")).getImage());
-        icons.add(new ImageIcon(getClass().getResource("/resources/icons/appIcon256.png")).getImage());
-        setIconImages(icons);
     }
 
     /**
