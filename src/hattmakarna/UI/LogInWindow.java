@@ -22,7 +22,6 @@ public class LogInWindow extends javax.swing.JFrame {
     public LogInWindow(InfDB idb) {
         this.idb = idb;
         initComponents();
-        getRootPane().setDefaultButton(btnLogIn);
         setLocationRelativeTo(null);
         lblError.setVisible(false);
         

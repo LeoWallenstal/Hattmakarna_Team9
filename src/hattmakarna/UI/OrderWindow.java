@@ -924,7 +924,14 @@ public class OrderWindow extends javax.swing.JFrame {
             normalOrderObject.setRecived_data(Calendar.getInstance().getTime());
             normalOrderObject.setStatus(Status.MOTTAGEN);
             normalOrderObject.setHats(normalOrder);
-
+            
+            final double[] total = {0};
+            // Calc total price
+            normalOrder.forEach(e -> {
+                total[0] += e.getPrice();
+            });
+            normalOrderObject.setTotalPris(total[0]);
+            
             if (!normalOrderObject.save()) {
                 JOptionPane.showMessageDialog(this, "Fel inträffade när ordern skulle sparas!");
                 //  hatsToOrder = (ArrayList<Hat>) normalOrder;
@@ -942,7 +949,13 @@ public class OrderWindow extends javax.swing.JFrame {
             expressOrderObject.setRecived_data(Calendar.getInstance().getTime());
             expressOrderObject.setStatus(Status.MOTTAGEN);
             expressOrderObject.setHats(expressOrder);
-
+ 
+            final double[] total = {0};            // Calc total price
+            normalOrder.forEach(e -> {
+                total[0] += e.getPrice();
+            });
+            expressOrderObject.setTotalPris(total[0]);
+            
             if (!expressOrderObject.save()) {
                 JOptionPane.showMessageDialog(this, "Fel inträffade när express order skulle sparas!");
                 // hatsToOrder.addAll(expressOrder);
