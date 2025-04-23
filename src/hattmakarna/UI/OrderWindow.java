@@ -48,6 +48,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.TableModelEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -59,15 +60,11 @@ import oru.inf.InfException;
  */
 public class OrderWindow extends javax.swing.JFrame {
 
-    private double totalPrice;
-    private double originalTotalPrice = 0;
-    private boolean isExpress;
     CustomerRegister customerRegister;
     private User userLoggedIn;
     ModelRegister modelRegister;
     private ArrayList<Model> hatModels;
     private ArrayList<MaterialHat> tmp_materials;
-    private DefaultTableModel tableModel;
     private DefaultListModel<String> customerModel;
 
     int customerID = 0;
@@ -75,6 +72,7 @@ public class OrderWindow extends javax.swing.JFrame {
 
     private BufferedImage tmp_spec_image_holder = null;
     private BufferedImage tmp_spec_sketch_holder = null;
+    private boolean isUpdatingTable = false;
 
     /**
      * Creates new form OrderWindow
@@ -101,13 +99,25 @@ public class OrderWindow extends javax.swing.JFrame {
         btnRemoveCustomer.setEnabled(false);
         customerModel = (DefaultListModel<String>) customerJList.getModel();
 
-        totalPrice = 0;
-        isExpress = false;
-
         // Fixa layout för material lista
         BoxLayout b = new BoxLayout(materialList, BoxLayout.Y_AXIS);
         materialList.setLayout(b);
         jScrollPane2.setViewportView(materialList);
+
+        ((DefaultTableModel) tblSeeOrder.getModel()).addTableModelListener(e -> {
+            if (isUpdatingTable) {
+                return;
+            }
+
+            if (e.getType() == TableModelEvent.UPDATE && e.getFirstRow() != TableModelEvent.HEADER_ROW) {
+                int row = e.getFirstRow();
+                if (row >= 0) {
+                    isUpdatingTable = true;
+                    updateHatsAndTableRow(row);
+                    isUpdatingTable = false;
+                }
+            }
+        });
 
     }
 
@@ -553,12 +563,36 @@ public class OrderWindow extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Modell", "Storlek", "Material", "Antal", "St/pris", "Total", "Express"
+                "Model", "Storlek", "Material", "Antal", "St/pris", "Total", "Express"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Object.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true, true, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblSeeOrder.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tblSeeOrder.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                tblSeeOrderPropertyChange(evt);
+            }
+        });
         tblOrder.setViewportView(tblSeeOrder);
 
         lblTotalPrice.setText("Totalpris:");
@@ -782,18 +816,61 @@ public class OrderWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_checkFastDeliveryActionPerformed
 
     private void remove_from_orderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_remove_from_orderActionPerformed
-        // Ta index av vald i tabellen
-        int selectedIndex = tblSeeOrder.getSelectedRow();
-        // Ej valt index
-        if (selectedIndex == -1) {
+
+        int selectedViewIndex = tblSeeOrder.getSelectedRow();
+
+        if (selectedViewIndex < 0) {
             return;
         }
 
-        // tabort från toOrderHats
-        hatsToOrder.remove(selectedIndex);
-        // Updatera listan
-        updateOrderTable();
+        int modelIndex = tblSeeOrder.convertRowIndexToModel(selectedViewIndex);
+
+        if (modelIndex >= 0 && modelIndex < hatsToOrder.size()) {
+            hatsToOrder.remove(modelIndex);
+            updateOrderTable();
+        }
     }//GEN-LAST:event_remove_from_orderActionPerformed
+
+    private void tblSeeOrderPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_tblSeeOrderPropertyChange
+
+    }//GEN-LAST:event_tblSeeOrderPropertyChange
+
+    private void updateHatsAndTableRow(int row) {
+        DefaultTableModel model = (DefaultTableModel) tblSeeOrder.getModel();
+
+        Hat hat = hatsToOrder.get(row).left;
+        int count = hatsToOrder.get(row).right;
+
+        // Get and update new price
+        Object objPrice = model.getValueAt(row, 4);
+        if (objPrice instanceof Number) {
+            hat.setPrice(((Number) objPrice).doubleValue());
+        }
+
+        // Get and update new count
+        Object objCount = model.getValueAt(row, 3);
+        if (objCount instanceof Number) {
+            count = ((Number) objCount).intValue();
+        }
+
+        hatsToOrder.set(row, new Pair<>(hat, count));
+
+        // Recalculate individual total
+        double rowTotal = hat.getPrice() * count * (hat.isIsExpress() ? 1.2 : 1);
+        model.setValueAt(rowTotal, row, 5); // Update total column
+
+        // Optionally update express column too (column 6)
+        model.setValueAt(hat.isIsExpress() ? "X" : "", row, 6);
+
+        // Recalculate overall total
+        double grandTotal = 0;
+        for (Pair<Hat, Integer> entry : hatsToOrder) {
+            double itemTotal = entry.left.getPrice() * entry.right * (entry.left.isIsExpress() ? 1.2 : 1);
+            grandTotal += itemTotal;
+        }
+
+        setTotal(grandTotal);
+    }
 
     private void saveSpecOrder() {
         Specification specification = new Specification();
@@ -925,6 +1002,13 @@ public class OrderWindow extends javax.swing.JFrame {
             normalOrderObject.setStatus(Status.MOTTAGEN);
             normalOrderObject.setHats(normalOrder);
 
+            final double[] total = {0};
+            // Calc total price
+            normalOrder.forEach(e -> {
+                total[0] += e.getPrice();
+            });
+            normalOrderObject.setTotalPris(total[0]);
+
             if (!normalOrderObject.save()) {
                 JOptionPane.showMessageDialog(this, "Fel inträffade när ordern skulle sparas!");
                 //  hatsToOrder = (ArrayList<Hat>) normalOrder;
@@ -942,6 +1026,12 @@ public class OrderWindow extends javax.swing.JFrame {
             expressOrderObject.setRecived_data(Calendar.getInstance().getTime());
             expressOrderObject.setStatus(Status.MOTTAGEN);
             expressOrderObject.setHats(expressOrder);
+
+            final double[] total = {0};            // Calc total price
+            normalOrder.forEach(e -> {
+                total[0] += e.getPrice();
+            });
+            expressOrderObject.setTotalPris(total[0]);
 
             if (!expressOrderObject.save()) {
                 JOptionPane.showMessageDialog(this, "Fel inträffade när express order skulle sparas!");
@@ -1010,7 +1100,9 @@ public class OrderWindow extends javax.swing.JFrame {
         lstModels.setModel(listModel);
 
         for (Model model : hatModels) {
-            listModel.addElement(model.getName());
+            if (!model.getModelID().equals("1")) {
+                listModel.addElement(model.getName());
+            }
         }
 
     }
@@ -1020,7 +1112,7 @@ public class OrderWindow extends javax.swing.JFrame {
         Model selectedModel = null;
 
         if (lstModels.getSelectedIndex() != -1) {
-            selectedModel = hatModels.get(lstModels.getSelectedIndex());
+            selectedModel = hatModels.get(lstModels.getSelectedIndex() + 1);
         } else {
             return;
         }
@@ -1185,7 +1277,7 @@ public class OrderWindow extends javax.swing.JFrame {
 
     private void updateOrderTable() {
 
-        ((DefaultTableModel) tblSeeOrder.getModel()).getDataVector().clear();
+        ((DefaultTableModel) tblSeeOrder.getModel()).setRowCount(0);
 
         Map<Hat, Integer> hatCountMap = new HashMap<>();
 
@@ -1203,7 +1295,8 @@ public class OrderWindow extends javax.swing.JFrame {
             });
 
             ((DefaultTableModel) tblSeeOrder.getModel()).addRow(new Object[]{
-                e.left.getModel().getName()+ (e.left.isIsSpecial()?"(Special)":""), // Model namn
+                e.left.getModel().getName() + (e.left.isIsSpecial() ? "(Special)" : ""), // Model namn
+
                 e.left.getSize(), // Storlek
                 materialListString.toString(), // Material lista
                 e.right, // Antal
@@ -1217,5 +1310,6 @@ public class OrderWindow extends javax.swing.JFrame {
 
         repaint();
         revalidate();
+
     }
 }
