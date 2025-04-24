@@ -343,7 +343,7 @@ public class ScheduleManager {
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
                 LEFT JOIN user u ON t.user_id = u.user_id
-                WHERE h.order_id = """ + aOrder.getOrder_id() //                   + """
+                WHERE h.order_id = """ + aOrder.getOrderId() //                   + """
                     //                  AND (
                     //                        SELECT COUNT(*) 
                     //                        FROM task t2
@@ -356,7 +356,7 @@ public class ScheduleManager {
 
             try {
                 ArrayList<HashMap<String, String>> hats = idb.fetchRows(query);
-                addOrders(listPanel, aOrder.getOrder_id(), hats);
+                addOrders(listPanel, aOrder.getOrderId(), hats);
 
             } catch (InfException ex) {
                 Logger.getLogger(ScheduleManager.class
