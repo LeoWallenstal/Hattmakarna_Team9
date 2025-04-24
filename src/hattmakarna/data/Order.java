@@ -18,7 +18,7 @@ public class Order extends DatabaseObject {
     // Fält motsvarande kolumner i tabellen sales_order
     private int order_id;
     private int customer_id;
-    private int totalPris;
+    private double totalPris;
     private Status status;
     private Date recived_date;
     private boolean material_ordered;
@@ -110,11 +110,11 @@ public class Order extends DatabaseObject {
         this.hats = hats;
     }
 
-    public int getTotalPris() {
+    public double getTotalPris() {
         return totalPris;
     }
 
-    public void setTotalPris(int totalPris) {
+    public void setTotalPris(double totalPris) {
         this.totalPris = totalPris;
     }
 

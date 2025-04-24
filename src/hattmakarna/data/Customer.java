@@ -72,16 +72,16 @@ public class Customer {
     }
     
     // -------------------- COPY CONSTRUCTOR --------------------
-    public Customer(Customer that){
-        this.customerID = that.getCustomerID();
-        this.firstName = that.getFirstName();
-        this.lastName = that.getLastName();
-        this.adress = that.getAdress();
-        this.postalCode = that.getPostalCode();
-        this.country = that.getCountry();
+    public Customer(Customer toCopy){
+        this.customerID = toCopy.getCustomerID();
+        this.firstName = toCopy.getFirstName();
+        this.lastName = toCopy.getLastName();
+        this.adress = toCopy.getAdress();
+        this.postalCode = toCopy.getPostalCode();
+        this.country = toCopy.getCountry();
        
-        this.telephoneNumbers = new ArrayList<>(that.getTelephoneNumbers());
-        this.emailAdresses = new ArrayList<>(that.getEmailAdresses());
+        this.telephoneNumbers = new ArrayList<>(toCopy.getTelephoneNumbers());
+        this.emailAdresses = new ArrayList<>(toCopy.getEmailAdresses());
     }
     
     // -------------------- Initialisering --------------------
@@ -151,8 +151,16 @@ public class Customer {
         return emailAdresses;
     }
     
+    public String getEmailAdress(){
+        return emailAdresses.getFirst();
+    }
+    
     public ArrayList<String> getTelephoneNumbers(){
         return telephoneNumbers;
+    }
+    
+    public String getTelephoneNumber(){
+        return telephoneNumbers.getFirst();
     }
     
     public String getAdress(){
@@ -206,11 +214,7 @@ public class Customer {
     
     public void setPostalCode(String newPostalCode){
         if(validatePostalCode(newPostalCode)){
-            if(newPostalCode.substring(3).equals(" ")){
-                String firstPart = newPostalCode.substring(0,3);
-                String secondPart = newPostalCode.substring(4,6);
-            }
-            this.postalCode = newPostalCode;
+            this.postalCode = Format.postalCode(newPostalCode);
         }
     }
     
@@ -315,6 +319,7 @@ public class Customer {
         updateTelephoneNumbers(unmodified);
         
         updateEmailAdresses(unmodified);
+        PrintDebugger.info(this.toString());
     }
     
     
@@ -325,7 +330,7 @@ public class Customer {
             idb.update("UPDATE sales_order SET customer_ID = NULL WHERE customer_id = " + customerID);
             idb.delete("DELETE FROM customer WHERE customer_id = " + customerID); 
             
-            PrintDebugger.info(("DELETE FROM phone WHERE customer_id = " + customerID),
+            PrintDebugger.info(this.toString() ,("DELETE FROM phone WHERE customer_id = " + customerID),
                 ("DELETE FROM mail WHERE customer_id = " + customerID),
                 ("UPDATE sales_order SET customer_ID = NULL WHERE customer_id = " + customerID),
                 ("DELETE FROM customer WHERE customer_id = " + customerID));
@@ -383,8 +388,7 @@ public class Customer {
                 System.out.println(ex.getMessage() + " 3rd sqlQuery, in insert(), Customer.java");
             }
         }
-        
-        
+        PrintDebugger.info(this.toString());
     }
         
     //----------Helpers till DB-funktionen save()----------
@@ -518,7 +522,6 @@ public class Customer {
             }
         }
 
-        System.out.println("TN ELSE IF!!!!!!!!!");
         sqlQuery = "";
         ArrayList<String> emailAdressesToRemove = fetchEmailAdressesToRemove();
 

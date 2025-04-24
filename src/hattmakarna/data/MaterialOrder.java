@@ -24,7 +24,7 @@ public class MaterialOrder {
         materialList = new ArrayList<>();
 
         try {
-            String sqlQuery = "SELECT material_id, amount, color FROM hat_material WHERE hat_id = " + hatID
+            String sqlQuery = "SELECT material_id, amount FROM hat_material WHERE hat_id = " + hatID
                     + " AND hat_id IN ( SELECT hat_id FROM hat WHERE order_id IN (SELECT order_id FROM sales_order WHERE material_ordered = 0))";
             ArrayList<HashMap<String, String>> result = idb.fetchRows(sqlQuery);
 
@@ -43,7 +43,7 @@ public class MaterialOrder {
     public void printMaterial() {
         for (HashMap<String, String> row : materialList) {
             System.out.println("Material: " + row.get("material_id")
-                    + ", färg: " + row.get("color") + ", " + row.get("amount"));
+                    + ", färg: " + row.get("amount"));
 
         }
     }
@@ -99,5 +99,18 @@ public class MaterialOrder {
         return orders;
     }
 
+    @Override
+    public MaterialOrder clone() {
+        MaterialOrder clone = new MaterialOrder(this.hatID);
+
+        // Clear the list loaded from DB in constructor and add cloned entries
+        clone.materialList.clear();
+        for (HashMap<String, String> originalMap : this.materialList) {
+            HashMap<String, String> copiedMap = new HashMap<>(originalMap);
+            clone.materialList.add(copiedMap);
+        }
+
+        return clone;
+    }
 
 }

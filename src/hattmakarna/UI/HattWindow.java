@@ -29,7 +29,10 @@ private ModelRegister modelRegister;
     /**
      * Creates new form HattWindow
      */
+
     public HattWindow(User userLoggedIn,Model model) {
+
+  
         this.userLoggedIn = userLoggedIn;
         this.model = null;
         this.modelRegister = new ModelRegister();
@@ -38,7 +41,11 @@ private ModelRegister modelRegister;
         fillTable();
     }
     public HattWindow(User userLoggedIn){
+
         
+
+        this.userLoggedIn = userLoggedIn;
+
         this.model = null;
         this.modelRegister = new ModelRegister(idb);
         this.hatRegister = new HatRegister(idb);
@@ -174,6 +181,7 @@ private ModelRegister modelRegister;
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+
        try {
         new MainMenu(userLoggedIn).setVisible(true);
         this.dispose();
@@ -182,6 +190,7 @@ private ModelRegister modelRegister;
         JOptionPane.showMessageDialog(this, "Ett fel inträffade när vi försökte gå tillbaka till huvudmenyn.");
     
 }
+
 
     }//GEN-LAST:event_btnBackActionPerformed
     private void fillTable() {
@@ -206,6 +215,7 @@ private ModelRegister modelRegister;
         jTable1.getColumnModel().getColumn(0).setMinWidth(0);
          jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
          jTable1.getColumnModel().getColumn(0).setWidth(0);
+
        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {
         if (evt.getClickCount() == 2) { //dubbelklick
@@ -218,6 +228,7 @@ private ModelRegister modelRegister;
          }
             });
     
+
     }
     private void openEditCustomerWindow(String model_id) {
     Model selectedModel = modelRegister.getModel(model_id);
