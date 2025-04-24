@@ -92,12 +92,10 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
 
                 for (HashMap<String, String> row : mo.getMaterialList()) {
                     String materialId = row.get("material_id");
-                    String color = row.get("color");
                     double amount = safeParseDouble(row.get("amount"));
-                    String key = materialId + " " + color;
 
-                    orderMaterial.merge(key, amount, Double::sum);
-                    totalMaterial.merge(key, amount, Double::sum);
+                    orderMaterial.merge(materialId, amount, Double::sum);
+                    totalMaterial.merge(materialId, amount, Double::sum);
                 }
                 orderData.put(orderId, orderMaterial);
             }
@@ -119,16 +117,11 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             for (String key : materials.keySet()) {
                 double amount = materials.get(key);
 
-                // Split materialId and color (optional)
-                String[] parts = key.split(" ");
-                String materialId = parts[0];
-                String color = parts.length > 1 ? parts[1] : "";
-
-                Material material = new Material(materialId);
+                Material material = new Material(key);
                 String name = material.getName();
                 String unit = material.getUnit();
 
-                paneOrderInfo.add(new JLabel("  Material: " + name + ", " + color + ", " + amount + " " + unit));
+                paneOrderInfo.add(new JLabel("  Material: " + name + ", " + amount + " " + unit));
             }
 
             paneOrderInfo.add(Box.createVerticalStrut(10)); // Blank line between orders
@@ -233,7 +226,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             }
         });
 
-        jLabel5.setText("Material");
+        jLabel5.setText("Lagersaldo");
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
 
@@ -242,14 +235,11 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addComponent(jLabel5))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btnBack)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 195, Short.MAX_VALUE)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnBack)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -260,7 +250,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                             .addComponent(jLabel3)
                             .addComponent(jLabel4)
                             .addComponent(dcToDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(dcFromDate, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
+                            .addComponent(dcFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton1)
                             .addComponent(btnClearDate)))
                     .addGroup(layout.createSequentialGroup()
@@ -268,42 +258,40 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel2))))
-                .addGap(23, 23, 23))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator1)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap(65, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel2)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnBack)
-                        .addContainerGap())
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 59, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
+                        .addGap(8, 8, 8)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dcFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(dcToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(dcFromDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(dcToDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnClearDate)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton1))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(12, 12, 12)
-                                .addComponent(scrollOrderInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(101, 101, 101))))
+                        .addComponent(btnClearDate)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(12, 12, 12)
+                        .addComponent(scrollOrderInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(101, 101, 101))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(67, 67, 67)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnBack)
+                .addContainerGap())
         );
 
         pack();
@@ -402,13 +390,12 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
 
                 for (String key : orderMaterial.keySet()) {
                     String id = key.replaceAll("[^0-9]", "");
-                    String color = key.replaceAll("[0-9]", "");
                     Material material = new Material(id);
                     String unit = material.getUnit();
                     String name = material.getName();
 
                     double amount = orderMaterial.get(key);
-                    contentStream.showText("Material: " + name + "," + color + ", " + amount + " " + unit);
+                    contentStream.showText("Material: " + name + ", " + amount + " " + unit);
                     contentStream.newLine();
                 }
 
@@ -432,13 +419,12 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
 
             for (String key : totalMaterial.keySet()) {
                 String id = key.replaceAll("[^0-9]", "");
-                String color = key.replaceAll("[0-9]", "");
                 Material material = new Material(id);
                 String unit = material.getUnit();
                 String name = material.getName();
 
                 double amount = totalMaterial.get(key);
-                contentStream.showText("Material: " + name + "," + color + ", " + amount + " " + unit);
+                contentStream.showText("Material: " + name + ", " + amount + " " + unit);
                 contentStream.newLine();
             }
         } catch (IOException e) {
