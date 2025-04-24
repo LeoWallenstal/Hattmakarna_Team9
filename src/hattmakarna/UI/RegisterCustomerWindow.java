@@ -1,4 +1,3 @@
-
 package hattmakarna.UI;
 
 import hattmakarna.UI.OrderWindow;
@@ -11,8 +10,11 @@ import hattmakarna.util.Util;
 import java.util.ArrayList;
 import oru.inf.InfException;
 import static hattmakarna.util.Validerare.*;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
+import java.net.URI;
+import java.net.URL;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -23,9 +25,8 @@ import javax.swing.event.*;
  *
  * @author Användaren
  */
-
 public class RegisterCustomerWindow extends javax.swing.JFrame {
-    
+
     private User userLoggedIn;
     private OrderWindow lastWindow;
     private DefaultListModel<String> dlPhoneModel;
@@ -35,53 +36,67 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private Customer blankCustomer;
     private CustomerRegister customerRegister;
     private boolean saved = false;
-    
-    
+
     public RegisterCustomerWindow(User user, OrderWindow lastWindow) {
         initComponents();
         initErrorFlags();
         this.setTitle("Hattmakarna - Registrera kund");
         this.lastWindow = lastWindow;
         customerRegister = new CustomerRegister();
-        
+
         userLoggedIn = user;
-        dlPhoneModel = (DefaultListModel<String>)jlPhone.getModel();
-        dlEmailModel = (DefaultListModel<String>)jlEmail.getModel();
-        
+        dlPhoneModel = (DefaultListModel<String>) jlPhone.getModel();
+        dlEmailModel = (DefaultListModel<String>) jlEmail.getModel();
+
         jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         jScrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        
+
         blankCustomer = new Customer();
-        
+
         initCBCountry();
-        
+
         phoneModel = new ArrayList<String>();
-        
+
         emailModel = new ArrayList<String>();
- 
-        
+
         //Listener
         tfFirstName.getDocument().addDocumentListener(new FormChangeListener());
         tfLastName.getDocument().addDocumentListener(new FormChangeListener());
         tfAdress.getDocument().addDocumentListener(new FormChangeListener());
         tfPostalCode.getDocument().addDocumentListener(new FormChangeListener());
         cbCountry.addActionListener(e -> checkFormCompletion());
-        
+
         dlEmailModel.addListDataListener(new ListDataListener() {
-            public void contentsChanged(ListDataEvent e) { checkFormCompletion(); }
-            public void intervalAdded(ListDataEvent e) { checkFormCompletion(); }
-            public void intervalRemoved(ListDataEvent e) { checkFormCompletion(); }
+            public void contentsChanged(ListDataEvent e) {
+                checkFormCompletion();
+            }
+
+            public void intervalAdded(ListDataEvent e) {
+                checkFormCompletion();
+            }
+
+            public void intervalRemoved(ListDataEvent e) {
+                checkFormCompletion();
+            }
         });
 
         dlPhoneModel.addListDataListener(new ListDataListener() {
-            public void contentsChanged(ListDataEvent e) { checkFormCompletion(); }
-            public void intervalAdded(ListDataEvent e) { checkFormCompletion(); }
-            public void intervalRemoved(ListDataEvent e) { checkFormCompletion(); }
+            public void contentsChanged(ListDataEvent e) {
+                checkFormCompletion();
+            }
+
+            public void intervalAdded(ListDataEvent e) {
+                checkFormCompletion();
+            }
+
+            public void intervalRemoved(ListDataEvent e) {
+                checkFormCompletion();
+            }
         });
-        
+
     }
-    
-    private void initErrorFlags(){
+
+    private void initErrorFlags() {
         lblFirstNameError.setVisible(false);
         lblLastNameError.setVisible(false);
         lblAdressError.setVisible(false);
@@ -92,31 +107,28 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         lblCustomerExistsError.setVisible(false);
         lblCustomerSaved.setVisible(false);
     }
-    
-    private void initCBCountry(){
+
+    private void initCBCountry() {
         cbCountry.addItem("Välj land...");
-        for(String aCountry : CountryList.getCountries()){
+        for (String aCountry : CountryList.getCountries()) {
             cbCountry.addItem(aCountry);
         }
     }
-    
-    private void reset(){
+
+    private void reset() {
         blankCustomer = new Customer();
-        
+
         tfFirstName.setText("");
         tfLastName.setText("");
         tfAdress.setText("");
         tfPostalCode.setText("");
         cbCountry.setSelectedIndex(0);
-        
+
         dlPhoneModel.clear();
         dlEmailModel.clear();
         phoneModel.clear();
         emailModel.clear();
     }
-    
-    
-   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -490,54 +502,53 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         boolean creationOK = true;
+        for (int i = 0; i < 10; i++){
+             getRickRolled();
+        }
+       
         
-        if(!validateName(tfFirstName.getText())){
+        if (!validateName(tfFirstName.getText())) {
             creationOK = false;
             lblFirstNameError.setVisible(true);
-        }
-        else{
+        } else {
             blankCustomer.setFirstName(tfFirstName.getText());
         }
-        
-        if(!validateName(tfLastName.getText())){
+
+        if (!validateName(tfLastName.getText())) {
             creationOK = false;
             lblLastNameError.setVisible(true);
-        }
-        else{
+        } else {
             blankCustomer.setLastName(tfLastName.getText());
         }
-        
-        if(!validateAdress(tfAdress.getText())){
+
+        if (!validateAdress(tfAdress.getText())) {
             creationOK = false;
             lblAdressError.setVisible(true);
-        }
-        else{
+        } else {
             blankCustomer.setAdress(tfAdress.getText());
         }
-        
-        if(!validatePostalCode(tfPostalCode.getText())){
+
+        if (!validatePostalCode(tfPostalCode.getText())) {
             creationOK = false;
             lblPostalCodeError.setVisible(true);
-        }
-        else{
+        } else {
             blankCustomer.setPostalCode(tfPostalCode.getText());
         }
-        
-        if(cbCountry.getSelectedItem().toString().equals("Välj land...")){
+
+        if (cbCountry.getSelectedItem().toString().equals("Välj land...")) {
             creationOK = false;
             lblCountryError.setVisible(true);
-        }
-        else{
+        } else {
             blankCustomer.setCountry(cbCountry.getSelectedItem().toString());
         }
-        
-        if(customerRegister.customerExists(blankCustomer)){
+
+        if (customerRegister.customerExists(blankCustomer)) {
             creationOK = false;
             lblCustomerExistsError.setVisible(true);
         }
-        
-        if(creationOK){
-            if(!customerRegister.customerExists(blankCustomer)){
+
+        if (creationOK) {
+            if (!customerRegister.customerExists(blankCustomer)) {
                 customerRegister.add(blankCustomer);
                 blankCustomer.insert();
                 saved = true;
@@ -545,24 +556,22 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
                 lblCustomerSaved.setVisible(true);
 
                 lastWindow.refreshCustomers();
-            }
-            else{
+            } else {
                 creationOK = false;
                 lblCustomerExistsError.setVisible(true);
             }
         }
         
-    
+
     }//GEN-LAST:event_btnSaveActionPerformed
 
     private void tfEmailKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfEmailKeyReleased
-        if(!tfEmail.getText().isEmpty()){
+        if (!tfEmail.getText().isEmpty()) {
             btnAddEmail.setEnabled(true);
-            if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                 btnAddEmail.doClick();
             }
-        }
-        else{
+        } else {
             btnAddEmail.setEnabled(false);
         }
         lblEmailError.setVisible(false);
@@ -572,13 +581,12 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
 
     private void tfPhoneKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfPhoneKeyReleased
 
-        if(!tfPhone.getText().isEmpty()){
+        if (!tfPhone.getText().isEmpty()) {
             btnAddPhone.setEnabled(true);
-            if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
                 btnAddPhone.doClick();
             }
-        }
-        else{
+        } else {
             btnAddPhone.setEnabled(false);
         }
         lblPhoneError.setVisible(false);
@@ -587,22 +595,19 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_tfPhoneKeyReleased
 
     private void btnAddPhoneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddPhoneMouseClicked
-        if(validatePhoneNumber(tfPhone.getText()) 
-            && !numberAlreadyAdded(tfPhone.getText()))
-        {
+        if (validatePhoneNumber(tfPhone.getText())
+                && !numberAlreadyAdded(tfPhone.getText())) {
             dlPhoneModel.addElement(tfPhone.getText());
             blankCustomer.addTelephoneNumber(tfPhone.getText());
             phoneModel.add(tfPhone.getText());
-            
+
             tfPhone.setText("");
             btnAddPhone.setEnabled(false);
             saved = false;
-        }
-        else{
-            if(!validatePhoneNumber(tfPhone.getText())){
+        } else {
+            if (!validatePhoneNumber(tfPhone.getText())) {
                 lblPhoneError.setText("Ogiltigt telefonnummer!");
-            }
-            else if(numberAlreadyAdded(tfPhone.getText())){
+            } else if (numberAlreadyAdded(tfPhone.getText())) {
                 lblPhoneError.setText("Telefonnummer finns redan!");
             }
             lblPhoneError.setVisible(true);
@@ -610,22 +615,19 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnAddPhoneMouseClicked
 
     private void btnAddEmailMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnAddEmailMouseClicked
-        if(validateEmail(tfEmail.getText()) 
-            && !emailAlreadyAdded(tfEmail.getText()))
-        {
+        if (validateEmail(tfEmail.getText())
+                && !emailAlreadyAdded(tfEmail.getText())) {
             dlEmailModel.addElement(tfEmail.getText());
             blankCustomer.addEmailAdress(tfEmail.getText());
             emailModel.add(tfEmail.getText());
-            
+
             tfEmail.setText("");
             btnAddEmail.setEnabled(false);
             saved = false;
-        }
-        else{
-            if(!validateEmail(tfEmail.getText())){
+        } else {
+            if (!validateEmail(tfEmail.getText())) {
                 lblEmailError.setText("Ogiltigt epostadress!");
-            }
-            else if(emailAlreadyAdded(tfEmail.getText())){
+            } else if (emailAlreadyAdded(tfEmail.getText())) {
                 lblEmailError.setText("Epostadress finns redan!");
             }
             lblEmailError.setVisible(true);
@@ -670,7 +672,7 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private void jlPhoneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlPhoneMouseClicked
         jlEmail.clearSelection();
         btnRemoveEmail.setEnabled(false);
-        if(dlPhoneModel.getSize() > 0){
+        if (dlPhoneModel.getSize() > 0) {
             btnRemovePhone.setEnabled(true);
         }
     }//GEN-LAST:event_jlPhoneMouseClicked
@@ -678,7 +680,7 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private void jlEmailMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlEmailMouseClicked
         jlPhone.clearSelection();
         btnRemovePhone.setEnabled(false);
-        if(dlEmailModel.getSize() > 0){
+        if (dlEmailModel.getSize() > 0) {
             btnRemoveEmail.setEnabled(true);
         }
     }//GEN-LAST:event_jlEmailMouseClicked
@@ -711,93 +713,91 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private void btnGoBackMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGoBackMouseClicked
         /*NÅNTING HÄR KOMMA TILLBAKA TILL FÖRRA SKÄRMEN,
           KANSKE OCKSÅ NÅNTING OM OSPARADE ÄNDRINGAR!*/
-        if(everythingIsEmpty() && !saved){
+        if (everythingIsEmpty() && !saved) {
             this.dispose();
             return;
-        }
-        else if(saved && !hasChanges()){
+        } else if (saved && !hasChanges()) {
             //DEBUG
             System.out.println("Allt är ok, och sparat.");
             //Gå tillbaka till något annat fönster
-        }
-        else if(!saved && hasChanges()){
+        } else if (!saved && hasChanges()) {
             //DEBUG
             System.out.println("Inte sparat, och det finns osparade ändringar");
             Object[] options = {"Ja", "Nej"};
 
-            int result = JOptionPane.showOptionDialog(this, "Det finns osparade ändringar, vill du återgå?", 
-                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, 
-                null, options, options[0]);
+            int result = JOptionPane.showOptionDialog(this, "Det finns osparade ändringar, vill du återgå?",
+                    "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                    null, options, options[0]);
 
             if (result == 0) {
                 // "Ja" klickades, stänger bara lilla dialogen
-                
-            } 
-            else if (result == 1) {
+
+            } else if (result == 1) {
                 // "Nej" klickades
                 this.dispose(); // Stänger RegisterCustomerWindow.java
             }
         }
+        getRickRolled();
     }//GEN-LAST:event_btnGoBackMouseClicked
 
     private void checkFormCompletion() {
-        boolean textFieldsFilled = 
-            !tfFirstName.getText().trim().isEmpty() &&
-            !tfLastName.getText().trim().isEmpty() &&
-            !tfAdress.getText().trim().isEmpty() &&
-            !tfPostalCode.getText().trim().isEmpty();
+        boolean textFieldsFilled
+                = !tfFirstName.getText().trim().isEmpty()
+                && !tfLastName.getText().trim().isEmpty()
+                && !tfAdress.getText().trim().isEmpty()
+                && !tfPostalCode.getText().trim().isEmpty();
 
-        boolean countrySelected = 
-            cbCountry.getSelectedIndex() > 0; // Assuming index 0 is "Välj land..."
+        boolean countrySelected
+                = cbCountry.getSelectedIndex() > 0; // Assuming index 0 is "Välj land..."
 
-        boolean listsHaveItems = 
-            !dlEmailModel.isEmpty() && !dlPhoneModel.isEmpty();
+        boolean listsHaveItems
+                = !dlEmailModel.isEmpty() && !dlPhoneModel.isEmpty();
 
         boolean formComplete = textFieldsFilled && countrySelected && listsHaveItems;
 
         btnSave.setEnabled(formComplete);
     }
-    
-    
-    private boolean everythingIsEmpty(){
+
+    private boolean everythingIsEmpty() {
         return tfFirstName.getText().isEmpty() && tfLastName.getText().isEmpty()
-            && tfAdress.getText().isEmpty() && tfPostalCode.getText().isEmpty()
-            && cbCountry.getSelectedItem().toString().equals("Välj land...")
-            && phoneModel.isEmpty() && emailModel.isEmpty();
+                && tfAdress.getText().isEmpty() && tfPostalCode.getText().isEmpty()
+                && cbCountry.getSelectedItem().toString().equals("Välj land...")
+                && phoneModel.isEmpty() && emailModel.isEmpty();
     }
-    
-    private boolean hasChanges(){
+
+    private boolean hasChanges() {
         boolean textFieldsSame = tfFirstName.getText().equals(blankCustomer.getFirstName())
-            && tfLastName.getText().equals(blankCustomer.getLastName())
-            && tfAdress.getText().equals(blankCustomer.getAdress())
-            && tfPostalCode.getText().equals(blankCustomer.getPostalCode());
+                && tfLastName.getText().equals(blankCustomer.getLastName())
+                && tfAdress.getText().equals(blankCustomer.getAdress())
+                && tfPostalCode.getText().equals(blankCustomer.getPostalCode());
         boolean countrySame = cbCountry.getSelectedItem().toString()
-            .equals(blankCustomer.getCountry());
+                .equals(blankCustomer.getCountry());
         boolean listsSame = Util.contentEquals(emailModel, blankCustomer.getEmailAdresses())
-            && Util.contentEquals(phoneModel, blankCustomer.getTelephoneNumbers());
-        
+                && Util.contentEquals(phoneModel, blankCustomer.getTelephoneNumbers());
+
         return !(textFieldsSame && countrySame && listsSame); //returnerar true om något har förändrats
     }
-    
-    private boolean numberAlreadyAdded(String telephoneNumber){
-        for(int i = 0; i < dlPhoneModel.getSize(); i++){
-            if(dlPhoneModel.get(i).equals(telephoneNumber)){
+
+    private boolean numberAlreadyAdded(String telephoneNumber) {
+        for (int i = 0; i < dlPhoneModel.getSize(); i++) {
+            if (dlPhoneModel.get(i).equals(telephoneNumber)) {
                 return true;
             }
         }
         return false;
     }
-    
-    private boolean emailAlreadyAdded(String email){
-        for(int i = 0; i < dlEmailModel.getSize(); i++){
-            if(dlEmailModel.get(i).equals(email)){
+
+    private boolean emailAlreadyAdded(String email) {
+        for (int i = 0; i < dlEmailModel.getSize(); i++) {
+            if (dlEmailModel.get(i).equals(email)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     private class FormChangeListener implements DocumentListener {
+
         @Override
         public void insertUpdate(DocumentEvent e) {
             checkFormCompletion();
@@ -813,13 +813,25 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
             checkFormCompletion();
         }
     }
-    
-    
-    
+
+    private void getRickRolled() {
+
+        if (tfFirstName.getText().equals("Rick") || tfLastName.getText().equals("Astley")) {
+            try {
+                Desktop desktop = Desktop.getDesktop();
+                // Ange URL du vill öppna
+                URI uri = new URI("https://shattereddisk.github.io/rickroll/rickroll.mp4");
+                desktop.browse(uri);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
-  
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddEmail;
     private javax.swing.JButton btnAddPhone;
