@@ -300,6 +300,11 @@ public class EditCustomer extends javax.swing.JFrame {
         lblAdress.setText("Adress:");
 
         tfFirstName.setText("jTextField1");
+        tfFirstName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfFirstNameActionPerformed(evt);
+            }
+        });
         tfFirstName.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 tfFirstNameKeyTyped(evt);
@@ -392,6 +397,11 @@ public class EditCustomer extends javax.swing.JFrame {
         cbCountry.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cbCountryItemStateChanged(evt);
+            }
+        });
+        cbCountry.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbCountryActionPerformed(evt);
             }
         });
 
@@ -704,6 +714,14 @@ public class EditCustomer extends javax.swing.JFrame {
         btnDeletePhone.setEnabled(false);
         btnDeleteEmail.setEnabled(false);
     }//GEN-LAST:event_formMouseClicked
+
+    private void tfFirstNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfFirstNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfFirstNameActionPerformed
+
+    private void cbCountryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCountryActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbCountryActionPerformed
 
    
     
