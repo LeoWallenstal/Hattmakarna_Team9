@@ -42,6 +42,7 @@ public class HattViewerWindow extends javax.swing.JFrame {
 
     private void init() {
 
+        this.setTitle("Hattvisare");
         btnLeft.setFocusable(false);
         btnRight.setFocusable(false);
         setFocusable(true);
@@ -83,10 +84,9 @@ public class HattViewerWindow extends javax.swing.JFrame {
         lblImage = new javax.swing.JLabel();
         btnRight = new javax.swing.JButton();
         btnLeft = new javax.swing.JButton();
-        btnOrder = new javax.swing.JButton();
         separator = new javax.swing.JSeparator();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
 
         pnlBild.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -120,22 +120,13 @@ public class HattViewerWindow extends javax.swing.JFrame {
             }
         });
 
-        btnOrder.setText("Tillbaka");
-        btnOrder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrderActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(btnLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(separator)
@@ -155,13 +146,12 @@ public class HattViewerWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(269, 269, 269)
                         .addComponent(btnLeft)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 277, Short.MAX_VALUE)
-                        .addComponent(btnOrder)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(279, 279, 279)
                 .addComponent(btnRight)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(296, Short.MAX_VALUE))
         );
 
         pack();
@@ -182,11 +172,6 @@ public class HattViewerWindow extends javax.swing.JFrame {
         currentIndex = (currentIndex - 1 + images.size()) % images.size();
         lblImage.setIcon(images.get(currentIndex));
     }//GEN-LAST:event_btnLeftActionPerformed
-
-    private void btnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrderActionPerformed
-        this.setVisible(false);
-        new OrderOverviewWindow(new User("1")).setVisible(true);
-    }//GEN-LAST:event_btnOrderActionPerformed
 
 //    /**
 //     * @param args the command line arguments
@@ -226,7 +211,6 @@ public class HattViewerWindow extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLeft;
-    private javax.swing.JButton btnOrder;
     private javax.swing.JButton btnRight;
     private javax.swing.JLabel lblImage;
     private javax.swing.JPanel pnlBild;
