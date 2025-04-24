@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.UIManager;
 import oru.inf.InfException;
+import java.util.ArrayList;
 
 /**
  *
@@ -31,6 +32,8 @@ public class Specification extends DatabaseObject {
     private BufferedImage imgImage = null;
     private String skiss_path;
     private BufferedImage skissImage = null;
+    private ArrayList<BufferedImage> extraImages = new ArrayList<>();
+    private ArrayList<String> extraImagePaths = new ArrayList<>();
 
     public BufferedImage getImgImage() {
         return imgImage;
@@ -94,6 +97,24 @@ public class Specification extends DatabaseObject {
         this.hat_id = id;
     }
 
+    public ArrayList<BufferedImage> getExtraImages() {
+        return extraImages;
+    }
+
+    public ArrayList<String> getExtraImagePaths() {
+        return extraImagePaths;
+    }
+
+    public void setExtraImages(ArrayList<BufferedImage> extraImages) {
+        this.extraImages = extraImages;
+    }
+
+    public void setExtraImagePaths(ArrayList<String> extraImagePaths) {
+        this.extraImagePaths = extraImagePaths;
+    }
+    
+    
+
     /**
      * Promptar användaren med ett fönster för att välja en bild fil.
      *
@@ -117,6 +138,33 @@ public class Specification extends DatabaseObject {
         }
 
         return null;
+    }
+
+    public static ArrayList<BufferedImage> set3DFilesFromUser() {
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "jpeg", "gif", "png");
+        chooser.setFileFilter(filter);
+        chooser.setMultiSelectionEnabled(true); // Tillåt flera filer
+
+        int returnVal = chooser.showOpenDialog(null);
+        ArrayList<BufferedImage> images = new ArrayList<>();
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File[] selectedFiles = chooser.getSelectedFiles();
+
+            for (File file : selectedFiles) {
+                try {
+                    BufferedImage img = ImageIO.read(file);
+                    if (img != null) {
+                        images.add(img);
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        return images;
     }
 
     @Override
@@ -162,6 +210,20 @@ public class Specification extends DatabaseObject {
                 ImageIO.write(skissImage, "png", fileToSave);
 
                 skiss_path = fileToSave.getPath().replace("\\", "\\\\");
+            }
+            if (extraImages != null && !extraImages.isEmpty()) {
+                
+
+                for (int i = 0; i < extraImages.size(); i++) {
+                    BufferedImage img = extraImages.get(i);
+
+                    String fileName = "extra-" + hat_id + "-" + i + ".png";
+                    File fileToSave = new File(SAVE_TO_PATH + fileName);
+                    fileToSave.getParentFile().mkdirs();
+
+                    ImageIO.write(img, "png", fileToSave);
+                    extraImagePaths.add(fileToSave.getPath().replace("\\", "\\\\"));
+                }
             }
             return super.save();
         } catch (IOException ex) {
