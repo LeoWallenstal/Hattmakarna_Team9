@@ -94,6 +94,28 @@ private void fillTable() {
     jTable1.getColumnModel().getColumn(0).setMinWidth(0);
     jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
     jTable1.getColumnModel().getColumn(0).setWidth(0);
+    
+    jTable1.setToolTipText(""); // Aktivera tooltips
+
+jTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+    @Override
+    public void mouseMoved(java.awt.event.MouseEvent e) {
+        java.awt.Point p = e.getPoint();
+        int rowIndex = jTable1.rowAtPoint(p);
+        int colIndex = jTable1.columnAtPoint(p);
+
+        if (rowIndex != -1 && (colIndex == 2 || colIndex == 3)) { // Email eller Telefon
+            Object value = jTable1.getValueAt(rowIndex, colIndex);
+            if (value != null && !value.toString().isEmpty()) {
+                jTable1.setToolTipText("<html>" + value.toString().replace(", ", "<br>") + "</html>");
+            } else {
+                jTable1.setToolTipText(null);
+            }
+        } else {
+            jTable1.setToolTipText(null);
+        }
+    }
+});
 
     jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -289,13 +311,13 @@ private Customer findCustomerByFullName(String fullName) {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnRefresh))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(14, 14, 14)
                         .addComponent(btnBack)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEditCustomer)))
+                        .addComponent(btnEditCustomer))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 818, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
