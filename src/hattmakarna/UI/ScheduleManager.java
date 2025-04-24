@@ -36,7 +36,7 @@ public class ScheduleManager {
     private LocalDate startDate;
     private final TaskRegister taskRegister;
     private ArrayList<Task> tasks;
-    private final OrderRegister orderRegister;
+    private OrderRegister orderRegister;
     private final ArrayList<JPanel> emptyCells;
     private JPanel highlightedCell = null;
 
@@ -320,6 +320,7 @@ public class ScheduleManager {
     }
 
     public void initOrders() {
+        orderRegister = new OrderRegister();
         ArrayList<Order> orders = orderRegister.getOrders();
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
@@ -387,10 +388,22 @@ public class ScheduleManager {
                     }
                 } else if (result == 1) {
                     if (task != null) {
-                        System.out.println("Task tillbaka");
-                        task.delete();
-                        refreshSchedule();
-                        initOrders();
+                        try {
+                            System.out.println("Task tillbaka");
+                            int hatId = task.getHatId();
+                            String query = "SELECT amount, material_id FROM hat_material WHERE hat_id = " + hatId;
+                            ArrayList<HashMap<String, String>> materialList = idb.fetchRows(query);
+                            for (HashMap<String, String> row : materialList) {
+                                query = "UPDATE material SET amount = amount + " + row.get("amount")
+                                        + " WHERE material_id = " + row.get("material_id");
+                                idb.update(query);
+                            }
+                            task.delete();
+                            refreshSchedule();
+                            initOrders();
+                        } catch (InfException ex) {
+                            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
 
                 }
@@ -413,6 +426,8 @@ public class ScheduleManager {
             toggleButton.setBorderPainted(false);
             toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
             toggleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            JButton openOrderButton = new JButton("Öppna");
 
             JPanel itemsPanel = new JPanel();
             itemsPanel.setLayout(new BoxLayout(itemsPanel, BoxLayout.Y_AXIS));
@@ -474,12 +489,30 @@ public class ScheduleManager {
                 parent.repaint();
             });
 
-            orderContainer.add(toggleButton);
+            openOrderButton.addActionListener(e -> {
+                new OrderInfoWindow(this, new Order(String.valueOf(orderId))).setVisible(true);
+
+            });
+
+            JPanel headerPanel = new JPanel();
+            headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
+            headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            headerPanel.setBackground(Color.GRAY);
+
+            toggleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            openOrderButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            headerPanel.add(toggleButton);
+            headerPanel.add(openOrderButton);
+
+            orderContainer.add(headerPanel);
+
             orderContainer.add(itemsPanel);
 
             parent.add(orderContainer);
         }
     }
+    
 
     public void makeDraggable(JPanel panel) {
         Point initialClick = new Point();
@@ -536,13 +569,23 @@ public class ScheduleManager {
                 Dimension scrollSize = scrollOrders.getSize();
                 Rectangle scrollBounds = new Rectangle(scrollLocationOnScreen, scrollSize);
                 if (scrollBounds.contains(droppedLocation)) {
-                    System.out.println("Släppt i scrollen");
                     Task task = (Task) panel.getClientProperty("task");
                     if (task != null) {
-                        System.out.println(task.getTaskId());
-
-                        task.delete();
-                        initOrders();
+                        try {
+                            System.out.println(task.getTaskId());
+                            int hatId = task.getHatId();
+                            String query = "SELECT amount, material_id FROM hat_material WHERE hat_id = " + hatId;
+                            ArrayList<HashMap<String, String>> materialList = idb.fetchRows(query);
+                            for (HashMap<String, String> row : materialList) {
+                                query = "UPDATE material SET amount = amount + " + row.get("amount")
+                                        + " WHERE material_id = " + row.get("material_id");
+                                idb.update(query);
+                            }
+                            task.delete();
+                            initOrders();
+                        } catch (InfException ex) {
+                            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
 
                 }
@@ -564,7 +607,7 @@ public class ScheduleManager {
                     LocalDate dropDate = startDate.plusDays(columnIndex);
                     moveTask(panel, bestCell, originCell[0], dropDate);
                 }
-                
+
                 refreshSchedule();
 
                 glassPane.removeAll();
@@ -733,6 +776,15 @@ public class ScheduleManager {
         try {
             String taskId = idb.getAutoIncrement("task", "task_id");
             idb.insert(query);
+
+            query = "SELECT amount, material_id FROM hat_material WHERE hat_id = " + hatId;
+            ArrayList<HashMap<String, String>> materialList = idb.fetchRows(query);
+            for (HashMap<String, String> row : materialList) {
+                query = "UPDATE material SET amount = amount - " + row.get("amount")
+                        + " WHERE material_id = " + row.get("material_id");
+                idb.update(query);
+            }
+
             return new Task(taskId);
 
         } catch (InfException ex) {

@@ -24,6 +24,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     private boolean isInitialized;
     private boolean initializedMaterialOrder;
     private OrderOverviewWindow window;
+    private ScheduleManager scheduleManager;
 
     /**
      * Creates new form OrderInfoWindow
@@ -32,6 +33,27 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         initComponents();
         this.currentOrder = order;
         this.window = window;
+        scheduleManager = null;
+        this.table = (DefaultTableModel) tblHats.getModel();
+
+        fillTable();
+        initStatusCb();
+        setStatus();
+        initMaterialOrderCb();
+        setStatusMaterialOrder();
+        lblSuccessFailed.setVisible(false);
+        btnDeleteOrder.setVisible(false);
+        setInfo();
+        setLocationRelativeTo(null);
+        this.isInitialized = true;
+        initializedMaterialOrder = true;
+    }
+    
+    public OrderInfoWindow(ScheduleManager scheduleManager, Order order) {
+        initComponents();
+        this.currentOrder = order;
+        this.window = null;
+        this.scheduleManager = scheduleManager;
         this.table = (DefaultTableModel) tblHats.getModel();
 
         fillTable();
@@ -284,7 +306,11 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         }
         currentOrder.setStatus(Status.valueOf(cbStatus.getSelectedItem().toString()));
         currentOrder.save();
-        window.initTable();
+        if(window != null)
+            window.initTable();
+        else if (scheduleManager != null){
+            scheduleManager.initOrders();
+        }
 
         if (cbStatus.getSelectedItem().toString().equals("MOTTAGEN")) {
             btnDeleteOrder.setVisible(true);
@@ -320,7 +346,8 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_cbStatusActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        window.initTable();
+        if(window != null)
+            window.initTable();
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
