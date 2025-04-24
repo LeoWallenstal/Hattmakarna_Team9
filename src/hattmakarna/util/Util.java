@@ -1,8 +1,18 @@
 package hattmakarna.util;
 
+import hattmakarna.UI.ChangePassWindow;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -187,6 +197,17 @@ public class Util {
             return copy;
         }
 
-        
-
+    
+    public static void getRolled() {
+        URL resourceUrl = ChangePassWindow.class.getResource("/videos/secretVid.mp4");
+        if (resourceUrl != null) {
+            try {
+                Desktop.getDesktop().open(new File(resourceUrl.toURI()));
+            } catch (IOException | URISyntaxException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            System.err.println("Resource not found.");
+        }
+    }
 }
