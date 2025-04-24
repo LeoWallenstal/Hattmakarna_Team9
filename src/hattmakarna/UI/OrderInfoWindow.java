@@ -24,6 +24,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     private boolean isInitialized;
     private boolean initializedMaterialOrder;
     private OrderOverviewWindow window;
+    private HashMap<String, String> modelToFirstHatId = new HashMap<>();
 
     /**
      * Creates new form OrderInfoWindow
@@ -60,7 +61,6 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         Customer customer = new Customer(id);
         lblCustomer.setText("Kund: " + id + ", " + customer.getFullName());
 
-        
         if (currentOrder.getStatus().toString().equals("MOTTAGEN")) {
             btnDeleteOrder.setVisible(true);
         }
@@ -180,6 +180,11 @@ public class OrderInfoWindow extends javax.swing.JFrame {
             }
         });
         tblHats.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tblHats.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblHatsMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblHats);
         if (tblHats.getColumnModel().getColumnCount() > 0) {
             tblHats.getColumnModel().getColumn(0).setResizable(false);
@@ -315,9 +320,43 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         String id = Integer.toString(currentOrder.getOrder_id());
-        
+
         new FraktSedelUI(this, id).setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void tblHatsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHatsMouseClicked
+        System.out.println("Klickad på tabellrad");
+
+        int row = tblHats.getSelectedRow();
+        if (row == -1) {
+            System.out.println("Ingen rad vald.");
+            return;
+        }
+
+        String clickedModelName = table.getValueAt(row, 0).toString();
+        System.out.println("Klickat modellnamn: " + clickedModelName);
+
+        ArrayList<String> hatIds = currentOrder.getHattar();
+        boolean matchFound = false;
+
+        for (String hatId : hatIds) {
+            Hat hat = new Hat(hatId);
+            String modelName = new ModelRegister().getModel(hat.getModelId()).getName();
+
+            System.out.println("Kontrollerar hatt: " + hatId + " med modellnamn: " + modelName);
+
+            if (modelName.equals(clickedModelName)) {
+                System.out.println("Match hittad! Öppnar HattViewerWindow med ID: " + hatId);
+                new HattViewerWindow(Integer.parseInt(hatId)).setVisible(true);
+                matchFound = true;
+                break;
+            }
+        }
+
+        if (!matchFound) {
+            System.out.println("Ingen matchande hatt hittades.");
+        }
+    }//GEN-LAST:event_tblHatsMouseClicked
 
     /**
      * @param args the command line arguments
