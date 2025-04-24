@@ -1,12 +1,24 @@
 package hattmakarna.util;
 
+import hattmakarna.UI.ChangePassWindow;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -162,5 +174,40 @@ public class Util {
             return freq1.equals(freq2);
         }
 
+        
+        /**
+     * Sort *any* list of T by extracting a Comparable key of type U.
+     *
+     * @param source       the input list (never modified)
+     * @param keyExtractor function T → U, where U is Comparable
+     * @param ascending    true for ascending, false for descending
+     * @param <T>          the element type
+     * @param <U>          the key type (must implement Comparable)
+     * @return a new ArrayList<T> sorted as requested
+     */
+    public static <T, U extends Comparable<? super U>> ArrayList<T> sortBy(List<T> source,
+        Function<? super T, ? extends U> keyExtractor,boolean ascending) 
+        {
+            ArrayList<T> copy = new ArrayList<>(source);
+            Comparator<T> cmp = Comparator.comparing(keyExtractor);
+            
+            if (!ascending) cmp = cmp.reversed();
+            
+            copy.sort(cmp);
+            return copy;
+        }
 
+    
+    public static void getRolled() {
+        URL resourceUrl = ChangePassWindow.class.getResource("/videos/secretVid.mp4");
+        if (resourceUrl != null) {
+            try {
+                Desktop.getDesktop().open(new File(resourceUrl.toURI()));
+            } catch (IOException | URISyntaxException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            System.err.println("Resource not found.");
+        }
+    }
 }

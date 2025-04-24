@@ -92,14 +92,16 @@ public abstract class DatabaseObject {
         for (Field f : ref.getClass().getDeclaredFields()) {
 
             try {
-                boolean access = f.canAccess(ref);
-                // Set to accessible temporary
-                f.setAccessible(true);
-
                 // If the field name doesn't exist in the class, continue;
                 if (response.get(f.getName()) == null) {
                     continue;
                 }
+                
+                boolean access = f.canAccess(ref);
+                // Set to accessible temporary
+                f.setAccessible(true);
+
+               
 
                 // Set fields value to responses value
                 f.set(ref, stringToFieldType(response.get(f.getName()), f));

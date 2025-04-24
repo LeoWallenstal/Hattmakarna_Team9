@@ -30,6 +30,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.multi.MultiLookAndFeel;
 import hattmakarna.UI.OrderWindow;
+import hattmakarna.util.PrintDebugger;
 import java.awt.AWTEvent;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -40,7 +41,6 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-
 import oru.inf.InfDB;
 import oru.inf.InfException;
 
@@ -69,12 +69,20 @@ public class Hattmakarna {
             Toolkit.getDefaultToolkit().getImage(Hattmakarna.class.getResource("/resources/icons/appIcon256.png"))
         );
 
+        //För att toggla printdebuggern av/på
+        PrintDebugger.enabled = true;
+      
         Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
             if (event instanceof WindowEvent we && we.getID() == WindowEvent.WINDOW_OPENED) {
                 Window w = we.getWindow();
                 if (w instanceof JFrame jf) {
                     // instead of jf.setIconImage(icon);
                     jf.setIconImages(icons);
+                    
+                    //Sätter defaulttitel till "Hattmakarna - " + det som redan finns i de andra fönstrena
+                    String existingTitle = jf.getTitle();
+                    String title = existingTitle.isBlank() ? "Hattmakarna - " : "Hattmakarna - " + existingTitle;
+                    jf.setTitle(title);
                 }
                 if(w instanceof JDialog jd){
                     jd.setIconImages(icons);

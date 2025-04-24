@@ -6,6 +6,7 @@ package hattmakarna.data;
 
 import static hattmakarna.data.Hattmakarna.idb;
 import java.util.*;
+import java.util.function.Function;
 import oru.inf.InfException;
 
 /**
@@ -33,6 +34,22 @@ public class OrderRegister {
             System.out.println(" in initAllOrders()");
         }
 
+    }
+    
+    /**
+     * A generalized function to sort a list of customers.
+     * @param fieldExtractor The function which gets the field to compare; e.g. Customer::getFirstName, Customer::getTelephoneNumber.
+     * @param ascending toggles ascending or descending.
+     * @return Returns the sorted list.
+     */
+    public ArrayList<Order> sortBy(Function<Order, String> fieldExtractor, boolean ascending) {
+        ArrayList<Order> sorted = new ArrayList<>(allOrders);
+        Comparator<Order> comparator = Comparator.comparing(fieldExtractor, String.CASE_INSENSITIVE_ORDER);
+        if (!ascending) {
+            comparator = comparator.reversed();
+        }
+        sorted.sort(comparator);
+        return sorted;
     }
     
     public ArrayList<Order> getOrders(){

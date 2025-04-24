@@ -5,6 +5,7 @@
 package hattmakarna.data;
 
 import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.util.PrintDebugger;
 import java.util.HashMap;
 import oru.inf.InfException;
 import static hattmakarna.util.Validerare.*;
@@ -90,6 +91,18 @@ public class User {
         return pwCandidate;
     }
     
+    public String fetchCurrentPW(){
+        String sqlQuery = "SELECT password FROM user WHERE user_id = " 
+            + userID + ";";
+        String currentPW = "";
+        try{
+            currentPW = idb.fetchSingle(sqlQuery);
+        }catch(InfException ex){
+            System.out.println(ex.getMessage() + " in fetchCurrentPW(), User.java");
+        }
+        return currentPW;
+    }
+    
     public boolean isAdmin(){
         String sqlQuery = "SELECT user_id FROM ADMIN WHERE user_id = "
             + userID + ";";
@@ -155,6 +168,14 @@ public class User {
     
     // ---------- DB ----------
     
+    public void savePW(){
+        if(!pwCandidate.equals(this.fetchCurrentPW())){
+            String sqlQuery = "UPDATE user SET "
+                + "password = " + pwCandidate
+                + " WHERE user_ id = " + userID + ";";
+        }
+    }
+    
     public void save(User unmodified){
         ArrayList<String> updates = fetchUpdates(unmodified);
         
@@ -168,6 +189,7 @@ public class User {
         
             try{
                 idb.update(sqlQuery);
+                PrintDebugger.info(sqlQuery);
             }catch(InfException ex){
                 System.out.println(ex.getMessage() + "\n1st query in save(), User.java");
                 System.out.println(sqlQuery);
@@ -183,31 +205,23 @@ public class User {
                 "VALUES ('" + userID + "');";
                 try{
                     idb.insert(sqlQuery);
+                    PrintDebugger.info(sqlQuery);
                 }catch(InfException ex){
                     System.out.println(ex.getMessage() + "\n2nd query in save(), User.java");
                     System.out.println(sqlQuery);
                 }
-                //ADMIN DEBUG
-                System.out.println("");
-                System.out.println("ADMIN GRANTED TO " + this.getFullName());
             }
             else{
                 sqlQuery = "DELETE FROM admin  " +
                 "WHERE user_id = " + userID + ";";
                 try{
                     idb.delete(sqlQuery);
+                    PrintDebugger.info(sqlQuery);
                 }catch(InfException ex){
                     System.out.println(ex.getMessage() + "\n3rd query in save(), User.java");
                     System.out.println(sqlQuery);
                 }
-                //ADMIN DEBUG
-                System.out.println("ADMIN TAKEN AWAY FROM " + this.getFullName());
             }  
-        }
-        //save() DEBUG
-        System.out.print("UPDATES: ");
-        for(String anUpdate : updates){
-            System.out.println(anUpdate);
         }
     }
     
@@ -228,6 +242,7 @@ public class User {
         
         try{
             idb.insert(sqlQuery);
+            PrintDebugger.info(sqlQuery);
         }catch(InfException ex){
             System.out.println(ex.getMessage() + "1st sqlQuery, in insert(), User.java");
         }
@@ -238,15 +253,12 @@ public class User {
                 "VALUES (" + newID + ");";
             try{
             idb.insert(sqlQuery);
+            PrintDebugger.info(sqlQuery);
             }catch(InfException ex){
                 System.out.println(ex.getMessage() + "2nd query in save(), User.java");
                 System.out.println(sqlQuery);
             }
-            //DEBUG
-            System.out.println("ADMIN GRANTED TO " + this.getFullName());
         }
-        
-        
     }
     
     public void delete(){
@@ -255,7 +267,10 @@ public class User {
             idb.delete("DELETE FROM user WHERE user_id = " + userID);
             if(isAdmin){
                 idb.delete("DELETE from admin WHERE user_id = " + userID);
+                PrintDebugger.info(("DELETE from admin WHERE user_id = " + userID));
             }
+            PrintDebugger.info(("DELETE FROM task WHERE user_id = " + userID),
+                ("DELETE FROM task WHERE user_id = " + userID));
 
         } catch (InfException ex) {
             System.out.println(ex.getMessage() + "in delete(), Customer.java");
