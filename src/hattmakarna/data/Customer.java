@@ -319,6 +319,7 @@ public class Customer {
         updateTelephoneNumbers(unmodified);
         
         updateEmailAdresses(unmodified);
+        PrintDebugger.info(this.toString());
     }
     
     
@@ -329,7 +330,7 @@ public class Customer {
             idb.update("UPDATE sales_order SET customer_ID = NULL WHERE customer_id = " + customerID);
             idb.delete("DELETE FROM customer WHERE customer_id = " + customerID); 
             
-            PrintDebugger.info(("DELETE FROM phone WHERE customer_id = " + customerID),
+            PrintDebugger.info(this.toString() ,("DELETE FROM phone WHERE customer_id = " + customerID),
                 ("DELETE FROM mail WHERE customer_id = " + customerID),
                 ("UPDATE sales_order SET customer_ID = NULL WHERE customer_id = " + customerID),
                 ("DELETE FROM customer WHERE customer_id = " + customerID));
@@ -387,8 +388,7 @@ public class Customer {
                 System.out.println(ex.getMessage() + " 3rd sqlQuery, in insert(), Customer.java");
             }
         }
-        
-        
+        PrintDebugger.info(this.toString());
     }
         
     //----------Helpers till DB-funktionen save()----------
