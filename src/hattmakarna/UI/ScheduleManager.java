@@ -23,6 +23,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import oru.inf.InfException;
+import javax.swing.SwingUtilities;
 
 /**
  *
