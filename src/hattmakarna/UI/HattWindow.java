@@ -4,13 +4,16 @@
  */
 package hattmakarna.UI;
 import hattmakarna.UI.OrderWindow;
+import hattmakarna.data.Customer;
 import hattmakarna.data.User;
 import static hattmakarna.data.Hattmakarna.idb;
 import oru.inf.InfException;
 import hattmakarna.data.Model;
 import hattmakarna.data.HatRegister;
 import hattmakarna.data.ModelRegister;
+import hattmakarna.data.Hat;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import oru.inf.InfDB;
 /**
@@ -26,17 +29,26 @@ private ModelRegister modelRegister;
     /**
      * Creates new form HattWindow
      */
-    public HattWindow( Model model) {
+
+    public HattWindow(User userLoggedIn,Model model) {
+
+  
         this.userLoggedIn = userLoggedIn;
         this.model = null;
         this.modelRegister = new ModelRegister();
+        this.hatRegister = new HatRegister(idb);
         initComponents();
         fillTable();
     }
     public HattWindow(User userLoggedIn){
+
+        
+
         this.userLoggedIn = userLoggedIn;
+
         this.model = null;
         this.modelRegister = new ModelRegister(idb);
+        this.hatRegister = new HatRegister(idb);
         initComponents();
         fillTable();
 
@@ -70,7 +82,7 @@ private ModelRegister modelRegister;
             .addGap(0, 300, Short.MAX_VALUE)
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel1.setText("Lagerförda Hattar");
@@ -145,8 +157,22 @@ private ModelRegister modelRegister;
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRedigeringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedigeringActionPerformed
-        EditHat editHat = new EditHat(model);
-        editHat.setVisible(true);
+
+         int selectedRow = jTable1.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Välj en kund i tabellen först.");
+        return;
+    }
+
+    String model_id = jTable1.getValueAt(selectedRow, 0).toString(); // Hämta från kolumn 0 (ID)
+
+    Model selectedModel = modelRegister.getModel(model_id);
+    if (selectedModel != null) {
+        EditHat editWindow = new EditHat(selectedModel);
+        editWindow.setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+    }
     }//GEN-LAST:event_btnRedigeringActionPerformed
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
@@ -155,8 +181,17 @@ private ModelRegister modelRegister;
     }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-         new MainMenu(userLoggedIn).setVisible(true);
-        this.setVisible(false);
+
+       try {
+        new MainMenu(userLoggedIn).setVisible(true);
+        this.dispose();
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Ett fel inträffade när vi försökte gå tillbaka till huvudmenyn.");
+    
+}
+
+
     }//GEN-LAST:event_btnBackActionPerformed
     private void fillTable() {
         System.out.println("fillTableKörs");
@@ -180,7 +215,30 @@ private ModelRegister modelRegister;
         jTable1.getColumnModel().getColumn(0).setMinWidth(0);
          jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
          jTable1.getColumnModel().getColumn(0).setWidth(0);
+
+       jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+        if (evt.getClickCount() == 2) { //dubbelklick
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow != -1) {
+        String email = (String) jTable1.getValueAt(selectedRow, 1);
+        openEditCustomerWindow(email);
     }
+      }
+         }
+            });
+    
+
+    }
+    private void openEditCustomerWindow(String model_id) {
+    Model selectedModel = modelRegister.getModel(model_id);
+    if (selectedModel != null) {
+        EditHat editWindow = new EditHat(selectedModel);
+        editWindow.setVisible(true);
+    } else {
+        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+    }
+}
 
     /**
      * @param args the command line arguments

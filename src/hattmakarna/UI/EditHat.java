@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
+import hattmakarna.data.Customer;
 import hattmakarna.data.Model;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -17,15 +18,17 @@ import hattmakarna.data.ModelRegister;
  * @author sebas
  */
 public class EditHat extends javax.swing.JFrame {
-//public final Model aModel;
-    /**
-     * Creates new form EditHat
-     
-     */
-    private final Model aModel;
-    public EditHat(Model aModel) {
-        initComponents();
-       this.aModel = aModel;
+ private final Model currentModel;
+ 
+ 
+    public EditHat(Model model) {
+         this.currentModel = model;
+       initComponents();
+       if (currentModel != null) {
+    lblModelNummer.setText(currentModel.getModelID());
+    tfPrice.setText(String.valueOf(currentModel.getPrice()));
+}
+         
         
     }
 
@@ -42,16 +45,15 @@ public class EditHat extends javax.swing.JFrame {
 
         lblHeader = new javax.swing.JLabel();
         lblInStockHats = new javax.swing.JLabel();
-        lblModelNumber = new javax.swing.JLabel();
+        lblDescription = new javax.swing.JLabel();
         lblPrice = new javax.swing.JLabel();
         tfPrice = new javax.swing.JTextField();
         btnBack = new javax.swing.JButton();
-        tfModelNumber = new javax.swing.JTextField();
         btnSettPrice = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lblModelNummer = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblHeader.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         lblHeader.setText("Hatt Redigering");
@@ -59,7 +61,7 @@ public class EditHat extends javax.swing.JFrame {
         lblInStockHats.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lblInStockHats.setText("Lagerförda hattar");
 
-        lblModelNumber.setText("Modellnummer:");
+        lblDescription.setText("Modellnummer:");
 
         lblPrice.setText("Pris:");
 
@@ -76,13 +78,6 @@ public class EditHat extends javax.swing.JFrame {
             }
         });
 
-        tfModelNumber.setText("Välj hatt du vill redigera ");
-        tfModelNumber.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfModelNumberActionPerformed(evt);
-            }
-        });
-
         btnSettPrice.setText("Ändra pris");
         btnSettPrice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -92,7 +87,7 @@ public class EditHat extends javax.swing.JFrame {
 
         jLabel1.setText("⬅Fyll i önskat pris i heltal");
 
-        jLabel2.setText("⬅Välj hatt du vill redigera ");
+        lblModelNummer.setText("jLabel3");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -101,32 +96,30 @@ public class EditHat extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnBack)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(17, 17, 17)
-                                .addComponent(lblInStockHats))))
-                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblModelNumber)
+                            .addComponent(lblDescription)
                             .addComponent(lblPrice))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(tfModelNumber)
-                            .addComponent(tfPrice))
-                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel2)))
+                            .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblModelNummer))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addComponent(lblHeader))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(130, 130, 130)
-                        .addComponent(btnSettPrice)))
-                .addContainerGap(115, Short.MAX_VALUE))
+                        .addComponent(btnSettPrice))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnBack)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(17, 17, 17)
+                                .addComponent(lblInStockHats)))))
+                .addContainerGap(120, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -137,9 +130,8 @@ public class EditHat extends javax.swing.JFrame {
                 .addComponent(lblInStockHats)
                 .addGap(55, 55, 55)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfModelNumber, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblModelNumber)
-                    .addComponent(jLabel2))
+                    .addComponent(lblDescription)
+                    .addComponent(lblModelNummer))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -148,7 +140,7 @@ public class EditHat extends javax.swing.JFrame {
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSettPrice)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
                         .addComponent(btnBack)
                         .addGap(14, 14, 14))
                     .addGroup(layout.createSequentialGroup()
@@ -160,34 +152,24 @@ public class EditHat extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSettPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettPriceActionPerformed
-      try {
-        String modelID = tfModelNumber.getText().trim();
+
+    try {
         double price = Double.parseDouble(tfPrice.getText());
+        currentModel.updatePrice(currentModel.getModelID(), price);
+        System.out.println("Priset har uppdaterats för " + currentModel.getModelID());
 
-        // Skapa ModelRegister tillfälligt
-        ModelRegister register = new ModelRegister(hattmakarna.data.Hattmakarna.idb);
-        Model model = register.getModel(modelID);
-
-        if (model != null) {
-            model.updatePrice(modelID, price);
-            System.out.println("Priset har uppdaterats");
-        } else {
-            System.out.println("Ingen modell hittades med det ID:t.");
-        }
-
+        this.dispose(); // Stänger fönstret efter uppdateringen
     } catch (NumberFormatException e) {
         System.out.println("Felaktigt prisformat: " + e.getMessage());
     }
+
+
 
     }//GEN-LAST:event_btnSettPriceActionPerformed
 
     private void tfPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfPriceActionPerformed
                 
     }//GEN-LAST:event_tfPriceActionPerformed
-
-    private void tfModelNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfModelNumberActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfModelNumberActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         // TODO add your handling code here:
@@ -203,12 +185,11 @@ public class EditHat extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSettPrice;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel lblDescription;
     private javax.swing.JLabel lblHeader;
     private javax.swing.JLabel lblInStockHats;
-    private javax.swing.JLabel lblModelNumber;
+    private javax.swing.JLabel lblModelNummer;
     private javax.swing.JLabel lblPrice;
-    private javax.swing.JTextField tfModelNumber;
     private javax.swing.JTextField tfPrice;
     // End of variables declaration//GEN-END:variables
 }
