@@ -76,7 +76,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
             String orderId = order.get("order_id");
             Order aOrder = new Order(orderId);
 
-            if (aOrder.getMaterialOrdered()) {
+            if (aOrder.isMaterialOrdered()) {
                 continue;
             }
 
