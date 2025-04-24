@@ -46,6 +46,7 @@ public class HattViewerWindow extends javax.swing.JFrame {
         btnLeft.setFocusable(false);
         btnRight.setFocusable(false);
         setFocusable(true);
+        setLocationRelativeTo(null);
 
         requestFocusInWindow();
         loadImages();
