@@ -62,32 +62,32 @@ public class PrintDebugger {
 
     // Common logging routine that formats the message
     private static void logWithLevel(String level, String color, Object... args) {
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        String timestamp = LocalDateTime.now().format(
+            DateTimeFormatter.ofPattern("HH:mm:ss"));
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         String caller = stack.length >= 4
-                ? stack[3].getClassName() + "# - " + stack[3].getMethodName() + "()"
-                : "Unknown";
+            ? stack[3].getClassName() + "#" + stack[3].getMethodName() + "()"
+            : "Unknown";
 
-        StringBuilder msgBuilder = new StringBuilder();
-        msgBuilder.append(color); // Start color here
+        StringBuilder b = new StringBuilder();
+        b.append(color)
+         .append("[").append(timestamp).append("]")
+         .append("[").append(level).append("] ")
+         .append(caller).append(":\n");
 
-        // First line: timestamp, level, and caller
-        msgBuilder.append("[").append(timestamp).append("]");
-        msgBuilder.append("[").append(level).append("] ");
-        msgBuilder.append(caller).append(":\n\t");
-
-        // Following lines: each argument on a new, indented line — re-applying color
-        if(args.length > 1){
-            for (Object arg : args) {
-                msgBuilder.append(color).append("  ").append(("-> " + arg)).append("\n\t");
+        for (Object arg : args) {
+            String text = String.valueOf(arg);
+            // Split at newlines so we can color every line
+            String[] lines = text.split("\\R");
+            for (int i = 0; i < lines.length; i++) {
+                b.append(color)              // re-apply color before each line
+                 .append("\t-> ")
+                 .append(lines[i])
+                 .append("\n");
             }
         }
-        else{
-            msgBuilder.append(color).append("  ").append(("-> " + args[0]));
-        }
-        
-        msgBuilder.append(RESET); // Reset color at the end
 
-        System.out.println(msgBuilder.toString());
+        b.append(RESET);
+        System.out.print(b.toString());
     }
 }

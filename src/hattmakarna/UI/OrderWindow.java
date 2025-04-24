@@ -19,8 +19,10 @@ import hattmakarna.data.Order;
 import hattmakarna.data.Specification;
 import hattmakarna.data.Status;
 import hattmakarna.data.User;
+import hattmakarna.util.PrintDebugger;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -48,10 +50,14 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import oru.inf.InfException;
 
 /**
@@ -67,6 +73,8 @@ public class OrderWindow extends javax.swing.JFrame {
     private ArrayList<MaterialHat> tmp_materials;
     private DefaultListModel<String> customerModel;
 
+    private ArrayList<Customer> toDisplay;
+    
     int customerID = 0;
     private ArrayList<Pair<Hat, Integer>> hatsToOrder;
 
@@ -80,6 +88,8 @@ public class OrderWindow extends javax.swing.JFrame {
     public OrderWindow(User userLoggedIn) {
         initComponents();
 
+        this.setTitle("Registrera order");
+        
         tillagd_label.setVisible(false);
         hatsToOrder = new ArrayList<>();
         tmp_materials = new ArrayList<>();
@@ -87,23 +97,40 @@ public class OrderWindow extends javax.swing.JFrame {
         setResizable(false);
         customerRegister = new CustomerRegister();
         modelRegister = new ModelRegister();
-        fillSearchResults();
+        toDisplay = customerRegister.sortBy(Customer::getFirstName, true);
+        initTable();
         hatModels = modelRegister.getAllHats();
         fillModels();
         this.userLoggedIn = userLoggedIn;
+        btnChooseCustomer.setEnabled(false);
+        btnAddOrder.setEnabled(false);
 
+        jrbName.setSelected(true);
+        jtCustomer.setAutoCreateRowSorter(true);
+        jtCustomer.setDefaultEditor(Object.class, null);
+        // only allow whole-row selection (optional, but often desirable)
+        jtCustomer.setRowSelectionAllowed(true);
+        jtCustomer.setColumnSelectionAllowed(false);
+
+        // single selection only (optional)
+        jtCustomer.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // remove any pre-existing selection
+        jtCustomer.clearSelection();
+        
+        
         modelRegister.getAllHats().forEach(e -> {
             baseModelCombo.addItem(e.getName());
         });
 
         btnRemoveCustomer.setEnabled(false);
-        customerModel = (DefaultListModel<String>) customerJList.getModel();
+        //customerModel = (DefaultListModel<String>) customerJList.getModel();
 
         // Fixa layout för material lista
         BoxLayout b = new BoxLayout(materialList, BoxLayout.Y_AXIS);
         materialList.setLayout(b);
         jScrollPane2.setViewportView(materialList);
-
+        
         ((DefaultTableModel) tblSeeOrder.getModel()).addTableModelListener(e -> {
             if (isUpdatingTable) {
                 return;
@@ -118,6 +145,33 @@ public class OrderWindow extends javax.swing.JFrame {
                 }
             }
         });
+        
+        
+        //Sökrutan
+        
+        tfSearch.getDocument().addDocumentListener(new DocumentListener() {
+            private void update() {
+                String text = tfSearch.getText();
+                if (text.isEmpty()) {
+                    refreshTable();
+                }
+                else{
+                    if(jrbName.isSelected()){
+                        toDisplay = customerRegister.searchByName(text);
+                    }
+                    else{
+                        toDisplay = customerRegister.searchByEmail(text);
+                    }
+                    toDisplay = hattmakarna.util.Util.sortBy(toDisplay, Customer::getFirstName, true);
+                    displayResults();
+                }
+            }
+            @Override public void insertUpdate(DocumentEvent e) { update(); }
+            @Override public void removeUpdate(DocumentEvent e) { update(); }
+            @Override public void changedUpdate(DocumentEvent e) { update(); }
+        });
+        
+        
 
     }
 
@@ -130,18 +184,20 @@ public class OrderWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        rbgEmailName = new javax.swing.ButtonGroup();
         paneSidebar = new javax.swing.JPanel();
         lblHeader = new javax.swing.JLabel();
         btnNewCustomer = new javax.swing.JButton();
         btnReturn = new javax.swing.JButton();
-        txtSearchEmail = new javax.swing.JTextField();
-        btnSearch = new javax.swing.JButton();
+        tfSearch = new javax.swing.JTextField();
         lblCustomer = new javax.swing.JLabel();
         lblSearchResult = new javax.swing.JLabel();
-        scrollSearchResult = new javax.swing.JScrollPane();
-        customerJList = new javax.swing.JList<>();
         btnChooseCustomer = new javax.swing.JButton();
         btnRemoveCustomer = new javax.swing.JButton();
+        jrbEmail = new javax.swing.JRadioButton();
+        jrbName = new javax.swing.JRadioButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jtCustomer = new javax.swing.JTable();
         tabbedPane = new javax.swing.JTabbedPane();
         paneStock = new javax.swing.JPanel();
         scrollModel = new javax.swing.JScrollPane();
@@ -187,6 +243,11 @@ public class OrderWindow extends javax.swing.JFrame {
         remove_from_order = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                formMouseClicked(evt);
+            }
+        });
 
         paneSidebar.setForeground(new java.awt.Color(102, 204, 255));
         paneSidebar.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -212,24 +273,10 @@ public class OrderWindow extends javax.swing.JFrame {
             }
         });
 
-        btnSearch.setText("Sök");
-        btnSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchActionPerformed(evt);
-            }
-        });
-
         lblCustomer.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         lblCustomer.setText("Kund");
 
         lblSearchResult.setText("Sökresultat:");
-
-        customerJList.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                customerJListMouseClicked(evt);
-            }
-        });
-        scrollSearchResult.setViewportView(customerJList);
 
         btnChooseCustomer.setText("Välj kund");
         btnChooseCustomer.addActionListener(new java.awt.event.ActionListener() {
@@ -245,6 +292,30 @@ public class OrderWindow extends javax.swing.JFrame {
             }
         });
 
+        rbgEmailName.add(jrbEmail);
+        jrbEmail.setText("Epost");
+
+        rbgEmailName.add(jrbName);
+        jrbName.setText("Namn");
+
+        jtCustomer.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jtCustomer.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtCustomerMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jtCustomer);
+
         javax.swing.GroupLayout paneSidebarLayout = new javax.swing.GroupLayout(paneSidebar);
         paneSidebar.setLayout(paneSidebarLayout);
         paneSidebarLayout.setHorizontalGroup(
@@ -256,20 +327,22 @@ public class OrderWindow extends javax.swing.JFrame {
                     .addGroup(paneSidebarLayout.createSequentialGroup()
                         .addGroup(paneSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(paneSidebarLayout.createSequentialGroup()
-                                .addComponent(txtSearchEmail)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnSearch)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfSearch, javax.swing.GroupLayout.DEFAULT_SIZE, 144, Short.MAX_VALUE)
+                                .addGap(84, 84, 84)
                                 .addComponent(btnNewCustomer))
-                            .addComponent(scrollSearchResult, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE)
                             .addComponent(lblCustomer)
                             .addComponent(lblSearchResult)
+                            .addComponent(btnReturn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(paneSidebarLayout.createSequentialGroup()
-                                .addGap(4, 4, 4)
+                                .addGap(6, 6, 6)
+                                .addComponent(jrbName)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jrbEmail))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addGroup(paneSidebarLayout.createSequentialGroup()
                                 .addComponent(btnChooseCustomer)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnRemoveCustomer))
-                            .addComponent(btnReturn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(btnRemoveCustomer)))
                         .addGap(0, 18, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -281,14 +354,17 @@ public class OrderWindow extends javax.swing.JFrame {
                 .addComponent(lblCustomer)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(paneSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txtSearchEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnSearch)
+                    .addComponent(tfSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnNewCustomer))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(paneSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jrbEmail)
+                    .addComponent(jrbName))
+                .addGap(10, 10, 10)
                 .addComponent(lblSearchResult)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollSearchResult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 280, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(paneSidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnChooseCustomer)
                     .addComponent(btnRemoveCustomer))
@@ -304,6 +380,17 @@ public class OrderWindow extends javax.swing.JFrame {
             }
         });
 
+        paneStock.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                paneStockMouseClicked(evt);
+            }
+        });
+
+        lstModels.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lstModelsMouseClicked(evt);
+            }
+        });
         scrollModel.setViewportView(lstModels);
 
         lblChooseModel.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -337,13 +424,14 @@ public class OrderWindow extends javax.swing.JFrame {
                         .addComponent(btnAddOrder)
                         .addGap(18, 18, 18)
                         .addComponent(checkFastDelivery))
+                    .addComponent(scrollModel)
+                    .addComponent(lblChooseModel)
                     .addGroup(paneStockLayout.createSequentialGroup()
+                        .addGap(339, 339, 339)
                         .addComponent(spnAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(scrollModel)
-                    .addComponent(lblChooseModel))
-                .addGap(0, 16, Short.MAX_VALUE))
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         paneStockLayout.setVerticalGroup(
             paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -360,7 +448,7 @@ public class OrderWindow extends javax.swing.JFrame {
                 .addGroup(paneStockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddOrder)
                     .addComponent(checkFastDelivery))
-                .addContainerGap(392, Short.MAX_VALUE))
+                .addContainerGap(439, Short.MAX_VALUE))
         );
 
         tabbedPane.addTab("Lagerförd", paneStock);
@@ -523,7 +611,7 @@ public class OrderWindow extends javax.swing.JFrame {
                         .addComponent(add_material)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, paneSpecialLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
                         .addGroup(paneSpecialLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
                             .addComponent(baseModelCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -700,10 +788,6 @@ public class OrderWindow extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnNewCustomerActionPerformed
 
-    private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
-        fillSearchResults();
-    }//GEN-LAST:event_btnSearchActionPerformed
-
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
         new MainMenu(userLoggedIn).setVisible(true);
         this.setVisible(false);
@@ -717,10 +801,28 @@ public class OrderWindow extends javax.swing.JFrame {
 
     }
 
+    private void displayResults(){
+        DefaultTableModel listModel = new DefaultTableModel();
+        jtCustomer.setModel(listModel);
+        
+        //clear
+        listModel.setRowCount(0);
+        
+        listModel.addColumn("Namn");
+        listModel.addColumn("Email");
+        
+        for(Customer aCustomer : toDisplay){
+            String[] rowData = new String[2];
+            rowData[0] = aCustomer.getFullName();
+            rowData[1] = aCustomer.getEmailAdress();
+            listModel.addRow(rowData);
+        }
+    }
+    
     private void btnRemoveCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveCustomerActionPerformed
         //Dialogfönster
-        int customerIndex = customerJList.getSelectedIndex();
-        Customer toRemove = customerRegister.getCustomer(customerIndex);
+        int customerIndex = jtCustomer.getSelectedColumn();
+        Customer toRemove = toDisplay.get(customerIndex);
         Object[] options = {"Ja", "Nej"};
 
         int result = JOptionPane.showOptionDialog(this,
@@ -731,22 +833,25 @@ public class OrderWindow extends javax.swing.JFrame {
         if (result == 0) {
             /* "Ja" klickades, 
                     tar bort den kunden och stänger dialogen. */
-            customerModel.remove(customerIndex);
-            customerRegister.remove(customerIndex);
+            DefaultTableModel dtModel = (DefaultTableModel) jtCustomer.getModel();
+            dtModel.removeRow(customerIndex);
+            toDisplay.remove(customerIndex);
+            //customerRegister.remove(customerIndex)
             toRemove.delete();
         } else if (result == 1) {
-            customerJList.clearSelection();
+            jtCustomer.clearSelection();
             btnRemoveCustomer.setEnabled(false);
+            btnChooseCustomer.setEnabled(false);
         }
     }//GEN-LAST:event_btnRemoveCustomerActionPerformed
 
-    private void customerJListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_customerJListMouseClicked
-        btnRemoveCustomer.setEnabled(true);
-    }//GEN-LAST:event_customerJListMouseClicked
-
     private void paneSidebarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneSidebarMouseClicked
         btnRemoveCustomer.setEnabled(false);
-        customerJList.clearSelection();
+        btnChooseCustomer.setEnabled(false);
+        btnAddOrder.setEnabled(false);
+        
+        lstModels.clearSelection();
+        jtCustomer.clearSelection();
     }//GEN-LAST:event_paneSidebarMouseClicked
 
     private void checkFastDeliverySpecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkFastDeliverySpecActionPerformed
@@ -759,7 +864,11 @@ public class OrderWindow extends javax.swing.JFrame {
 
     private void tabbedPaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabbedPaneMouseClicked
         btnRemoveCustomer.setEnabled(false);
-        customerJList.clearSelection();
+        btnChooseCustomer.setEnabled(false);
+        btnAddOrder.setEnabled(false);
+        
+        lstModels.clearSelection();
+        jtCustomer.clearSelection();
     }//GEN-LAST:event_tabbedPaneMouseClicked
 
     private void btnAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddOrderActionPerformed
@@ -835,6 +944,56 @@ public class OrderWindow extends javax.swing.JFrame {
 
     }//GEN-LAST:event_tblSeeOrderPropertyChange
 
+    private void paneStockMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_paneStockMouseClicked
+        btnRemoveCustomer.setEnabled(false);
+        btnChooseCustomer.setEnabled(false);
+        btnAddOrder.setEnabled(false);
+        
+        jtCustomer.clearSelection();
+        lstModels.clearSelection();
+    }//GEN-LAST:event_paneStockMouseClicked
+
+    private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+        btnRemoveCustomer.setEnabled(false);
+        btnChooseCustomer.setEnabled(false);
+        btnAddOrder.setEnabled(false);
+        jtCustomer.clearSelection();
+        lstModels.clearSelection();
+    }//GEN-LAST:event_formMouseClicked
+
+    private void lstModelsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstModelsMouseClicked
+        btnAddOrder.setEnabled(true);
+        btnRemoveCustomer.setEnabled(false);
+        btnChooseCustomer.setEnabled(false);
+        
+        jtCustomer.clearSelection();
+    }//GEN-LAST:event_lstModelsMouseClicked
+
+    private void jtCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtCustomerMouseClicked
+        lstModels.clearSelection();
+        
+        btnAddOrder.setEnabled(false);
+        btnRemoveCustomer.setEnabled(true);
+        btnChooseCustomer.setEnabled(true);
+    }//GEN-LAST:event_jtCustomerMouseClicked
+
+    private void refreshTable(){
+        toDisplay = customerRegister.sortBy(Customer::getFirstName, true);
+        PrintDebugger.info("refreshTable()");
+        DefaultTableModel listModel = new DefaultTableModel();
+        jtCustomer.setModel(listModel);
+        
+        listModel.addColumn("Namn");
+        listModel.addColumn("Email");
+        
+        for(Customer aCustomer : toDisplay){
+            String[] rowData = new String[2];
+            rowData[0] = aCustomer.getFullName();
+            rowData[1] = aCustomer.getEmailAdress();
+            listModel.addRow(rowData);
+        }
+    }
+    
     private void updateHatsAndTableRow(int row) {
         DefaultTableModel model = (DefaultTableModel) tblSeeOrder.getModel();
 
@@ -1060,38 +1219,31 @@ public class OrderWindow extends javax.swing.JFrame {
     }
 
     public void selectCustomer() {
-        int selectedCustomer = customerJList.getSelectedIndex();
-        if (selectedCustomer == -1) {
-            return;
-        }
-
-        Customer c = customerRegister.getAllCustomers().get(selectedCustomer);
+        int index = jtCustomer.getSelectedRow();
+        
+        Customer c = toDisplay.get(index);
         customerID = Integer.parseInt(c.getCustomerID());
         customer_label.setText(c.getFullName());
     }
 
     public void refreshCustomers() {
         customerRegister = new CustomerRegister();
-        fillSearchResults();
+        initTable();
     }
 
-    private void fillSearchResults() {
-        DefaultListModel<String> listModel = new DefaultListModel<>();
-        customerJList.setModel(listModel);
-        ArrayList<Customer> customerMailList = customerRegister.searchByEmail(txtSearchEmail.getText());
-        ArrayList<Customer> customerNameList = customerRegister.searchByName(txtSearchEmail.getText());
-        HashMap<String, Customer> customerList = new HashMap<>();
-
-        for (Customer customer : customerMailList) {
-            customerList.put(customer.getCustomerID(), customer);
-        }
-
-        for (Customer customer : customerNameList) {
-            customerList.put(customer.getCustomerID(), customer);
-        }
-
-        for (Customer customer : customerList.values()) {
-            listModel.addElement(customer.getFullName());
+    private void initTable() {
+        DefaultTableModel listModel = new DefaultTableModel();
+        jtCustomer.setModel(listModel);
+        
+        listModel.addColumn("Namn");
+        listModel.addColumn("Email");
+        
+        for(Customer aCustomer : toDisplay){
+            String[] rowData = new String[2];
+            rowData[0] = aCustomer.getFullName();
+            rowData[1] = !aCustomer.getEmailAdresses().isEmpty()
+                ? aCustomer.getEmailAdress() : "";
+            listModel.addRow(rowData);
         }
     }
 
@@ -1228,12 +1380,10 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnNewCustomer;
     private javax.swing.JButton btnRemoveCustomer;
     private javax.swing.JButton btnReturn;
-    private javax.swing.JButton btnSearch;
     private java.awt.Canvas canvas1;
     private javax.swing.JComboBox<String> cbxSize;
     private javax.swing.JCheckBox checkFastDelivery;
     private javax.swing.JCheckBox checkFastDeliverySpec;
-    private javax.swing.JList<String> customerJList;
     private javax.swing.JLabel customer_label;
     private javax.swing.JLabel file_path_label_img;
     private javax.swing.JLabel file_path_label_sketch;
@@ -1241,8 +1391,12 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JRadioButton jrbEmail;
+    private javax.swing.JRadioButton jrbName;
+    private javax.swing.JTable jtCustomer;
     private javax.swing.JLabel lblChooseModel;
     private javax.swing.JLabel lblCustomer;
     private javax.swing.JLabel lblCustomerOrder;
@@ -1262,16 +1416,16 @@ public class OrderWindow extends javax.swing.JFrame {
     private javax.swing.JPanel paneSpecial;
     private javax.swing.JPanel paneStock;
     private javax.swing.JButton pnlSaveOrder;
+    private javax.swing.ButtonGroup rbgEmailName;
     private javax.swing.JButton remove_from_order;
     private javax.swing.JScrollPane scrollModel;
-    private javax.swing.JScrollPane scrollSearchResult;
     private javax.swing.JSpinner spnAmount;
     private javax.swing.JTabbedPane tabbedPane;
     private javax.swing.JScrollPane tblOrder;
     private javax.swing.JTable tblSeeOrder;
+    private javax.swing.JTextField tfSearch;
     private javax.swing.JLabel tillagd_label;
     private javax.swing.JTextField txtPrice;
-    private javax.swing.JTextField txtSearchEmail;
     private javax.swing.JTextArea txtSpecialDesc;
     // End of variables declaration//GEN-END:variables
 

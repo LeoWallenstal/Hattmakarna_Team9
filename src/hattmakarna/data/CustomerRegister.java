@@ -62,12 +62,11 @@ public class CustomerRegister {
     public ArrayList<Customer> searchByName(String nameSearch){
         ArrayList<Customer> searchResult = new ArrayList<>();
         
+        nameSearch = nameSearch.toLowerCase();
+        
         for(Customer aCustomer : allCustomers){
-
-            String firstName = aCustomer.getFirstName().toLowerCase();
-            String lastName = aCustomer.getLastName().toLowerCase();
-            if(firstName.startsWith(nameSearch.toLowerCase()) || lastName.startsWith(nameSearch.toLowerCase())){
-
+            String fullName = aCustomer.getFullName().toLowerCase();
+            if(fullName.startsWith(nameSearch)){
                 searchResult.add(aCustomer);
             }
         }
