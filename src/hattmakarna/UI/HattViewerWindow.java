@@ -54,8 +54,7 @@ public class HattViewerWindow extends javax.swing.JFrame {
     }
 
     private void loadImages() {
-        //String imageDir = "images/3d/folder_" + hatID;
-        String imageDir = "images/"; // Där sakerna ligger
+        String imageDir = "images/hattextra" + hatID;
         File folder = new File(imageDir);
         File[] files = folder.listFiles((dir, name)
                 -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".jpg"));

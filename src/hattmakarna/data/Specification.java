@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import javax.swing.UIManager;
 import oru.inf.InfException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -142,7 +143,7 @@ public class Specification extends DatabaseObject {
 
     public static ArrayList<BufferedImage> set3DFilesFromUser() {
         JFileChooser chooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "jpeg", "gif", "png");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("png");
         chooser.setFileFilter(filter);
         chooser.setMultiSelectionEnabled(true); // Tillåt flera filer
 
@@ -211,17 +212,22 @@ public class Specification extends DatabaseObject {
 
                 skiss_path = fileToSave.getPath().replace("\\", "\\\\");
             }
+
             if (extraImages != null && !extraImages.isEmpty()) {
-                
+
+                // Skapa undermapp för denna hatt
+                String folderName = "hattextra" + hat_id;
+                File extraFolder = new File(SAVE_TO_PATH + folderName);
+                extraFolder.mkdirs();  // Skapa mapp om den inte redan finns
 
                 for (int i = 0; i < extraImages.size(); i++) {
                     BufferedImage img = extraImages.get(i);
 
-                    String fileName = "extra-" + hat_id + "-" + i + ".png";
-                    File fileToSave = new File(SAVE_TO_PATH + fileName);
-                    fileToSave.getParentFile().mkdirs();
+                    String fileName = "extra" + (i + 1) + ".png"; // Namnge bara bilden
+                    File fileToSave = new File(extraFolder, fileName);  // Sparar i undermappen
 
                     ImageIO.write(img, "png", fileToSave);
+
                     extraImagePaths.add(fileToSave.getPath().replace("\\", "\\\\"));
                 }
             }
@@ -253,6 +259,14 @@ public class Specification extends DatabaseObject {
 
         if (this.skissImage != null) {
             copy.skissImage = deepCopyBufferedImage(this.skissImage);
+        }
+
+        if (this.extraImages != null) {
+            List<BufferedImage> copyList = new ArrayList<>();
+            for (BufferedImage img : this.extraImages) {
+                copyList.add(deepCopyBufferedImage(img));
+            }
+            copy.extraImages = (ArrayList<BufferedImage>) copyList;
         }
 
         return copy;
