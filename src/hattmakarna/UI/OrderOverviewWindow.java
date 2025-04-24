@@ -42,13 +42,13 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
 
         orders = new OrderRegister().getOrders();
         
-        orders.sort(Comparator.comparingInt(Order::getOrderId));
+        orders.sort(Comparator.comparingInt(Order::getOrder_id));
 
         for (Order aOrder : orders) {
-            int id = aOrder.getOrderId();
+            int id = aOrder.getOrder_id();
 
             String status = aOrder.getStatus().toString();
-            Date date = aOrder.getReceivedDate();
+            Date date = aOrder.getRecived_data();
             SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
             String formattedDate = dateF.format(date);
             table.addRow(new Object[]{id, formattedDate, status});
@@ -79,24 +79,24 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
             to = calTo.getTime();
         }
         
-        orders.sort(Comparator.comparingInt(Order::getOrderId));
+        orders.sort(Comparator.comparingInt(Order::getOrder_id));
 
         if (from == null && to == null) {
             for (Order aOrder : orders) {
-                int id = aOrder.getOrderId();
+                int id = aOrder.getOrder_id();
 
                 String status = aOrder.getStatus().toString();
-                Date date = aOrder.getReceivedDate();
+                Date date = aOrder.getRecived_data();
                 SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
                 String formattedDate = dateF.format(date);
                 table.addRow(new Object[]{id, formattedDate, status});
             }
         } else if (from != null && to != null) {
             for (Order aOrder : orders) {
-                Date recivedDate = aOrder.getReceivedDate();
+                Date recivedDate = aOrder.getRecived_data();
                 if ((recivedDate.equals(from) || recivedDate.after(from))
                         && (recivedDate.equals(to) || recivedDate.before(to))) {
-                    int id = aOrder.getOrderId();
+                    int id = aOrder.getOrder_id();
                     String status = aOrder.getStatus().toString();
                     SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
                     String formattedDate = dateF.format(recivedDate);
@@ -105,9 +105,9 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
             }
         } else if (from != null && to == null) {
             for (Order aOrder : orders) {
-                Date recivedDate = aOrder.getReceivedDate();
+                Date recivedDate = aOrder.getRecived_data();
                 if ((recivedDate.equals(from) || recivedDate.after(from))) {
-                    int id = aOrder.getOrderId();
+                    int id = aOrder.getOrder_id();
                     String status = aOrder.getStatus().toString();
                     SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
                     String formattedDate = dateF.format(recivedDate);
@@ -116,9 +116,9 @@ public class OrderOverviewWindow extends javax.swing.JFrame {
             }
         } else if (from == null && to != null) {
             for (Order aOrder : orders) {
-                Date recivedDate = aOrder.getReceivedDate();
+                Date recivedDate = aOrder.getRecived_data();
                 if ((recivedDate.equals(to) || recivedDate.before(to))) {
-                    int id = aOrder.getOrderId();
+                    int id = aOrder.getOrder_id();
                     String status = aOrder.getStatus().toString();
                     SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
                     String formattedDate = dateF.format(recivedDate);
