@@ -46,7 +46,7 @@ public class ScheduleManager {
         this.scrollOrders = scrollOrders;
         startDate = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
         taskRegister = new TaskRegister();
-        tasks = taskRegister.getTasks();
+        tasks = taskRegister.getOngoingTasks();
         orderRegister = new OrderRegister();
         emptyCells = new ArrayList<>();
 
@@ -56,6 +56,8 @@ public class ScheduleManager {
     }
 
     public void refreshSchedule() {
+        taskRegister.refreshTasks();
+        tasks = taskRegister.getOngoingTasks();
         HashMap<LocalDate, ArrayList<Task>> taskDates = createTaskDateMap();
 
         for (Component comp : calendarPanel.getComponents()) {
@@ -185,11 +187,13 @@ public class ScheduleManager {
 
     private HashMap<LocalDate, ArrayList<Task>> createTaskDateMap() {
         HashMap<LocalDate, ArrayList<Task>> taskDates = new HashMap<>();
-        for (Task aTask : tasks) {
-            LocalDate date = aTask.getStartDate().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
-            taskDates.computeIfAbsent(date, k -> new ArrayList<>()).add(aTask);
+        if (tasks != null) {
+            for (Task aTask : tasks) {
+                LocalDate date = aTask.getStartDate().toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+                taskDates.computeIfAbsent(date, k -> new ArrayList<>()).add(aTask);
+            }
         }
         return taskDates;
     }
@@ -330,9 +334,10 @@ public class ScheduleManager {
                     m.name,
                     u.first_name,
                     u.last_name,
+                    t.task_id,
                     CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
-                    CASE WHEN t.status = 'KLAR' THEN 1 ELSE 0 END AS done,
-                    CASE WHEN h.model_id != 1 THEN 1 ELSE 0 END AS done
+                    CASE WHEN t.status = 'KLAR' OR
+                    h.model_id != 1 THEN 1 ELSE 0 END AS done
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
@@ -359,6 +364,29 @@ public class ScheduleManager {
         }
         scrollOrders.setViewportView(listPanel);
         scrollOrders.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+    }
+
+    private void addTaskListener(JPanel taskPanel) {
+        taskPanel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Object[] options = {"Ja", "Nej"};
+                System.out.println("Klick");
+                int result = JOptionPane.showOptionDialog(calendarPanel.getParent(), "Vill du markera denna hatt som klar?", "Bekräfta", JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+                if (result == 0) {
+                    Task task = (Task) taskPanel.getClientProperty("task");
+                    if (task != null) {
+                        System.out.println("Task hittad");
+                        task.setStatus(TaskStatus.KLAR);
+                        task.save();
+                        refreshSchedule();
+                        initOrders();
+                    }
+                }
+            }
+        });
 
     }
 
@@ -389,6 +417,7 @@ public class ScheduleManager {
                 String userName = hat.get("first_name") + " " + hat.get("last_name");
                 boolean isAssigned = "1".equals(hat.get("in_task"));
                 boolean isDone = "1".equals(hat.get("done"));
+                String taskId = hat.get("task_id");
 
                 JPanel item = createTaskPanel(hatName, hatId);
                 int totalHeight = calendarPanel.getHeight();
@@ -414,6 +443,9 @@ public class ScheduleManager {
                     workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
                     item.add(workerLabel, BorderLayout.SOUTH);
                     item.setBackground(Color.YELLOW);
+                    Task task = new Task(taskId);
+                    item.putClientProperty("task", task);
+                    addTaskListener(item);
                 } else {
                     item.setBackground(Color.LIGHT_GRAY);
                     makeDraggable(item);
@@ -501,8 +533,6 @@ public class ScheduleManager {
                         System.out.println(task.getTaskId());
 
                         task.delete();
-                        taskRegister.refreshTasks();
-                        tasks = taskRegister.getTasks();
                         refreshSchedule();
                         initOrders();
                     }
@@ -618,7 +648,8 @@ public class ScheduleManager {
             if (task == null) {
                 task = createNewTaskFromPanel(panel, dropDate);
                 if (task != null) {
-                    setHatAsAssigned(panel);
+                    setHatAsAssigned(panel, task);
+                    tasks = taskRegister.getOngoingTasks();
                     tasks.add(task);
                     panel.putClientProperty("task", task);
                 }
@@ -630,8 +661,6 @@ public class ScheduleManager {
         bestCell.revalidate();
         bestCell.repaint();
         emptyCells.remove(bestCell);
-        taskRegister.refreshTasks();
-        tasks = taskRegister.getTasks();
         refreshSchedule();
     }
 
@@ -657,7 +686,7 @@ public class ScheduleManager {
         return clone;
     }
 
-    private void setHatAsAssigned(JPanel original) {
+    private void setHatAsAssigned(JPanel original, Task task) {
         Container parent = original.getParent();
         if (parent == null) {
             return;
@@ -667,6 +696,8 @@ public class ScheduleManager {
 
         JLabel workerLabel = new JLabel(userLoggedIn.getFullName(), SwingConstants.CENTER);
         workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        clone.putClientProperty("task", task);
+        addTaskListener(clone);
         clone.add(workerLabel, BorderLayout.SOUTH);
 
         int index = -1;
