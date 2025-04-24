@@ -324,7 +324,7 @@ public class ScheduleManager {
         JPanel listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         for (Order aOrder : orders) {
-            if (aOrder.getStatus() != Status.BEKRÄFTAD) {
+            if (aOrder.getStatus() != Status.BEKRÄFTAD && aOrder.getStatus() != Status.PÅGÅENDE) {
                 continue;
             }
 
@@ -372,18 +372,27 @@ public class ScheduleManager {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                Object[] options = {"Ja", "Nej"};
+                Object[] options = {"Klarmarkera", "Ta tillbaka", "Avbryt"};
                 System.out.println("Klick");
-                int result = JOptionPane.showOptionDialog(calendarPanel.getParent(), "Vill du markera denna hatt som klar?", "Bekräfta", JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+                int result = JOptionPane.showOptionDialog(calendarPanel.getParent(), "Vill du markera denna hatt som klar?", "Bekräfta", JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+                Task task = (Task) taskPanel.getClientProperty("task");
                 if (result == 0) {
-                    Task task = (Task) taskPanel.getClientProperty("task");
+
                     if (task != null) {
-                        System.out.println("Task hittad");
+                        System.out.println("Task klar");
                         task.setStatus(TaskStatus.KLAR);
                         task.save();
                         refreshSchedule();
                         initOrders();
                     }
+                } else if (result == 1) {
+                    if (task != null) {
+                        System.out.println("Task tillbaka");
+                        task.delete();
+                        refreshSchedule();
+                        initOrders();
+                    }
+
                 }
             }
         });
@@ -533,7 +542,6 @@ public class ScheduleManager {
                         System.out.println(task.getTaskId());
 
                         task.delete();
-                        refreshSchedule();
                         initOrders();
                     }
 
@@ -556,6 +564,8 @@ public class ScheduleManager {
                     LocalDate dropDate = startDate.plusDays(columnIndex);
                     moveTask(panel, bestCell, originCell[0], dropDate);
                 }
+                
+                refreshSchedule();
 
                 glassPane.removeAll();
 
@@ -649,9 +659,8 @@ public class ScheduleManager {
                 task = createNewTaskFromPanel(panel, dropDate);
                 if (task != null) {
                     setHatAsAssigned(panel, task);
-                    tasks = taskRegister.getOngoingTasks();
-                    tasks.add(task);
                     panel.putClientProperty("task", task);
+                    initOrders();
                 }
             }
         }
@@ -661,7 +670,6 @@ public class ScheduleManager {
         bestCell.revalidate();
         bestCell.repaint();
         emptyCells.remove(bestCell);
-        refreshSchedule();
     }
 
     private JPanel clonePanel(JPanel originalPanel, boolean showOriginalComponents, Color overrideBackground) {
