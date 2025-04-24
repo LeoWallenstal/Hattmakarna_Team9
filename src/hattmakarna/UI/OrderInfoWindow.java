@@ -374,7 +374,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
             return;
         }
 
-        String clickedModelName = table.getValueAt(row, 0).toString();
+        String clickedModelName = "Special";
         System.out.println("Klickat modellnamn: " + clickedModelName);
 
         ArrayList<String> hatIds = (ArrayList<String>) currentOrder.fetchHatIds();
