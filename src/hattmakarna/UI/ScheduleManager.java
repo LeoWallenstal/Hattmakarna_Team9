@@ -255,41 +255,61 @@ public class ScheduleManager {
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
         panel.add(nameLabel, BorderLayout.CENTER);
 
-        Hat hat = new Hat(hatId);
-        if (hat.isSpecial()) {
-            System.out.println("Körs special");
-            String sqlQuery = "SELECT spec_id FROM hat_spec WHERE hat_id = " + hatId;
-            try {
-                String specId = idb.fetchSingle(sqlQuery);
-                Specification spec = new Specification(specId);
-                String imagePath = spec.getImagePath();
-                String toolTip = "<html>";
-                if (imagePath != null) {
-                    System.out.println(imagePath);
-                    imagePath = imagePath.trim();
-                    URL imageUrl = getClass().getResource(imagePath);
-                    System.out.println(imageUrl);
-                    if (imageUrl != null) {
-                        toolTip += "<img src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>";
+        String sqlQuery = """ 
+                          SELECT 
+            hs.spec_id,
+            CASE 
+                WHEN h.model_id IN (SELECT model_id FROM hat_model WHERE name = 'Special') THEN 1 
+                ELSE 0 
+            END AS is_special
+        FROM 
+            hat_spec hs
+        JOIN 
+            hat h ON hs.hat_id = h.hat_id
+        WHERE 
+            hs.hat_id =""" + hatId;
+
+        try {
+            HashMap<String, String> hatMap = idb.fetchRow(sqlQuery);
+            boolean isSpecial = "1".equals(hatMap.get("is_special"));
+
+            if (isSpecial) {
+                System.out.println("Körs special");
+
+                try {
+                    String specId = idb.fetchSingle(sqlQuery);
+                    Specification spec = new Specification(specId);
+                    String imagePath = spec.getImagePath();
+                    String toolTip = "<html>";
+                    if (imagePath != null) {
+                        System.out.println(imagePath);
+                        imagePath = imagePath.trim();
+                        URL imageUrl = getClass().getResource(imagePath);
+                        System.out.println(imageUrl);
+                        if (imageUrl != null) {
+                            toolTip += "<img src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>";
+                        } else {
+                            System.err.println("Kunde inte hitta bilden på: ");
+                        }
+
+                    }
+                    String desc = spec.getDescription();
+                    if (desc != null) {
+                        toolTip += desc;
                     } else {
-                        System.err.println("Kunde inte hitta bilden på: ");
+                        toolTip += "Finns ingen beskrivning...";
                     }
 
-                }
-                String desc = spec.getDescription();
-                if (desc != null) {
-                    toolTip += desc;
-                } else {
-                    toolTip += "Finns ingen beskrivning...";
+                    toolTip += "<br> </html>";
+                    System.out.println(toolTip);
+                    panel.setToolTipText(toolTip);
+                } catch (InfException ex) {
+                    Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                toolTip += "<br> </html>";
-                System.out.println(toolTip);
-                panel.setToolTipText(toolTip);
-            } catch (InfException ex) {
-                Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-
+        } catch (InfException ex) {
+            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return panel;
@@ -305,16 +325,14 @@ public class ScheduleManager {
             }
 
             String query = """
-                SELECT h.hat_id,
-                       m.name,
-                       u.first_name,
-                       u.last_name,
-                       CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
-                       CASE 
-                           WHEN h.model_id != 1 THEN 1
-                           WHEN t.status = 'KLAR' THEN 1
-                           ELSE 0
-                       END AS done
+                SELECT 
+                    h.hat_id,
+                    m.name,
+                    u.first_name,
+                    u.last_name,
+                    CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
+                    CASE WHEN t.status = 'KLAR' THEN 1 ELSE 0 END AS done,
+                    CASE WHEN h.model_id != 1 THEN 1 ELSE 0 END AS done
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
