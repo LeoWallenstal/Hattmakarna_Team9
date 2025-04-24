@@ -61,6 +61,7 @@ import javax.swing.table.TableModel;
 import oru.inf.InfException;
 
 /**
+ *
  * @author Användaren
  */
 public class OrderWindow extends javax.swing.JFrame {
@@ -1154,9 +1155,9 @@ public class OrderWindow extends javax.swing.JFrame {
         if (normalOrder.size() > 0) {
             // Spara order i sales_order
             Order normalOrderObject = new Order();
-            normalOrderObject.setCustomerId(customerID);
+            normalOrderObject.setCustomer_id(customerID);
             normalOrderObject.setFastProduction(false);
-            normalOrderObject.setReceivedDate(Calendar.getInstance().getTime());
+            normalOrderObject.setRecived_data(Calendar.getInstance().getTime());
             normalOrderObject.setStatus(Status.MOTTAGEN);
             normalOrderObject.setHats(normalOrder);
 
@@ -1165,7 +1166,7 @@ public class OrderWindow extends javax.swing.JFrame {
             normalOrder.forEach(e -> {
                 total[0] += e.getPrice();
             });
-            normalOrderObject.setTotalPrice(total[0]);
+            normalOrderObject.setTotalPris(total[0]);
 
             if (!normalOrderObject.save()) {
                 JOptionPane.showMessageDialog(this, "Fel inträffade när ordern skulle sparas!");
@@ -1179,9 +1180,9 @@ public class OrderWindow extends javax.swing.JFrame {
         if (expressOrder.size() > 0) {
             // Spara order i sales_order
             Order expressOrderObject = new Order();
-            expressOrderObject.setCustomerId(customerID);
+            expressOrderObject.setCustomer_id(customerID);
             expressOrderObject.setFastProduction(true);
-            expressOrderObject.setReceivedDate(Calendar.getInstance().getTime());
+            expressOrderObject.setRecived_data(Calendar.getInstance().getTime());
             expressOrderObject.setStatus(Status.MOTTAGEN);
             expressOrderObject.setHats(expressOrder);
 
@@ -1189,7 +1190,7 @@ public class OrderWindow extends javax.swing.JFrame {
             normalOrder.forEach(e -> {
                 total[0] += e.getPrice();
             });
-            expressOrderObject.setTotalPrice(total[0]);
+            expressOrderObject.setTotalPris(total[0]);
 
             if (!expressOrderObject.save()) {
                 JOptionPane.showMessageDialog(this, "Fel inträffade när express order skulle sparas!");

@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -49,14 +48,14 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }
 
     private void setInfo() {
-        lblOrderNr.setText("Ordernummer: " + currentOrder.getOrderId());
+        lblOrderNr.setText("Ordernummer: " + currentOrder.getOrder_id());
 
-        Date date = currentOrder.getReceivedDate();
+        Date date = currentOrder.getRecived_data();
         SimpleDateFormat dateF = new SimpleDateFormat("yyyy-MM-dd");
         String formattedDate = dateF.format(date);
         lblDate.setText("Datum: " + formattedDate);
-        lblPrice.setText("Pris: " + currentOrder.getTotalPrice());
-        String id = "" + currentOrder.getCustomerId();
+        lblPrice.setText("Pris: " + currentOrder.getTotalPris());
+        String id = "" + currentOrder.getCustomer_id();
         Customer customer = new Customer(id);
         lblCustomer.setText("Kund: " + id + ", " + customer.getFullName());
 
@@ -67,11 +66,11 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }
 
     private void fillTable() {
-        List<Hat> hatIds = currentOrder.fetchHatObjects();
-       
+        ArrayList<String> hatIds = currentOrder.getHattar();
         HashMap<String, Integer> hatCount = new HashMap<>();
-        for (Hat hat : hatIds) {
-            String model = new ModelRegister().getModel(hat.getModelId()).getName();
+        for (String id : hatIds) {
+            Hat aHat = new Hat(id);
+            String model = new ModelRegister().getModel(aHat.getModelId()).getName();
             hatCount.put(model, hatCount.getOrDefault(model, 0) + 1);
         }
 
@@ -97,16 +96,14 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
     public void setStatusMaterialOrder() {
         boolean special = false;
-        for (Hat aHat : currentOrder.fetchHatObjects()) {
+        for (Hat aHat : currentOrder.getHattarObjects()) {
             if (aHat.isIsSpecial()) {
                 special = true;
                 break;
             }
-
         }
-
         if (special) {
-            if (currentOrder.isMaterialOrdered()) {
+            if (currentOrder.getMaterialOrdered()) {
                 cbMaterialOrder.setSelectedItem("BESTÄLLT");
             } else {
                 cbMaterialOrder.setSelectedItem("EJ BESTÄLLT");
@@ -327,7 +324,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String id = Integer.toString(currentOrder.getOrderId());
+        String id = Integer.toString(currentOrder.getOrder_id());
 
         new FraktSedelUI(this, id).setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -346,24 +343,16 @@ public class OrderInfoWindow extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(OrderInfoWindow.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-
+            java.util.logging.Logger.getLogger(OrderInfoWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(OrderInfoWindow.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-
+            java.util.logging.Logger.getLogger(OrderInfoWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(OrderInfoWindow.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
-
+            java.util.logging.Logger.getLogger(OrderInfoWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(OrderInfoWindow.class
-                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(OrderInfoWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
