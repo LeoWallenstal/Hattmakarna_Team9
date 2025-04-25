@@ -91,6 +91,18 @@ public class User {
         return pwCandidate;
     }
     
+    public String fetchCurrentPW(){
+        String sqlQuery = "SELECT password FROM user WHERE user_id = " 
+            + userID + ";";
+        String currentPW = "";
+        try{
+            currentPW = idb.fetchSingle(sqlQuery);
+        }catch(InfException ex){
+            System.out.println(ex.getMessage() + " in fetchCurrentPW(), User.java");
+        }
+        return currentPW;
+    }
+    
     public boolean isAdmin(){
         String sqlQuery = "SELECT user_id FROM ADMIN WHERE user_id = "
             + userID + ";";
@@ -155,6 +167,14 @@ public class User {
     }
     
     // ---------- DB ----------
+    
+    public void savePW(){
+        if(!pwCandidate.equals(this.fetchCurrentPW())){
+            String sqlQuery = "UPDATE user SET "
+                + "password = " + pwCandidate
+                + " WHERE user_ id = " + userID + ";";
+        }
+    }
     
     public void save(User unmodified){
         ArrayList<String> updates = fetchUpdates(unmodified);

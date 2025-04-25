@@ -53,7 +53,7 @@ public class EditCustomer extends javax.swing.JFrame {
  
         
         initComponents();
-        this.setTitle("Hattmakarna - Redigera kund");
+        this.setTitle("Redigera kund");
         btnDeletePhone.setEnabled(false);
         btnDeleteEmail.setEnabled(false);
         setLocationRelativeTo(null);

@@ -3,6 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
+import hattmakarna.UI.EditCustomer;
+import hattmakarna.UI.MainMenu;
+import hattmakarna.UI.RegisterCustomerWindow;
 import oru.inf.InfException;
 import hattmakarna.data.CustomerRegister;
 import java.util.ArrayList;
@@ -94,6 +97,28 @@ private void fillTable() {
     jTable1.getColumnModel().getColumn(0).setMinWidth(0);
     jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
     jTable1.getColumnModel().getColumn(0).setWidth(0);
+    
+    jTable1.setToolTipText(""); // Aktivera tooltips
+
+jTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+    @Override
+    public void mouseMoved(java.awt.event.MouseEvent e) {
+        java.awt.Point p = e.getPoint();
+        int rowIndex = jTable1.rowAtPoint(p);
+        int colIndex = jTable1.columnAtPoint(p);
+
+        if (rowIndex != -1 && (colIndex == 2 || colIndex == 3)) { // Email eller Telefon
+            Object value = jTable1.getValueAt(rowIndex, colIndex);
+            if (value != null && !value.toString().isEmpty()) {
+                jTable1.setToolTipText("<html>" + value.toString().replace(", ", "<br>") + "</html>");
+            } else {
+                jTable1.setToolTipText(null);
+            }
+        } else {
+            jTable1.setToolTipText(null);
+        }
+    }
+});
 
     jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
         public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -220,6 +245,7 @@ private Customer findCustomerByFullName(String fullName) {
         btnEditCustomer = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
+        btnRegNewCustomer = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -268,6 +294,13 @@ private Customer findCustomerByFullName(String fullName) {
             }
         });
 
+        btnRegNewCustomer.setText("Ny kund");
+        btnRegNewCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegNewCustomerActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -289,13 +322,15 @@ private Customer findCustomerByFullName(String fullName) {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnRefresh))))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 628, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(14, 14, 14)
                         .addComponent(btnBack)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEditCustomer)))
+                        .addComponent(btnEditCustomer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnRegNewCustomer))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 818, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -315,7 +350,8 @@ private Customer findCustomerByFullName(String fullName) {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBack)
-                    .addComponent(btnEditCustomer))
+                    .addComponent(btnEditCustomer)
+                    .addComponent(btnRegNewCustomer))
                 .addContainerGap())
         );
 
@@ -351,6 +387,11 @@ private Customer findCustomerByFullName(String fullName) {
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
         fillTable();
     }//GEN-LAST:event_btnRefreshActionPerformed
+
+    private void btnRegNewCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegNewCustomerActionPerformed
+    new RegisterCustomerWindow(userLoggedIn).setVisible(true);
+      // TODO add your handling code here:
+    }//GEN-LAST:event_btnRegNewCustomerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -391,6 +432,7 @@ private Customer findCustomerByFullName(String fullName) {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnEditCustomer;
     private javax.swing.JButton btnRefresh;
+    private javax.swing.JButton btnRegNewCustomer;
     private javax.swing.JComboBox<String> cbMail;
     private javax.swing.JComboBox<String> cbName;
     private javax.swing.JScrollPane jScrollPane1;

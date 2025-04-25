@@ -60,9 +60,12 @@
                           <Component id="tfPrice" pref="142" max="32767" attributes="0"/>
                           <Component id="tfName" max="32767" attributes="0"/>
                       </Group>
+
                   </Group>
               </Group>
               <EmptySpace pref="274" max="32767" attributes="0"/>
+
+
           </Group>
       </Group>
     </DimensionLayout>
@@ -153,6 +156,16 @@
     <Component class="javax.swing.JLabel" name="lblModelNummer">
       <Properties>
         <Property name="text" type="java.lang.String" value="jLabel3"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Namn:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="tfName">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="jTextField1"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">

@@ -128,8 +128,10 @@ public class EditHat extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(tfPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+
                             .addComponent(tfName))))
                 .addContainerGap(274, Short.MAX_VALUE))
+
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -171,7 +173,9 @@ public class EditHat extends javax.swing.JFrame {
         currentModel.updatePrice(currentModel.getModelID(), price);
         currentModel.updateName(newname);
         System.out.println("Priset har uppdaterats för " + currentModel.getModelID());
+
         new HattWindow(userLoggedIn).setVisible(true);
+
         this.dispose(); // Stänger fönstret efter uppdateringen
     } catch (NumberFormatException e) {
         System.out.println("Felaktigt prisformat: " + e.getMessage());
@@ -186,8 +190,12 @@ public class EditHat extends javax.swing.JFrame {
     }//GEN-LAST:event_tfPriceActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+
         new HattWindow(userLoggedIn).setVisible(true);
         this.dispose();    
+
+
+
     }//GEN-LAST:event_btnBackActionPerformed
 
     /**
@@ -199,6 +207,10 @@ public class EditHat extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSettPrice;
+
+
+    
+
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblDescription;
     private javax.swing.JLabel lblHeader;

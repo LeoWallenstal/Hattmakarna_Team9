@@ -129,12 +129,16 @@ private ModelRegister modelRegister;
             .addGroup(layout.createSequentialGroup()
                 .addGap(132, 132, 132)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnBack)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRedigering)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnAdd))
+
+                    
+
                     .addComponent(jLabel1)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(26, Short.MAX_VALUE))
@@ -144,13 +148,21 @@ private ModelRegister modelRegister;
             .addGroup(layout.createSequentialGroup()
                 .addGap(58, 58, 58)
                 .addComponent(jLabel1)
+
+
+                
+
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBack)
+
                     .addComponent(btnRedigering)
                     .addComponent(btnAdd))
+
+                    
+
                 .addContainerGap(7, Short.MAX_VALUE))
         );
 
@@ -210,6 +222,7 @@ this.setVisible(false);
     List<Model> filteredModels = new ArrayList<>();
 
     // Filtrera bort hattar med namn "special"
+
     
 
         // Gå igenom varje hatt och kontrollera om namnet är "special"
@@ -223,6 +236,9 @@ this.setVisible(false);
       
   
     
+
+    
+
 
     // Skapa tabellens data och uppdatera den
     String[] columnNames = {"model_id", "Namn", "Pris"};
@@ -255,7 +271,10 @@ this.setVisible(false);
                 
                 // Dubbelklick (vid event.getClickCount() == 2)
                 if (evt.getClickCount() == 2) {
+
                     dispose();
+
+
                     openEditCustomerWindow(modelId); // Öppnar redigeringsfönstret
                 }
             }

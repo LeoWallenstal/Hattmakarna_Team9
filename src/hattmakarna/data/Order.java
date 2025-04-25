@@ -3,161 +3,208 @@ package hattmakarna.data;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import oru.inf.InfException;
 
 /**
- * Representerar en beställning i systemet och hanterar kopplingar mellan kund,
- * datum, hattar och beställningsstatus.
+ * Representerar en beställning i systemet och hanterar kopplingar
+ * mellan kund, hattar, beställningsstatus, datum och materialbeställning.
  */
 public class Order extends DatabaseObject {
 
-    // Fält motsvarande kolumner i tabellen sales_order
+    /** Unikt ID för beställningen. */
     private int order_id;
+
+    /** ID för den kund som gjort beställningen. */
     private int customer_id;
-    private double totalPris;
+
+    /** Totalt pris för beställningen. */
+    private double price;
+
+    /** Aktuell status för beställningen. */
     private Status status;
+
+    /** Datum då beställningen mottogs. */
     private Date recived_date;
+
+    /** Om materialet har beställts för denna order. */
     private boolean material_ordered;
+
+    /** Om beställningen ska gå i snabb produktion. */
     private boolean isFastProduction;
 
+    /** Lista med hattar som ingår i beställningen. */
     private List<Hat> hats;
 
-    /**
-     * Tom standardkonstruktor.
-     */
-    public Order() {
-    }
+    /** Standardkonstruktor. */
+    public Order() {}
 
     /**
-     * Konstruktor som laddar en order utifrån dess ID, och hämtar relaterade
-     * hattar.
+     * Skapar en ny Order med givet ID.
      *
      * @param orderId Orderns ID som sträng
      */
     public Order(String orderId) {
         super(orderId);
-
     }
 
-    /**
-     * @return Namnet på tabellen i databasen som motsvarar detta objekt.
-     */
     @Override
     protected String getTabelName() {
         return "sales_order";
     }
 
-    /**
-     * @return Namnet på ID-kolumnen i databasen.
-     */
     @Override
     protected String getIdAttributeName() {
         return "order_id";
     }
 
-    // Getters och setters för alla fält
-    public int getOrder_id() {
+    // --- Getters och setters ---
+
+    /** @return Orderns ID */
+    public int getOrderId() {
         return order_id;
     }
 
-    public void setOrder_id(int order_id) {
-        this.order_id = order_id;
+    /**
+     * Sätter orderns ID.
+     * @param orderId nytt order-ID
+     */
+    public void setOrderId(int orderId) {
+        this.order_id = orderId;
     }
 
-    public int getCustomer_id() {
+    /** @return Kundens ID */
+    public int getCustomerId() {
         return customer_id;
     }
 
-    public void setCustomer_id(int customer_id) {
-        this.customer_id = customer_id;
+    /**
+     * Sätter kundens ID.
+     * @param customerId nytt kund-ID
+     */
+    public void setCustomerId(int customerId) {
+        this.customer_id = customerId;
     }
 
-    public ArrayList<hattmakarna.data.Hat> getHattarObjects() {
-
-        ArrayList<Hat> hattar = new ArrayList<>();
-
-        try {
-            // Hämta alla hatt-id:n kopplade till denna order
-            Hattmakarna.idb.fetchColumn(
-                    "SELECT hat_id FROM hat WHERE order_id = " + order_id).forEach(h -> {
-                        hattar.add(new Hat(h));
-                    });
-
-        } catch (InfException e) {
-            e.printStackTrace();
-        }
-        return hattar;
+    /** @return Beställningens totalpris */
+    public double getTotalPrice() {
+        return price;
     }
 
-    public ArrayList<String> getHattar() {
-
-        try {
-            return Hattmakarna.idb.fetchColumn(
-                    "SELECT hat_id FROM hat WHERE order_id = " + order_id);
-        } catch (InfException ex) {
-            Logger.getLogger(Order.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return null;
-
+    /**
+     * Sätter totalpriset för beställningen.
+     * @param totalPrice nytt totalpris
+     */
+    public void setTotalPrice(double totalPrice) {
+        this.price = totalPrice;
     }
 
-    public void setHats(List<Hat> hats) {
-        this.hats = hats;
-    }
-
-    public double getTotalPris() {
-        return totalPris;
-    }
-
-    public void setTotalPris(double totalPris) {
-        this.totalPris = totalPris;
-    }
-
+    /** @return Status för beställningen */
     public Status getStatus() {
         return status;
     }
 
+    /**
+     * Sätter status för beställningen.
+     * @param status ny status
+     */
     public void setStatus(Status status) {
         this.status = status;
     }
 
-    public Date getRecived_data() {
+    /** @return Datum då beställningen togs emot */
+    public Date getReceivedDate() {
         return recived_date;
     }
 
-    public void setRecived_data(Date recived_data) {
-        this.recived_date = recived_data;
+    /**
+     * Sätter mottagningsdatum för beställningen.
+     * @param receivedDate datum då ordern mottogs
+     */
+    public void setReceivedDate(Date receivedDate) {
+        this.recived_date = receivedDate;
     }
 
+    /** @return true om ordern är för snabb produktion */
     public boolean isFastProduction() {
         return isFastProduction;
     }
 
-    public void setFastProduction(boolean isFastProduction) {
-        this.isFastProduction = isFastProduction;
+    /**
+     * Sätter om ordern är för snabb produktion.
+     * @param fastProduction true om snabb produktion krävs
+     */
+    public void setFastProduction(boolean fastProduction) {
+        this.isFastProduction = fastProduction;
     }
 
-    public void setMaterialOrdered(boolean status) {
-        this.material_ordered = status;
-    }
-
-    public boolean getMaterialOrdered() {
+    /** @return true om material har beställts */
+    public boolean isMaterialOrdered() {
         return material_ordered;
     }
 
+    /**
+     * Sätter om material har beställts för ordern.
+     * @param materialOrdered true om materialet är beställt
+     */
+    public void setMaterialOrdered(boolean materialOrdered) {
+        this.material_ordered = materialOrdered;
+    }
+
+    /** @return Lista med hattar i beställningen */
+    public List<Hat> getHats() {
+        return hats;
+    }
+
+    /**
+     * Sätter listan med hattar för ordern.
+     * @param hats lista med hattobjekt
+     */
+    public void setHats(List<Hat> hats) {
+        this.hats = hats;
+    }
+
+    /**
+     * Hämtar alla hattobjekt kopplade till denna order.
+     * @return lista med Hat-objekt
+     */
+    public List<Hat> fetchHatObjects() {
+        List<Hat> fetchedHats = new ArrayList<>();
+        try {
+            List<String> hatIds = Hattmakarna.idb.fetchColumn("SELECT hat_id FROM hat WHERE order_id = " + order_id
+            );
+            for (String id : hatIds) {
+                fetchedHats.add(new Hat(id));
+            }
+        } catch (InfException e) {
+            Logger.getLogger(Order.class.getName()).log(Level.SEVERE, "Kunde inte hämta hattar för order", e);
+        }
+        return fetchedHats;
+    }
+
+    /**
+     * Hämtar alla hatt-ID:n kopplade till denna order.
+     * @return lista med strängar av hatt-ID:n
+     */
+    public List<String> fetchHatIds() {
+        try {
+            return Hattmakarna.idb.fetchColumn("SELECT hat_id FROM hat WHERE order_id = " + order_id
+            );
+        } catch (InfException e) {
+            Logger.getLogger(Order.class.getName()).log(Level.SEVERE, "Kunde inte hämta hatt-ID:n", e);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * @return Customer-objekt kopplat till denna order
+     */
     public Customer getCustomer() {
         return new Customer(String.valueOf(customer_id));
     }
 
-    /**
-     * @return ID:t som sträng, används av basklassen för att avgöra om INSERT
-     * eller UPDATE ska göras.
-     */
     @Override
     protected String getIdString() {
         return Integer.toString(order_id);
@@ -168,18 +215,20 @@ public class Order extends DatabaseObject {
         this.order_id = Integer.parseInt(id);
     }
 
+    /**
+     * Sparar ordern till databasen, inklusive kopplade hattar.
+     * @return true om sparningen lyckades
+     */
     @Override
     public boolean save() {
-        // Spara order objektet
         super.save();
 
         if (hats != null) {
-            hats.forEach(e -> {
-                e.setOrder_id(order_id);
-                e.save();
-            });
+            for (Hat hat : hats) {
+                hat.setOrder_id(order_id);
+                hat.save();
+            }
         }
-
         return true;
     }
 }

@@ -74,9 +74,9 @@ public class FraktSedelUI extends javax.swing.JFrame {
         weight_field.setText("0");
         vat_field.setText("25");
         freight_field.setText("0");
-        order_id.setText("#" + order.getOrder_id());
+        order_id.setText("#" + order.getOrderId());
 
-        order.getHattarObjects().forEach(e -> {
+        order.fetchHatObjects().forEach(e -> {
             ((DefaultTableModel) order_summary_table.getModel()).addRow(new String[]{e.gethatId(), e.getModel().getName(), String.format("%.2f kr", e.getPrice())});
         });
 
@@ -95,7 +95,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
         double summa = 0;
 
         // Summan av alla hattar
-        for (Hat h : order.getHattarObjects()) {
+        for (Hat h : order.fetchHatObjects()) {
             summa += h.getPrice();
         }
 
@@ -210,7 +210,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
             html = html.replace("THANK YOU FOR YOUR ORDER", bundle.getString("thankYouForYourOrder"));
 
             html = html.replace("{weight}", weight_field.getText());
-            html = html.replace("{orderId}", String.valueOf(order.getOrder_id()));
+            html = html.replace("{orderId}", String.valueOf(order.getOrderId()));
             html = html.replace("{shipping}", "Postnord AB, 2 days");
             html = html.replace("{value}", getTotal());
             html = html.replace("{shippingCode}", "#" + shippingNumberField.getText());
@@ -221,7 +221,7 @@ public class FraktSedelUI extends javax.swing.JFrame {
             html = html.replace("{telephone}", phone_combobox.getSelectedItem().toString());
 
             StringBuilder br = new StringBuilder();
-            order.getHattarObjects().forEach(e -> {
+            order.fetchHatObjects().forEach(e -> {
 
                 br.append("<tr>");
                 br.append("<td>");
