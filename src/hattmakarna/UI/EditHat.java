@@ -14,6 +14,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import hattmakarna.data.ModelRegister;
 import hattmakarna.data.User;
+import hattmakarna.util.Validerare;
+import javax.swing.JOptionPane;
 /**
  *
  * @author sebas
@@ -57,6 +59,10 @@ public class EditHat extends javax.swing.JFrame {
         lblModelNummer = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         tfName = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        tfName1 = new javax.swing.JTextField();
+        lblErrorName = new javax.swing.JLabel();
+        lblErrorPrice = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -96,6 +102,10 @@ public class EditHat extends javax.swing.JFrame {
 
         tfName.setText("jTextField1");
 
+        jLabel3.setText("Namn:");
+
+        tfName1.setText("jTextField1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -128,10 +138,12 @@ public class EditHat extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(tfPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-
-                            .addComponent(tfName))))
-                .addContainerGap(274, Short.MAX_VALUE))
-
+                            .addComponent(tfName))
+                        .addGap(56, 56, 56)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblErrorName)
+                            .addComponent(lblErrorPrice))))
+                .addContainerGap(218, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -147,11 +159,14 @@ public class EditHat extends javax.swing.JFrame {
                 .addGap(33, 33, 33)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblErrorName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblErrorPrice))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSettPrice)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
@@ -167,21 +182,48 @@ public class EditHat extends javax.swing.JFrame {
 
     private void btnSettPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettPriceActionPerformed
 
-    try {
-        String newname = tfName.getText().trim();
-        double price = Double.parseDouble(tfPrice.getText());
-        currentModel.updatePrice(currentModel.getModelID(), price);
-        currentModel.updateName(newname);
-        System.out.println("Priset har uppdaterats för " + currentModel.getModelID());
+        boolean editOK = true;
 
-        new HattWindow(userLoggedIn).setVisible(true);
+    String name = tfName.getText().trim();
+    String priceText = tfPrice.getText().trim();
 
-        this.dispose(); // Stänger fönstret efter uppdateringen
-    } catch (NumberFormatException e) {
-        System.out.println("Felaktigt prisformat: " + e.getMessage());
+    // Töm tidigare felmeddelanden
+    lblErrorName.setText("");
+    lblErrorPrice.setText("");
+
+    // --- Namnvalidering ---
+    if (name.isEmpty()) {
+        lblErrorName.setText("Får inte vara tomt!");
+        editOK = false;
+    } else if (!Validerare.validateName(name)) {
+        lblErrorName.setText("Får bara innehålla bokstäver och bindestreck!");
+        editOK = false;
     }
 
+    // --- Prisvalidering ---
+    if (priceText.isEmpty()) {
+        lblErrorPrice.setText("Får inte vara tomt!");
+        editOK = false;
+    } else if (!Validerare.validatePrice(priceText)) {
+        lblErrorPrice.setText("Endast siffror + punkt eller komma är tillåtna!");
+        editOK = false;
+    }
 
+    // --- Om allt är OK: spara ändringar ---
+    if (editOK) {
+        try {
+            double price = Double.parseDouble(priceText.replace(',', '.'));
+            currentModel.updatePrice(currentModel.getModelID(), price);
+            currentModel.updateName(name);
+
+            System.out.println("Priset har uppdaterats för " + currentModel.getModelID());
+
+            new HattWindow(userLoggedIn).setVisible(true);
+            this.dispose();
+        } catch (NumberFormatException e) {
+            lblErrorPrice.setText("Ogiltigt format. Kontrollera decimaltecken.");
+        }
+    }
 
     }//GEN-LAST:event_btnSettPriceActionPerformed
 
@@ -207,17 +249,17 @@ public class EditHat extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSettPrice;
-
-
-    
-
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel lblDescription;
+    private javax.swing.JLabel lblErrorName;
+    private javax.swing.JLabel lblErrorPrice;
     private javax.swing.JLabel lblHeader;
     private javax.swing.JLabel lblInStockHats;
     private javax.swing.JLabel lblModelNummer;
     private javax.swing.JLabel lblPrice;
     private javax.swing.JTextField tfName;
+    private javax.swing.JTextField tfName1;
     private javax.swing.JTextField tfPrice;
     // End of variables declaration//GEN-END:variables
 }

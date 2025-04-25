@@ -60,12 +60,14 @@
                           <Component id="tfPrice" pref="142" max="32767" attributes="0"/>
                           <Component id="tfName" max="32767" attributes="0"/>
                       </Group>
-
+                      <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lblErrorName" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblErrorPrice" min="-2" max="-2" attributes="0"/>
+                      </Group>
                   </Group>
               </Group>
-              <EmptySpace pref="274" max="32767" attributes="0"/>
-
-
+              <EmptySpace pref="218" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -85,11 +87,15 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="tfName" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblErrorName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="tfPrice" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="tfPrice" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblErrorPrice" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="btnSettPrice" min="-2" max="-2" attributes="0"/>
                       <EmptySpace pref="67" max="32767" attributes="0"/>
@@ -168,15 +174,19 @@
         <Property name="text" type="java.lang.String" value="jTextField1"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel2">
+    <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
         <Property name="text" type="java.lang.String" value="Namn:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="tfName">
+    <Component class="javax.swing.JTextField" name="tfName1">
       <Properties>
         <Property name="text" type="java.lang.String" value="jTextField1"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrorName">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblErrorPrice">
     </Component>
   </SubComponents>
 </Form>
