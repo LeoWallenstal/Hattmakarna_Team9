@@ -27,6 +27,7 @@ public class EditHat extends javax.swing.JFrame {
        if (currentModel != null) {
     lblModelNummer.setText(currentModel.getModelID());
     tfPrice.setText(String.valueOf(currentModel.getPrice()));
+    tfName.setText(String.valueOf(currentModel.getName()));
 }
          
         
@@ -52,6 +53,8 @@ public class EditHat extends javax.swing.JFrame {
         btnSettPrice = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         lblModelNummer = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        tfName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -89,23 +92,16 @@ public class EditHat extends javax.swing.JFrame {
 
         lblModelNummer.setText("jLabel3");
 
+        jLabel2.setText("Namn:");
+
+        tfName.setText("jTextField1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblDescription)
-                            .addComponent(lblPrice))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblModelNummer))
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel1))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(16, 16, 16)
                         .addComponent(lblHeader))
@@ -118,8 +114,24 @@ public class EditHat extends javax.swing.JFrame {
                             .addComponent(btnBack)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(17, 17, 17)
-                                .addComponent(lblInStockHats)))))
-                .addContainerGap(120, Short.MAX_VALUE))
+                                .addComponent(lblInStockHats))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblDescription)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblModelNummer))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(53, 53, 53)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel2)
+                            .addComponent(lblPrice))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(tfPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
+                            .addComponent(tfName))
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1)))
+                .addContainerGap(122, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -128,11 +140,15 @@ public class EditHat extends javax.swing.JFrame {
                 .addComponent(lblHeader)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblInStockHats)
-                .addGap(55, 55, 55)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDescription)
                     .addComponent(lblModelNummer))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(33, 33, 33)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -140,7 +156,7 @@ public class EditHat extends javax.swing.JFrame {
                             .addComponent(jLabel1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSettPrice)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
                         .addComponent(btnBack)
                         .addGap(14, 14, 14))
                     .addGroup(layout.createSequentialGroup()
@@ -154,10 +170,12 @@ public class EditHat extends javax.swing.JFrame {
     private void btnSettPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSettPriceActionPerformed
 
     try {
+        String newname = tfName.getText().trim();
         double price = Double.parseDouble(tfPrice.getText());
         currentModel.updatePrice(currentModel.getModelID(), price);
+        currentModel.updateName(newname);
         System.out.println("Priset har uppdaterats för " + currentModel.getModelID());
-
+         
         this.dispose(); // Stänger fönstret efter uppdateringen
     } catch (NumberFormatException e) {
         System.out.println("Felaktigt prisformat: " + e.getMessage());
@@ -172,7 +190,7 @@ public class EditHat extends javax.swing.JFrame {
     }//GEN-LAST:event_tfPriceActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-        // TODO add your handling code here:
+this.dispose();    
     }//GEN-LAST:event_btnBackActionPerformed
 
     /**
@@ -185,11 +203,13 @@ public class EditHat extends javax.swing.JFrame {
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSettPrice;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblDescription;
     private javax.swing.JLabel lblHeader;
     private javax.swing.JLabel lblInStockHats;
     private javax.swing.JLabel lblModelNummer;
     private javax.swing.JLabel lblPrice;
+    private javax.swing.JTextField tfName;
     private javax.swing.JTextField tfPrice;
     // End of variables declaration//GEN-END:variables
 }
