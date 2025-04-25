@@ -31,6 +31,22 @@ public class Model extends DatabaseObject {
         name = modelMap.get("name");
         price = Double.parseDouble(modelMap.get("price"));
     }
+    public Model(String name,double price){
+        super(null);
+        this.name = name;
+        this.price = price;
+    
+    
+    }
+    public void create(){
+    String sql = "INSERT INTO hat_model (name, price) VALUES ('" + name + "',"+ price + ")";
+    try{
+    idb.insert(sql);
+    }catch (InfException ex){
+     System.out.println("Fel vid skapande av model" + ex.getMessage());
+    }
+    
+    }
 
     public void addMaterial(String name, double price) {
         String sqlAddQuery = "INSERT INTO hat_model VALUES ('" + name + "', " + price + ")";
@@ -58,6 +74,9 @@ public class Model extends DatabaseObject {
 
     public void setName(String name) {
         this.name = name;
+    }
+    public void setPrice(double price){
+    this.price = price; 
     }
 
     public double getPrice() {
