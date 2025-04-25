@@ -312,7 +312,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         if(window != null)
             window.initTable();
         else if (scheduleManager != null){
-            scheduleManager.initOrders();
+            scheduleManager.buildOrdersPanel(true);
         }
 
         if (cbStatus.getSelectedItem().toString().equals("MOTTAGEN")) {

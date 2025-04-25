@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import oru.inf.InfException;
 
@@ -39,6 +40,13 @@ public class ScheduleManager {
     private OrderRegister orderRegister;
     private final ArrayList<JPanel> emptyCells;
     private JPanel highlightedCell = null;
+    private final ArrayList<JPanel> highlightedCells = new ArrayList<>();
+    private Set<Integer> expandedOrders = new HashSet<>();
+
+    private final Color doneColor;
+    private final Color underWorkColor;
+    private final Color readyColor;
+    private final Color expressColor;
 
     public ScheduleManager(User userLoggedIn, JPanel calendarPanel, JScrollPane scrollOrders) {
         this.userLoggedIn = userLoggedIn;
@@ -50,8 +58,13 @@ public class ScheduleManager {
         orderRegister = new OrderRegister();
         emptyCells = new ArrayList<>();
 
+        doneColor = new Color(0xA8C686);       // Soft green
+        underWorkColor = new Color(0xF2D388);  // Warm yellow
+        readyColor = new Color(0xA2C2E2);      // Gentle blue
+        expressColor = new Color(0xE27D60);    // Warm muted red
+
         initSchedule();
-        initOrders();
+        buildOrdersPanel(false);
 
     }
 
@@ -137,6 +150,11 @@ public class ScheduleManager {
         calendarPanel.setMinimumSize(preferred);
         calendarPanel.setPreferredSize(preferred);
         calendarPanel.setMaximumSize(preferred);
+        
+        preferred = new Dimension(scrollOrders.getWidth(), preferredHeight);
+        scrollOrders.setMinimumSize(preferred);
+        scrollOrders.setPreferredSize(preferred);
+        scrollOrders.setMaximumSize(preferred);
     }
 
     private JPanel setupCalendarTopPanel() {
@@ -252,44 +270,34 @@ public class ScheduleManager {
 
     private JPanel createTaskPanel(String modelName, String hatId) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(Color.LIGHT_GRAY);
-        panel.setOpaque(true);
+        panel.setBackground(underWorkColor);
 
         JLabel nameLabel = new JLabel(modelName, SwingConstants.CENTER);
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
         panel.add(nameLabel, BorderLayout.CENTER);
 
         String sqlQuery = """ 
-                          SELECT 
-            hs.spec_id,
-            CASE 
-                WHEN h.model_id IN (SELECT model_id FROM hat_model WHERE name = 'Special') THEN 1 
-                ELSE 0 
-            END AS is_special
-        FROM 
-            hat_spec hs
-        JOIN 
-            hat h ON hs.hat_id = h.hat_id
-        WHERE 
-            hs.hat_id =""" + hatId;
+        SELECT hs.spec_id,
+        CASE WHEN h.model_id IN 
+            (SELECT model_id FROM hat_model WHERE name = 'Special') THEN 1 ELSE 0 END AS is_special
+        FROM hat_spec hs
+        JOIN hat h ON hs.hat_id = h.hat_id                         
+        WHERE hs.hat_id =""" + hatId;
 
         try {
             HashMap<String, String> hatMap = idb.fetchRow(sqlQuery);
             boolean isSpecial = "1".equals(hatMap.get("is_special"));
+            
 
             if (isSpecial) {
-                System.out.println("Körs special");
-
                 try {
                     String specId = idb.fetchSingle(sqlQuery);
                     Specification spec = new Specification(specId);
                     String imagePath = spec.getImagePath();
                     String toolTip = "<html>";
                     if (imagePath != null) {
-                        System.out.println(imagePath);
                         imagePath = imagePath.trim();
                         URL imageUrl = getClass().getResource(imagePath);
-                        System.out.println(imageUrl);
                         if (imageUrl != null) {
                             toolTip += "<img src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>";
                         } else {
@@ -305,7 +313,6 @@ public class ScheduleManager {
                     }
 
                     toolTip += "<br> </html>";
-                    System.out.println(toolTip);
                     panel.setToolTipText(toolTip);
                 } catch (InfException ex) {
                     Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -319,7 +326,37 @@ public class ScheduleManager {
         return panel;
     }
 
-    public void initOrders() {
+    public void buildOrdersPanel(boolean keepOrdersOpen) {
+        if (keepOrdersOpen) {
+            expandedOrders.clear();
+
+            // Suppose current listPanel is the current view in scrollOrders
+            Component view = scrollOrders.getViewport().getView();
+            if (view instanceof JPanel listPanel) {
+                for (Component orderContainer : listPanel.getComponents()) {
+                    if (orderContainer instanceof JPanel containerPanel) {
+                        Component[] containerChildren = containerPanel.getComponents();
+                        if (containerChildren.length >= 2) {
+                            JPanel headerPanel = (JPanel) containerChildren[0]; // Header
+                            JPanel itemsPanel = (JPanel) containerChildren[1];  // Items
+
+                            // Find toggleButton inside headerPanel
+                            for (Component comp : headerPanel.getComponents()) {
+                                if (comp instanceof JButton toggleButton) {
+                                    Object idProp = toggleButton.getClientProperty("order_id");
+                                    if (idProp instanceof Integer id) {
+                                        if (itemsPanel.isVisible()) {
+                                            expandedOrders.add(id);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         orderRegister = new OrderRegister();
         ArrayList<Order> orders = orderRegister.getOrders();
         JPanel listPanel = new JPanel();
@@ -330,29 +367,14 @@ public class ScheduleManager {
             }
 
             String query = """
-                SELECT 
-                    h.hat_id,
-                    m.name,
-                    u.first_name,
-                    u.last_name,
-                    t.task_id,
+                SELECT h.hat_id, m.name, u.first_name, u.last_name, t.task_id,
                     CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
-                    CASE WHEN t.status = 'KLAR' OR
-                    h.model_id != 1 THEN 1 ELSE 0 END AS done
+                    CASE WHEN t.status = 'KLAR' OR h.model_id != 1 THEN 1 ELSE 0 END AS done
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
                 LEFT JOIN user u ON t.user_id = u.user_id
-                WHERE h.order_id = """ + aOrder.getOrderId() //                   + """
-                    //                  AND (
-                    //                        SELECT COUNT(*) 
-                    //                        FROM task t2
-                    //                        JOIN hat h2 ON t2.hat_id = h2.hat_id
-                    //                        WHERE h2.order_id = h.order_id
-                    //                          AND t2.status <> 'KLAR'
-                    //                      ) > 0
-                    //                """
-                    ;
+                WHERE h.order_id = """ + aOrder.getOrderId();
 
             try {
                 ArrayList<HashMap<String, String>> hats = idb.fetchRows(query);
@@ -374,22 +396,19 @@ public class ScheduleManager {
             @Override
             public void mousePressed(MouseEvent e) {
                 Object[] options = {"Klarmarkera", "Ta tillbaka", "Avbryt"};
-                System.out.println("Klick");
                 int result = JOptionPane.showOptionDialog(calendarPanel.getParent(), "Vill du markera denna hatt som klar?", "Bekräfta", JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
                 Task task = (Task) taskPanel.getClientProperty("task");
                 if (result == 0) {
 
                     if (task != null) {
-                        System.out.println("Task klar");
                         task.setStatus(TaskStatus.KLAR);
                         task.save();
                         refreshSchedule();
-                        initOrders();
+                        buildOrdersPanel(true);
                     }
                 } else if (result == 1) {
                     if (task != null) {
                         try {
-                            System.out.println("Task tillbaka");
                             int hatId = task.getHatId();
                             String query = "SELECT amount, material_id FROM hat_material WHERE hat_id = " + hatId;
                             ArrayList<HashMap<String, String>> materialList = idb.fetchRows(query);
@@ -400,7 +419,7 @@ public class ScheduleManager {
                             }
                             task.delete();
                             refreshSchedule();
-                            initOrders();
+                            buildOrdersPanel(true);
                         } catch (InfException ex) {
                             Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -417,7 +436,9 @@ public class ScheduleManager {
             JPanel orderContainer = new JPanel();
             orderContainer.setLayout(new BoxLayout(orderContainer, BoxLayout.Y_AXIS));
             orderContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
-            orderContainer.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+            Border padding = BorderFactory.createEmptyBorder(0, 0, 20, 100);
+            Border bottomLine = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK);
+            orderContainer.setBorder(BorderFactory.createCompoundBorder(bottomLine, padding));;
 
             String orderTitle = "Order #" + orderId;
             JButton toggleButton = new JButton("▶ " + orderTitle);
@@ -427,11 +448,19 @@ public class ScheduleManager {
             toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
             toggleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JButton openOrderButton = new JButton("Öppna");
+            JButton openOrderButton = new JButton();
+
+            openOrderButton.setIcon(new ImageIcon(getClass().getResource("/resources/icons/info.png")));
 
             JPanel itemsPanel = new JPanel();
             itemsPanel.setLayout(new BoxLayout(itemsPanel, BoxLayout.Y_AXIS));
             itemsPanel.setVisible(false);
+
+            // Set initially based on expandedOrders
+            if (expandedOrders.contains(orderId)) {
+                itemsPanel.setVisible(true);
+                toggleButton.setText("▼ " + orderTitle);
+            }
 
             JPanel currentRow = null;
             int i = 0;
@@ -461,17 +490,17 @@ public class ScheduleManager {
                 Dimension taskSize = new Dimension(slotWidth - 1, slotHeight - 1);
                 item.setPreferredSize(taskSize);
                 if (isDone) {
-                    item.setBackground(Color.GREEN);
+                    item.setBackground(doneColor);
                 } else if (isAssigned) {
                     JLabel workerLabel = new JLabel(userName, SwingConstants.CENTER);
                     workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
                     item.add(workerLabel, BorderLayout.SOUTH);
-                    item.setBackground(Color.YELLOW);
+                    item.setBackground(underWorkColor);
                     Task task = new Task(taskId);
                     item.putClientProperty("task", task);
                     addTaskListener(item);
                 } else {
-                    item.setBackground(Color.LIGHT_GRAY);
+                    item.setBackground(readyColor);
                     makeDraggable(item);
                 }
 
@@ -481,38 +510,202 @@ public class ScheduleManager {
                 currentRow.add(item);
                 i++;
             }
-            toggleButton.addActionListener(e -> {
-                boolean visible = itemsPanel.isVisible();
-                itemsPanel.setVisible(!visible);
-                toggleButton.setText((visible ? "▶ " : "▼ ") + orderTitle);
-                parent.revalidate();
-                parent.repaint();
+
+            toggleButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    calendarPanel.getParent().setCursor(new Cursor(Cursor.HAND_CURSOR));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    calendarPanel.getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    boolean visible = itemsPanel.isVisible();
+                    itemsPanel.setVisible(!visible);
+                    toggleButton.setText((visible ? "▶ " : "▼ ") + orderTitle);
+                    parent.revalidate();
+                    parent.repaint();
+                }
             });
 
-            openOrderButton.addActionListener(e -> {
-                new OrderInfoWindow(this, new Order(String.valueOf(orderId))).setVisible(true);
+            openOrderButton.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    calendarPanel.getParent().setCursor(new Cursor(Cursor.HAND_CURSOR));
+                }
 
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    calendarPanel.getParent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    new OrderInfoWindow(ScheduleManager.this, new Order(String.valueOf(orderId))).setVisible(true);
+                }
             });
 
             JPanel headerPanel = new JPanel();
             headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.X_AXIS));
             headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            headerPanel.setBackground(Color.GRAY);
 
             toggleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            toggleButton.setFocusable(false);
+            toggleButton.putClientProperty("order_id", orderId);
             openOrderButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+            openOrderButton.setFocusable(false);
+            openOrderButton.setContentAreaFilled(false);
 
-            headerPanel.add(toggleButton);
             headerPanel.add(openOrderButton);
+            headerPanel.add(toggleButton);
 
+            makeOrderDraggable(orderContainer);
             orderContainer.add(headerPanel);
-
             orderContainer.add(itemsPanel);
 
             parent.add(orderContainer);
         }
     }
-    
+
+    private void makeOrderDraggable(JPanel orderContainer) {
+        Point initialClick = new Point();
+        final JPanel[] tempPanel = new JPanel[1];
+
+        orderContainer.addMouseListener(new MouseAdapter() {
+            JFrame frame;
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+                frame = (JFrame) SwingUtilities.getWindowAncestor(orderContainer);
+
+                // New test panel
+                JPanel test = new JPanel();
+                test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS)); // Grow vertically
+
+                for (Component comp : orderContainer.getComponents()) {
+                    if (comp instanceof JPanel itemsPanel) {
+                        // Skip the header panel (assuming it's the first or identified differently)
+                        // Check if this is likely the itemsPanel by inspecting its contents
+                        for (Component row : itemsPanel.getComponents()) {
+                            if (row instanceof JPanel rowPanel) {
+//                                test.setLayout(rowPanel.getLayout());
+                                for (Component item : rowPanel.getComponents()) {
+                                    if (item instanceof JPanel itemPanel) {
+                                        if (itemPanel.getBackground() == readyColor) {
+                                            JPanel cloned = clonePanel(itemPanel, true, itemPanel.getBackground());
+                                            cloned.setMaximumSize(itemPanel.getPreferredSize());
+                                            cloned.setPreferredSize(itemPanel.getPreferredSize());
+                                            test.add(cloned);
+                                            test.add(Box.createVerticalStrut(1));
+                                        }
+
+                                    } else {
+                                        test.add(new JLabel("Other comp: " + item.getClass().getSimpleName()));
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Get glass pane and add test panel at top-left
+                JComponent glassPane = (JComponent) frame.getGlassPane();
+                glassPane.setLayout(null);
+                glassPane.setVisible(true);
+
+                // Set a fixed location and pack size
+                Point cursor = SwingUtilities.convertPoint(orderContainer, e.getPoint(), glassPane);
+                test.setLocation(cursor); // Just drop it near top-left corner
+                test.setSize(test.getPreferredSize()); // Let layout define size after add()
+                tempPanel[0] = test;
+                glassPane.add(tempPanel[0]);
+                glassPane.repaint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                Point droppedLocation = new Point();
+                droppedLocation.setLocation(e.getLocationOnScreen());
+                frame = (JFrame) SwingUtilities.getWindowAncestor(orderContainer);
+                JComponent glassPane = (JComponent) frame.getGlassPane();
+
+                for (Component comp : tempPanel[0].getComponents()) {
+                    if (!(comp instanceof JPanel panel)) {
+                        continue;
+                    }
+                    Rectangle tempBounds = panel.getBounds();
+
+                    tempBounds.setLocation(panel.getLocationOnScreen());
+
+                    JPanel bestCell = findBestEmptyCell(tempBounds);
+
+                    if (bestCell
+                            != null) {
+                        int dropX = bestCell.getLocationOnScreen().x;
+                        int calendarX = calendarPanel.getLocationOnScreen().x;
+                        int totalWidth = calendarPanel.getWidth();
+                        int columnWidth = totalWidth / 7;
+                        int columnIndex = Math.max(0, Math.min(6, (dropX - calendarX) / columnWidth));
+                        LocalDate dropDate = startDate.plusDays(columnIndex);
+                        moveTask(panel, bestCell, null, dropDate);
+                    }
+                }
+
+                refreshSchedule();
+                glassPane.removeAll();
+                glassPane.repaint();
+                glassPane.setVisible(false);
+            }
+        });
+
+        orderContainer.addMouseMotionListener(new MouseMotionAdapter() {
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+                JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(orderContainer);
+                JComponent glassPane = (JComponent) frame.getGlassPane();
+                Point cursor = SwingUtilities.convertPoint(orderContainer, e.getPoint(), glassPane);
+
+                if (tempPanel[0] != null) {
+                    tempPanel[0].setLocation(cursor.x - initialClick.x, cursor.y - initialClick.y);
+
+                    // Clear previous highlights
+                    for (JPanel prev : highlightedCells) {
+                        resetHighlightedCellBorder(prev);
+                    }
+                    highlightedCells.clear();
+
+                    for (Component comp : tempPanel[0].getComponents()) {
+                        if (!(comp instanceof JPanel test)) {
+                            continue;
+                        }
+
+                        Rectangle tempBounds = test.getBounds();
+                        Point testLocationOnGlass = SwingUtilities.convertPoint(test.getParent(), test.getLocation(), calendarPanel);
+                        tempBounds.setLocation(calendarPanel.getLocationOnScreen().x + testLocationOnGlass.x,
+                                calendarPanel.getLocationOnScreen().y + testLocationOnGlass.y);
+
+                        JPanel currentBestCell = findBestEmptyCell(tempBounds);
+
+                        if (currentBestCell != null && !highlightedCells.contains(currentBestCell)) {
+                            currentBestCell.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
+                            highlightedCells.add(currentBestCell);
+                        }
+                    }
+                }
+
+                glassPane.repaint();
+            }
+
+        });
+    }
 
     public void makeDraggable(JPanel panel) {
         Point initialClick = new Point();
@@ -524,36 +717,30 @@ public class ScheduleManager {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1) {
-                    System.out.println("Vänsterklick");
+                initialClick.setLocation(e.getPoint());
+                frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
 
-                    initialClick.setLocation(e.getPoint());
-                    frame = (JFrame) SwingUtilities.getWindowAncestor(panel);
-
-                    Point calendarLocationOnScreen = calendarPanel.getLocationOnScreen();
-                    Dimension calendarSize = calendarPanel.getSize();
-                    Rectangle calendarBounds = new Rectangle(calendarLocationOnScreen, calendarSize);
-                    if (calendarBounds.contains(panel.getLocationOnScreen())) {
-                        originCell[0] = (JPanel) panel.getParent();
-                    }
-                    tempPanel[0] = clonePanel(panel, false, panel.getBackground());
-                    tempPanel[0].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-                    Point panelPosInGlass = SwingUtilities.convertPoint(panel.getParent(), panel.getLocation(), frame.getGlassPane());
-
-                    JComponent glassPane = (JComponent) frame.getGlassPane();
-                    glassPane.setLayout(null);
-                    glassPane.setVisible(true);
-                    tempPanel[0].setBounds(panelPosInGlass.x, panelPosInGlass.y, panel.getWidth(), panel.getHeight());
-                    glassPane.add(tempPanel[0]);
-                    glassPane.repaint();
-
-                    panel.setOpaque(false);
-                    frame.setCursor(Cursor.HAND_CURSOR);
-                } else if (e.getButton() == MouseEvent.BUTTON3) {
-                    System.out.println("Högerklick");
-
+                Point calendarLocationOnScreen = calendarPanel.getLocationOnScreen();
+                Dimension calendarSize = calendarPanel.getSize();
+                Rectangle calendarBounds = new Rectangle(calendarLocationOnScreen, calendarSize);
+                if (calendarBounds.contains(panel.getLocationOnScreen())) {
+                    originCell[0] = (JPanel) panel.getParent();
                 }
+                tempPanel[0] = clonePanel(panel, false, panel.getBackground());
+                tempPanel[0].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+                Point panelPosInGlass = SwingUtilities.convertPoint(panel.getParent(), panel.getLocation(), frame.getGlassPane());
+
+                JComponent glassPane = (JComponent) frame.getGlassPane();
+                glassPane.setLayout(null);
+                glassPane.setVisible(true);
+                tempPanel[0].setBounds(panelPosInGlass.x, panelPosInGlass.y, panel.getWidth(), panel.getHeight());
+                glassPane.add(tempPanel[0]);
+                glassPane.repaint();
+
+                panel.setOpaque(false);
+                frame.setCursor(Cursor.HAND_CURSOR);
+
             }
 
             @Override
@@ -572,7 +759,6 @@ public class ScheduleManager {
                     Task task = (Task) panel.getClientProperty("task");
                     if (task != null) {
                         try {
-                            System.out.println(task.getTaskId());
                             int hatId = task.getHatId();
                             String query = "SELECT amount, material_id FROM hat_material WHERE hat_id = " + hatId;
                             ArrayList<HashMap<String, String>> materialList = idb.fetchRows(query);
@@ -582,7 +768,7 @@ public class ScheduleManager {
                                 idb.update(query);
                             }
                             task.delete();
-                            initOrders();
+                            buildOrdersPanel(true);
                         } catch (InfException ex) {
                             Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -619,9 +805,8 @@ public class ScheduleManager {
                 tempPanel[0] = null;
                 frame.setCursor(Cursor.DEFAULT_CURSOR);
 
-                panel.setOpaque(
-                        true);
-                panel.setBackground(Color.LIGHT_GRAY);
+                panel.setOpaque(true);
+                panel.setBackground(readyColor);
 
                 for (Component comp
                         : panel.getComponents()) {
@@ -661,7 +846,7 @@ public class ScheduleManager {
                     }
 
                     if (currentBestCell != null && currentBestCell != highlightedCell) {
-                        currentBestCell.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
+                        currentBestCell.setBorder(BorderFactory.createLineBorder(new Color(172, 130, 66), 2));
                         highlightedCell = currentBestCell;
                     }
                 }
@@ -703,7 +888,7 @@ public class ScheduleManager {
                 if (task != null) {
                     setHatAsAssigned(panel, task);
                     panel.putClientProperty("task", task);
-                    initOrders();
+                    buildOrdersPanel(true);
                 }
             }
         }
@@ -716,13 +901,13 @@ public class ScheduleManager {
     }
 
     private JPanel clonePanel(JPanel originalPanel, boolean showOriginalComponents, Color overrideBackground) {
-        JPanel clone = new JPanel(originalPanel.getLayout());
-        clone.setOpaque(true);
+        JPanel clone = new JPanel();
+        clone.setLayout(new BorderLayout());
         clone.setBackground(overrideBackground != null ? overrideBackground : originalPanel.getBackground());
         clone.setSize(originalPanel.getSize());
         clone.setPreferredSize(originalPanel.getPreferredSize());
         clone.setBorder(originalPanel.getBorder());
-
+        clone.putClientProperty("hat_id", originalPanel.getClientProperty("hat_id"));
         for (Component comp : originalPanel.getComponents()) {
             if (comp instanceof JLabel) {
                 JLabel originalLabel = (JLabel) comp;
@@ -743,7 +928,7 @@ public class ScheduleManager {
             return;
         }
 
-        JPanel clone = clonePanel(original, true, Color.YELLOW);
+        JPanel clone = clonePanel(original, true, underWorkColor);
 
         JLabel workerLabel = new JLabel(userLoggedIn.getFullName(), SwingConstants.CENTER);
         workerLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
