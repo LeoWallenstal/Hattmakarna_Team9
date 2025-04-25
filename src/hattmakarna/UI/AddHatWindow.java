@@ -21,12 +21,53 @@ private  Model model;
         initComponents();
         this.userLoggedIn = userLoggedIn;
     }
-public void addHat(){
-    {
-            Model newModel = new Model(tfName.getText(),Double.parseDouble(tfPrice.getText()));
+public void addHat() {
+    boolean addOK = true;
+
+    String name = tfName.getText().trim();
+    String priceText = tfPrice.getText().trim();
+
+    // Nollställ felmeddelanden
+    lblErrorName.setText("");
+    lblErrorPrice.setText("");
+
+    // --- Validera namn ---
+    if (name.isEmpty()) {
+        lblErrorName.setText("Får inte vara tomt!");
+        addOK = false;
+    } else if (!hattmakarna.util.Validerare.validateName(name)) {
+        lblErrorName.setText("Får bara innehålla bokstäver och bindestreck!");
+        addOK = false;
+    }
+
+    // --- Validera pris ---
+    if (priceText.isEmpty()) {
+        lblErrorPrice.setText("Får inte vara tomt!");
+        addOK = false;
+    } else if (!hattmakarna.util.Validerare.validatePrice(priceText)) {
+        lblErrorPrice.setText("Endast siffror + punkt eller komma är tillåtna!");
+        addOK = false;
+    }
+
+    // --- Om allting är korrekt ---
+    if (addOK) {
+        try {
+            double price = Double.parseDouble(priceText.replace(',', '.'));
+
+            Model newModel = new Model(name, price);
             newModel.create();  
+
+            System.out.println("Ny hattmodell skapad: " + name);
+
+            // Stäng nuvarande fönster och öppna HattWindow
             this.setVisible(false);
+            new HattWindow(userLoggedIn).setVisible(true);
+            this.dispose();
+        } catch (NumberFormatException e) {
+            lblErrorPrice.setText("Felaktigt prisformat: " + e.getMessage());
         }
+    }
+    
     }
     /**
      * This method is called from within the constructor to initialize the form.
@@ -44,14 +85,23 @@ public void addHat(){
         jLabel3 = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
         btnAdd = new javax.swing.JButton();
+        lblErrorName = new javax.swing.JLabel();
+        lblErrorPrice = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jLabel1.setFont(new java.awt.Font("Helvetica Neue", 0, 18)); // NOI18N
         jLabel1.setText("Lägg till lagerförd hatt");
 
         tfName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfNameActionPerformed(evt);
+            }
+        });
+
+        tfPrice.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfPriceActionPerformed(evt);
             }
         });
 
@@ -80,41 +130,51 @@ public void addHat(){
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addComponent(jLabel1))
+                        .addContainerGap()
+                        .addComponent(btnBack))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblErrorName))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(44, 44, 44)
+                                .addComponent(btnAdd))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(18, 18, 18)
+                                .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(lblErrorPrice))))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnBack)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnAdd)))
-                .addContainerGap(244, Short.MAX_VALUE))
+                        .addGap(14, 14, 14)
+                        .addComponent(jLabel1)))
+                .addContainerGap(227, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addGap(17, 17, 17)
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
+                .addGap(69, 69, 69)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
                     .addComponent(tfName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(lblErrorName))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnBack)
-                    .addComponent(btnAdd))
-                .addContainerGap(156, Short.MAX_VALUE))
+                    .addComponent(jLabel3)
+                    .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblErrorPrice))
+                .addGap(18, 18, 18)
+                .addComponent(btnAdd)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                .addComponent(btnBack)
+                .addContainerGap())
         );
 
         pack();
@@ -130,9 +190,12 @@ public void addHat(){
     }//GEN-LAST:event_tfNameActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-           addHat();
-           new HattWindow(userLoggedIn).setVisible(true);
+           addHat();  // Bara kör addHat() här - ingen extra kod
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void tfPriceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfPriceActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfPriceActionPerformed
 
    
 
@@ -142,6 +205,8 @@ public void addHat(){
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel lblErrorName;
+    private javax.swing.JLabel lblErrorPrice;
     private javax.swing.JTextField tfName;
     private javax.swing.JTextField tfPrice;
     // End of variables declaration//GEN-END:variables
