@@ -43,6 +43,10 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private boolean saved = false;
     
     
+    public RegisterCustomerWindow(User user) {
+    this(user, null);
+}
+    
     public RegisterCustomerWindow(User user, OrderWindow lastWindow) {
         initComponents();
         initErrorFlags();
