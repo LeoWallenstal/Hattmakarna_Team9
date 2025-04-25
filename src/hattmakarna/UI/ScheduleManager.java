@@ -396,7 +396,9 @@ public class ScheduleManager {
             @Override
             public void mousePressed(MouseEvent e) {
                 Object[] options = {"Klarmarkera", "Ta tillbaka", "Avbryt"};
-                int result = JOptionPane.showOptionDialog(calendarPanel.getParent(), "Vill du markera denna hatt som klar?", "Bekräfta", JOptionPane.DEFAULT_OPTION, JOptionPane.YES_NO_CANCEL_OPTION, null, options, options[0]);
+                int result = JOptionPane.showOptionDialog(
+                        calendarPanel.getParent(), "Vad vill du göra med hatten?", "Bekräfta", 
+                        JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
                 Task task = (Task) taskPanel.getClientProperty("task");
                 if (result == 0) {
 
@@ -438,7 +440,7 @@ public class ScheduleManager {
             orderContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
             Border padding = BorderFactory.createEmptyBorder(0, 0, 20, 100);
             Border bottomLine = BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK);
-            orderContainer.setBorder(BorderFactory.createCompoundBorder(bottomLine, padding));;
+            orderContainer.setBorder(BorderFactory.createCompoundBorder(bottomLine, padding));
 
             String orderTitle = "Order #" + orderId;
             JButton toggleButton = new JButton("▶ " + orderTitle);
