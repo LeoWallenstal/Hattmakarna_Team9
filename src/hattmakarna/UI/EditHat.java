@@ -13,17 +13,20 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import hattmakarna.data.ModelRegister;
+import hattmakarna.data.User;
 /**
  *
  * @author sebas
  */
 public class EditHat extends javax.swing.JFrame {
  private final Model currentModel;
+ private User userLoggedIn;
  
- 
-    public EditHat(Model model) {
+    public EditHat(User userLoggedIn,Model model) {
+        initComponents();
          this.currentModel = model;
-       initComponents();
+          this.userLoggedIn = userLoggedIn;
+          
        if (currentModel != null) {
     lblModelNummer.setText(currentModel.getModelID());
     tfPrice.setText(String.valueOf(currentModel.getPrice()));
@@ -51,7 +54,6 @@ public class EditHat extends javax.swing.JFrame {
         tfPrice = new javax.swing.JTextField();
         btnBack = new javax.swing.JButton();
         btnSettPrice = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
         lblModelNummer = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         tfName = new javax.swing.JTextField();
@@ -81,14 +83,12 @@ public class EditHat extends javax.swing.JFrame {
             }
         });
 
-        btnSettPrice.setText("Ändra pris");
+        btnSettPrice.setText("Spara");
         btnSettPrice.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSettPriceActionPerformed(evt);
             }
         });
-
-        jLabel1.setText("⬅Fyll i önskat pris i heltal");
 
         lblModelNummer.setText("jLabel3");
 
@@ -128,10 +128,10 @@ public class EditHat extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(tfPrice, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
-                            .addComponent(tfName))
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel1)))
-                .addContainerGap(122, Short.MAX_VALUE))
+
+                            .addComponent(tfName))))
+                .addContainerGap(274, Short.MAX_VALUE))
+
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -151,9 +151,7 @@ public class EditHat extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
+                        .addComponent(tfPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnSettPrice)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
@@ -175,7 +173,9 @@ public class EditHat extends javax.swing.JFrame {
         currentModel.updatePrice(currentModel.getModelID(), price);
         currentModel.updateName(newname);
         System.out.println("Priset har uppdaterats för " + currentModel.getModelID());
-         
+
+        new HattWindow(userLoggedIn).setVisible(true);
+
         this.dispose(); // Stänger fönstret efter uppdateringen
     } catch (NumberFormatException e) {
         System.out.println("Felaktigt prisformat: " + e.getMessage());
@@ -190,7 +190,12 @@ public class EditHat extends javax.swing.JFrame {
     }//GEN-LAST:event_tfPriceActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
-this.dispose();    
+
+        new HattWindow(userLoggedIn).setVisible(true);
+        this.dispose();    
+
+
+
     }//GEN-LAST:event_btnBackActionPerformed
 
     /**
@@ -202,7 +207,10 @@ this.dispose();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSettPrice;
-    private javax.swing.JLabel jLabel1;
+
+
+    
+
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblDescription;
     private javax.swing.JLabel lblHeader;
