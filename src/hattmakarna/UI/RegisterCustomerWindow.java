@@ -733,7 +733,6 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
                 this.dispose(); // Stänger RegisterCustomerWindow.java
             }
         }
-        getRickRolled();
     }//GEN-LAST:event_btnGoBackMouseClicked
 
     private void checkFormCompletion() {
