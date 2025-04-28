@@ -4,32 +4,44 @@ import hattmakarna.util.Validerare;
 import oru.inf.InfDB;
 import oru.inf.InfException;
 import static hattmakarna.data.Hattmakarna.idb;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Representerar ett material i databasen, inklusive namn, enhet och saldo.
  */
 public class Material extends DatabaseObject {
 
-    /** Materialets unika ID. */
+    /**
+     * Materialets unika ID.
+     */
     private int material_id;
 
-    /** Namnet på materialet. */
+    /**
+     * Namnet på materialet.
+     */
     private String name;
 
-    /** Enheten som materialet mäts i (t.ex. meter, styck). */
+    /**
+     * Enheten som materialet mäts i (t.ex. meter, styck).
+     */
     private String unit;
 
-    /** Aktuellt saldo (mängd) av materialet i lager. */
+    /**
+     * Aktuellt saldo (mängd) av materialet i lager.
+     */
     private int amount;
 
-    /** Standardkonstruktor. */
+    /**
+     * Standardkonstruktor.
+     */
     public Material() {
         super();
     }
 
     /**
      * Skapar ett Material-objekt baserat på ett givet material-ID.
-     * 
+     *
      * @param materialID materialets ID som sträng
      */
     public Material(String materialID) {
@@ -37,9 +49,9 @@ public class Material extends DatabaseObject {
     }
 
     /**
-     * Hämtar ett specifikt kolumnvärde från material med angivet ID.
-     * Endast för intern/temporär användning.
-     * 
+     * Hämtar ett specifikt kolumnvärde från material med angivet ID. Endast för
+     * intern/temporär användning.
+     *
      * @param id materialets ID
      * @param column kolumnnamnet som ska hämtas
      * @return kolumnens värde som sträng
@@ -57,9 +69,9 @@ public class Material extends DatabaseObject {
     }
 
     /**
-     * Lägger till ett nytt material i databasen.
-     * OBS! Föråldrad metod – använd inte i ny kod.
-     * 
+     * Lägger till ett nytt material i databasen. OBS! Föråldrad metod – använd
+     * inte i ny kod.
+     *
      * @param name materialets namn
      * @param unit enhet för materialet
      */
@@ -75,9 +87,9 @@ public class Material extends DatabaseObject {
     }
 
     /**
-     * Tar bort ett material från databasen.
-     * OBS! Föråldrad metod – använd inte i ny kod.
-     * 
+     * Tar bort ett material från databasen. OBS! Föråldrad metod – använd inte
+     * i ny kod.
+     *
      * @param materialId ID för materialet som ska tas bort
      */
     @Deprecated
@@ -100,7 +112,7 @@ public class Material extends DatabaseObject {
 
     /**
      * Sätter materialets namn om det är giltigt enligt valideringsregler.
-     * 
+     *
      * @param name det nya namnet
      */
     public void setName(String name) {
@@ -125,7 +137,7 @@ public class Material extends DatabaseObject {
 
     /**
      * Sätter enheten för materialet, om den inte är tom.
-     * 
+     *
      * @param newUnit den nya enheten
      */
     public void setUnit(String newUnit) {
@@ -158,7 +170,7 @@ public class Material extends DatabaseObject {
 
     /**
      * Skapar en kopia av detta Material-objekt.
-     * 
+     *
      * @return en klonad instans av Material
      */
     @Override

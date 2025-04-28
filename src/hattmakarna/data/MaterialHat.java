@@ -83,6 +83,7 @@ public class MaterialHat extends DatabaseObject {
     @Override
     protected void setIdString(String id) {
         material_hat_id = Integer.parseInt(id);
+        System.out.println(id);
     }
     @Override
 public MaterialHat clone() {
