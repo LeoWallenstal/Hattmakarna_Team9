@@ -22,7 +22,6 @@ public class TaskRegister {
         allTasks = new ArrayList<>();
         ongoingTasks = new ArrayList<>();
         initAllTasks();
-        initOngoingTasks();
     }
 
     private void initAllTasks() {
@@ -46,7 +45,7 @@ public class TaskRegister {
         }
     }
 
-    private void initOngoingTasks() {
+    private void initUsersOngoingTasks(String userId) {
         String sqlQuery = """
             SELECT 
             t.*, 
@@ -55,8 +54,8 @@ public class TaskRegister {
             FROM task t       
             JOIN hat h ON t.hat_id = h.hat_id
             JOIN hat_model m ON h.model_id = m.model_id
-            WHERE t.status = 'PÅGÅENDE'
-        """;
+            WHERE t.status = 'PÅGÅENDE' AND
+            t.user_id = """ + userId;
 
         try {
             ArrayList<HashMap<String, String>> tasks = idb.fetchRows(sqlQuery);
@@ -73,14 +72,13 @@ public class TaskRegister {
         return allTasks;
     }
 
-    public ArrayList<Task> getOngoingTasks() {
+    public ArrayList<Task> getUsersOngoingTasks(String userId) {
+        initUsersOngoingTasks(userId);
         return ongoingTasks;
     }
 
-    public void refreshTasks() {
-        allTasks.clear();
+    public void refreshUsersOngoingTasks(String UserId) {
         ongoingTasks.clear();
-        initOngoingTasks();
-        initAllTasks();
+        initUsersOngoingTasks(UserId);
     }
 }
