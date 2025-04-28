@@ -251,7 +251,7 @@ public class ChangePassWindow extends javax.swing.JFrame {
         if(saveOK){
             lblPwChanged.setVisible(true);
             loggedIn.setPWCandidate(newPw);
-            //loggedIn.savePW();
+            loggedIn.savePW();
             PrintDebugger.info("Här savear man till DB då, men inte just nu");
         }
     }//GEN-LAST:event_btnSaveActionPerformed
