@@ -40,6 +40,10 @@ public class Validerare {
         return adress.matches("^[a-zA-ZåäöÅÄÖ0-9](?!.*[ ,\\-]{2})[a-zA-ZåäöÅÄÖ0-9 ,\\-]*[a-zA-ZåäöÅÄÖ0-9]$");
     }
     
+    //Tillåter endast alla siffror, komma och punkt 
+      public static boolean validatePrice(String price){
+        return price.matches("^(?:[0-9]+(?:\\.[0-9]+)?|[0-9]+(?:,[0-9]+)?)$");
+    }
     
     
 }
