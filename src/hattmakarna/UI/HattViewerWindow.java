@@ -1,5 +1,8 @@
 package hattmakarna.UI;
 
+import static hattmakarna.data.Hattmakarna.idb;
+import hattmakarna.data.Hat;
+import hattmakarna.data.Specification;
 import java.awt.Image;
 import java.io.File;
 import java.util.ArrayList;
@@ -7,6 +10,9 @@ import javax.swing.ImageIcon;
 import hattmakarna.data.User;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import oru.inf.InfException;
 
 public class HattViewerWindow extends javax.swing.JFrame {
 
@@ -40,6 +46,30 @@ public class HattViewerWindow extends javax.swing.JFrame {
 
     }
 
+    private String fetchHatDescriptionFromDB() {
+        String descriptionSQLQuery = "SELECT beskrivning from hat_spec where hat_id = " + hatID;
+        String description = "";
+
+        try {
+            description = idb.fetchSingle(descriptionSQLQuery);
+        } catch (InfException ex) {
+            Logger.getLogger(HattViewerWindow.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return description;
+    }
+
+    private void displayDescription() {
+
+        String description = fetchHatDescriptionFromDB();
+
+        if (description == null) {
+            txtDescription.setText("Beskrivning saknas för hatten.");
+        }
+        txtDescription.setText(description);
+
+    }
+
     private void init() {
 
         this.setTitle("Hattvisare");
@@ -50,7 +80,11 @@ public class HattViewerWindow extends javax.swing.JFrame {
 
         requestFocusInWindow();
         loadImages();
-        lblImage.setIcon(images.get(currentIndex));
+        displayDescription();
+        if (!images.isEmpty()) {
+            lblImage.setIcon(images.get(currentIndex));
+        }
+
     }
 
     private void loadImages() {
@@ -65,8 +99,31 @@ public class HattViewerWindow extends javax.swing.JFrame {
             }
         }
 
+        String skissFileName = "specSkiss-hat-" + hatID + ".png";
+        File specialSkiss = new File("images/" + skissFileName);
+
+        if (specialSkiss.exists()) {
+            images.add(scaleImage(specialSkiss.getAbsolutePath()));
+        } else {
+            System.out.println("Special sketch not found for hatID " + hatID);
+        }
+
+        String specialBildFileName = "specBild-hat-" + hatID + ".png";
+        File specialFile = new File("images/" + specialBildFileName);
+
+        if (specialFile.exists()) {
+            images.add(scaleImage(specialFile.getAbsolutePath()));
+        } else {
+            System.out.println("Special hat not found for hatID " + hatID);
+        }
+
         if (!images.isEmpty()) {
             lblImage.setIcon(images.get(currentIndex));
+
+        } else {
+        btnLeft.setVisible(false);
+        btnRight.setVisible(false);
+        lblImage.setText("Det finns inga bilder anknytna till denna hatt");
         }
     }
 
@@ -80,31 +137,17 @@ public class HattViewerWindow extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlBild = new javax.swing.JPanel();
-        lblImage = new javax.swing.JLabel();
         btnRight = new javax.swing.JButton();
-        btnLeft = new javax.swing.JButton();
         separator = new javax.swing.JSeparator();
+        btnLeft = new javax.swing.JButton();
+        lblDescription = new javax.swing.JLabel();
+        scrollPane = new javax.swing.JScrollPane();
+        txtDescription = new javax.swing.JTextArea();
+        lblHeader = new javax.swing.JLabel();
+        lblImage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
-
-        pnlBild.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        pnlBild.setPreferredSize(new java.awt.Dimension(311, 311));
-
-        javax.swing.GroupLayout pnlBildLayout = new javax.swing.GroupLayout(pnlBild);
-        pnlBild.setLayout(pnlBildLayout);
-        pnlBildLayout.setHorizontalGroup(
-            pnlBildLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlBildLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblImage, javax.swing.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        pnlBildLayout.setVerticalGroup(
-            pnlBildLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
 
         btnRight.setText(">");
         btnRight.addActionListener(new java.awt.event.ActionListener() {
@@ -120,38 +163,60 @@ public class HattViewerWindow extends javax.swing.JFrame {
             }
         });
 
+        lblDescription.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lblDescription.setText("Beskrivning:");
+
+        txtDescription.setColumns(20);
+        txtDescription.setRows(5);
+        txtDescription.setFocusable(false);
+        scrollPane.setViewportView(txtDescription);
+
+        lblHeader.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        lblHeader.setText("Hattvisare");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnLeft, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(separator)
-                    .addComponent(pnlBild, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnRight, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(65, 65, 65)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 278, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnLeft)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnRight))))
+                    .addComponent(lblHeader, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblDescription)
+                        .addGap(15, 15, 15)
+                        .addComponent(separator, javax.swing.GroupLayout.PREFERRED_SIZE, 577, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addContainerGap()
+                .addComponent(lblHeader)
+                .addGap(13, 13, 13)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(separator, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(separator, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pnlBild, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE))
+                        .addComponent(lblImage, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnRight)
+                            .addComponent(btnLeft)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(269, 269, 269)
-                        .addComponent(btnLeft)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(279, 279, 279)
-                .addComponent(btnRight)
-                .addContainerGap(296, Short.MAX_VALUE))
+                        .addComponent(lblDescription)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pack();
@@ -212,8 +277,11 @@ public class HattViewerWindow extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLeft;
     private javax.swing.JButton btnRight;
+    private javax.swing.JLabel lblDescription;
+    private javax.swing.JLabel lblHeader;
     private javax.swing.JLabel lblImage;
-    private javax.swing.JPanel pnlBild;
+    private javax.swing.JScrollPane scrollPane;
     private javax.swing.JSeparator separator;
+    private javax.swing.JTextArea txtDescription;
     // End of variables declaration//GEN-END:variables
 }
