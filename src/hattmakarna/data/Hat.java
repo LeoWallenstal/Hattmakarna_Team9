@@ -264,6 +264,15 @@ public class Hat extends DatabaseObject {
                 e.save();
             });
         }
+        if(materials != null)
+        {
+            materials.forEach(e -> {
+                e.setHat_id(hat_id);
+                e.setIdString(String.valueOf(hat_id));
+                
+            e.save();
+            });
+        }
 
         return true;
     }

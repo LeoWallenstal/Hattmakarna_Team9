@@ -57,7 +57,7 @@ public void addHat() {
             Model newModel = new Model(name, price);
             newModel.create();  
 
-            System.out.println("Ny hattmodell skapad: " + name);
+            
 
             // Stäng nuvarande fönster och öppna HattWindow
             this.setVisible(false);

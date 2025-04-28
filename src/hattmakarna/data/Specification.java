@@ -16,6 +16,8 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.UIManager;
 import oru.inf.InfException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -31,6 +33,8 @@ public class Specification extends DatabaseObject {
     private BufferedImage imgImage = null;
     private String skiss_path;
     private BufferedImage skissImage = null;
+    private ArrayList<BufferedImage> extraImages = new ArrayList<>();
+    private ArrayList<String> extraImagePaths = new ArrayList<>();
 
     public BufferedImage getImgImage() {
         return imgImage;
@@ -94,6 +98,24 @@ public class Specification extends DatabaseObject {
         this.hat_id = id;
     }
 
+    public ArrayList<BufferedImage> getExtraImages() {
+        return extraImages;
+    }
+
+    public ArrayList<String> getExtraImagePaths() {
+        return extraImagePaths;
+    }
+
+    public void setExtraImages(ArrayList<BufferedImage> extraImages) {
+        this.extraImages = extraImages;
+    }
+
+    public void setExtraImagePaths(ArrayList<String> extraImagePaths) {
+        this.extraImagePaths = extraImagePaths;
+    }
+    
+    
+
     /**
      * Promptar användaren med ett fönster för att välja en bild fil.
      *
@@ -117,6 +139,33 @@ public class Specification extends DatabaseObject {
         }
 
         return null;
+    }
+
+    public static ArrayList<BufferedImage> set3DFilesFromUser() {
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG files", "png");
+        chooser.setFileFilter(filter);
+        chooser.setMultiSelectionEnabled(true); // Tillåt flera filer
+
+        int returnVal = chooser.showOpenDialog(null);
+        ArrayList<BufferedImage> images = new ArrayList<>();
+
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File[] selectedFiles = chooser.getSelectedFiles();
+
+            for (File file : selectedFiles) {
+                try {
+                    BufferedImage img = ImageIO.read(file);
+                    if (img != null) {
+                        images.add(img);
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        return images;
     }
 
     @Override
@@ -163,6 +212,25 @@ public class Specification extends DatabaseObject {
 
                 skiss_path = fileToSave.getPath().replace("\\", "\\\\");
             }
+
+            if (extraImages != null && !extraImages.isEmpty()) {
+
+                // Skapa undermapp för denna hatt
+                String folderName = "hattextra" + hat_id;
+                File extraFolder = new File(SAVE_TO_PATH + folderName);
+                extraFolder.mkdirs();  // Skapa mapp om den inte redan finns
+
+                for (int i = 0; i < extraImages.size(); i++) {
+                    BufferedImage img = extraImages.get(i);
+
+                    String fileName = "extra" + (i + 1) + ".png"; // Namnge bara bilden
+                    File fileToSave = new File(extraFolder, fileName);  // Sparar i undermappen
+
+                    ImageIO.write(img, "png", fileToSave);
+
+                    extraImagePaths.add(fileToSave.getPath().replace("\\", "\\\\"));
+                }
+            }
             return super.save();
         } catch (IOException ex) {
             Logger.getLogger(Specification.class.getName()).log(Level.SEVERE, null, ex);
@@ -191,6 +259,14 @@ public class Specification extends DatabaseObject {
 
         if (this.skissImage != null) {
             copy.skissImage = deepCopyBufferedImage(this.skissImage);
+        }
+
+        if (this.extraImages != null) {
+            List<BufferedImage> copyList = new ArrayList<>();
+            for (BufferedImage img : this.extraImages) {
+                copyList.add(deepCopyBufferedImage(img));
+            }
+            copy.extraImages = (ArrayList<BufferedImage>) copyList;
         }
 
         return copy;
