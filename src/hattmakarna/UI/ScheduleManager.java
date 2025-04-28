@@ -149,7 +149,7 @@ public class ScheduleManager {
         calendarPanel.setMinimumSize(preferred);
         calendarPanel.setPreferredSize(preferred);
         calendarPanel.setMaximumSize(preferred);
-        
+
         preferred = new Dimension(scrollOrders.getWidth(), preferredHeight);
         scrollOrders.setMinimumSize(preferred);
         scrollOrders.setPreferredSize(preferred);
@@ -276,21 +276,17 @@ public class ScheduleManager {
         panel.add(nameLabel, BorderLayout.CENTER);
 
         String sqlQuery = """ 
-        SELECT hs.spec_id,
-        CASE WHEN h.model_id IN 
-            (SELECT model_id FROM hat_model WHERE name = 'Special') THEN 1 ELSE 0 END AS is_special
+        SELECT hs.spec_id
         FROM hat_spec hs
         JOIN hat h ON hs.hat_id = h.hat_id                         
         WHERE hs.hat_id =""" + hatId;
 
         try {
             HashMap<String, String> hatMap = idb.fetchRow(sqlQuery);
-            boolean isSpecial = "1".equals(hatMap.get("is_special"));
-            
 
-            if (isSpecial) {
-                try {
-                    String specId = idb.fetchSingle(sqlQuery);
+            try {
+                String specId = idb.fetchSingle(sqlQuery);
+                if (specId != null) {
                     Specification spec = new Specification(specId);
                     String imagePath = spec.getImagePath();
                     String toolTip = "<html>";
@@ -313,11 +309,11 @@ public class ScheduleManager {
 
                     toolTip += "<br> </html>";
                     panel.setToolTipText(toolTip);
-                } catch (InfException ex) {
-                    Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
+            } catch (InfException ex) {
+                Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
             }
+
         } catch (InfException ex) {
             Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -329,7 +325,6 @@ public class ScheduleManager {
         if (keepOrdersOpen) {
             expandedOrders.clear();
 
-            // Suppose current listPanel is the current view in scrollOrders
             Component view = scrollOrders.getViewport().getView();
             if (view instanceof JPanel listPanel) {
                 for (Component orderContainer : listPanel.getComponents()) {
@@ -368,7 +363,8 @@ public class ScheduleManager {
             String query = """
                 SELECT h.hat_id, m.name, u.first_name, u.last_name, t.task_id,
                     CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
-                    CASE WHEN t.status = 'KLAR' OR h.model_id != 1 THEN 1 ELSE 0 END AS done
+                    CASE WHEN t.status = 'KLAR' OR 
+                           h.hat_id not in (select hat_id from hat_spec) THEN 1 ELSE 0 END AS done
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
@@ -396,7 +392,7 @@ public class ScheduleManager {
             public void mousePressed(MouseEvent e) {
                 Object[] options = {"Klarmarkera", "Ta tillbaka", "Avbryt"};
                 int result = JOptionPane.showOptionDialog(
-                        calendarPanel.getParent(), "Vad vill du göra med hatten?", "Bekräfta", 
+                        calendarPanel.getParent(), "Vad vill du göra med hatten?", "Bekräfta",
                         JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
                 Task task = (Task) taskPanel.getClientProperty("task");
                 if (result == 0) {
@@ -616,8 +612,8 @@ public class ScheduleManager {
                 glassPane.setVisible(true);
 
                 Point cursor = SwingUtilities.convertPoint(orderContainer, e.getPoint(), glassPane);
-                orderTasks.setLocation(cursor); 
-                orderTasks.setSize(orderTasks.getPreferredSize()); 
+                orderTasks.setLocation(cursor);
+                orderTasks.setSize(orderTasks.getPreferredSize());
                 tempPanel[0] = orderTasks;
                 glassPane.add(tempPanel[0]);
                 glassPane.repaint();
@@ -956,18 +952,18 @@ public class ScheduleManager {
         try {
             String taskId = idb.getAutoIncrement("task", "task_id");
             idb.insert(query);
-              System.out.println(query);
-              
+            System.out.println(query);
+
             query = "SELECT amount, material_id FROM hat_material WHERE hat_id = " + hatId;
             ArrayList<HashMap<String, String>> materialList = idb.fetchRows(query);
-              
+
             System.out.println(query);
-              
+
             for (HashMap<String, String> row : materialList) {
                 query = "UPDATE material SET amount = amount - " + row.get("amount")
                         + " WHERE material_id = " + row.get("material_id");
                 idb.update(query);
-                
+
                 System.out.println(query);
             }
 
