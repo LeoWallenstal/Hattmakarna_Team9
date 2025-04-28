@@ -584,29 +584,25 @@ public class ScheduleManager {
 
                 frame = (JFrame) SwingUtilities.getWindowAncestor(orderContainer);
 
-                // New test panel
-                JPanel test = new JPanel();
-                test.setLayout(new BoxLayout(test, BoxLayout.Y_AXIS)); // Grow vertically
+                JPanel orderTasks = new JPanel();
+                orderTasks.setLayout(new BoxLayout(orderTasks, BoxLayout.Y_AXIS));
 
                 for (Component comp : orderContainer.getComponents()) {
                     if (comp instanceof JPanel itemsPanel) {
-                        // Skip the header panel (assuming it's the first or identified differently)
-                        // Check if this is likely the itemsPanel by inspecting its contents
                         for (Component row : itemsPanel.getComponents()) {
                             if (row instanceof JPanel rowPanel) {
-//                                test.setLayout(rowPanel.getLayout());
                                 for (Component item : rowPanel.getComponents()) {
                                     if (item instanceof JPanel itemPanel) {
                                         if (itemPanel.getBackground() == readyColor) {
                                             JPanel cloned = clonePanel(itemPanel, true, itemPanel.getBackground());
                                             cloned.setMaximumSize(itemPanel.getPreferredSize());
                                             cloned.setPreferredSize(itemPanel.getPreferredSize());
-                                            test.add(cloned);
-                                            test.add(Box.createVerticalStrut(1));
+                                            orderTasks.add(cloned);
+                                            orderTasks.add(Box.createVerticalStrut(1));
                                         }
 
                                     } else {
-                                        test.add(new JLabel("Other comp: " + item.getClass().getSimpleName()));
+                                        orderTasks.add(new JLabel("Other comp: " + item.getClass().getSimpleName()));
 
                                     }
                                 }
@@ -615,16 +611,14 @@ public class ScheduleManager {
                     }
                 }
 
-                // Get glass pane and add test panel at top-left
                 JComponent glassPane = (JComponent) frame.getGlassPane();
                 glassPane.setLayout(null);
                 glassPane.setVisible(true);
 
-                // Set a fixed location and pack size
                 Point cursor = SwingUtilities.convertPoint(orderContainer, e.getPoint(), glassPane);
-                test.setLocation(cursor); // Just drop it near top-left corner
-                test.setSize(test.getPreferredSize()); // Let layout define size after add()
-                tempPanel[0] = test;
+                orderTasks.setLocation(cursor); 
+                orderTasks.setSize(orderTasks.getPreferredSize()); 
+                tempPanel[0] = orderTasks;
                 glassPane.add(tempPanel[0]);
                 glassPane.repaint();
             }
