@@ -962,13 +962,19 @@ public class ScheduleManager {
         try {
             String taskId = idb.getAutoIncrement("task", "task_id");
             idb.insert(query);
-
+              System.out.println(query);
+              
             query = "SELECT amount, material_id FROM hat_material WHERE hat_id = " + hatId;
             ArrayList<HashMap<String, String>> materialList = idb.fetchRows(query);
+              
+            System.out.println(query);
+              
             for (HashMap<String, String> row : materialList) {
                 query = "UPDATE material SET amount = amount - " + row.get("amount")
                         + " WHERE material_id = " + row.get("material_id");
                 idb.update(query);
+                
+                System.out.println(query);
             }
 
             return new Task(taskId);

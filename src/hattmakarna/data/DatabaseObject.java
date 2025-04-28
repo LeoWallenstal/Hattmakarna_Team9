@@ -307,7 +307,7 @@ public abstract class DatabaseObject {
                         + " (" + String.join(", ", attributeNames) + ") VALUES ("
                         + String.join(", ", attributeValues) + ");";
 
-                //System.out.println("Genererad SQL: " + sql);
+                System.out.println("Genererad SQL: " + sql);
                 hattmakarna.data.Hattmakarna.idb.insert(sql);
                 setIdString(id);
                 
@@ -323,7 +323,7 @@ public abstract class DatabaseObject {
                         + " SET " + String.join(", ", setClauses)
                         + " WHERE " + getIdAttributeName() + " = " + getIdString() + ";";
 
-                //System.out.println("Genererad SQL: " + sql);
+                System.out.println("Genererad SQL: " + sql);
                 hattmakarna.data.Hattmakarna.idb.update(sql);
             }
 
