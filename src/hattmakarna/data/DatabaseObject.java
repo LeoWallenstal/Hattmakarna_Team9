@@ -44,8 +44,12 @@ import oru.inf.InfException;
  */
 public abstract class DatabaseObject {
 
+    // Fält för att spåra om objektet ¨har ett id
     protected boolean hasId;
 
+    /**
+     * Konstruktur för att initiera ett objekt utan att utgå från databasen
+     */
     public DatabaseObject() {
         hasId = false;
     }
@@ -73,9 +77,9 @@ public abstract class DatabaseObject {
 
     // Returnerar namnet på ID-attributet för objektet
     protected abstract String getIdAttributeName();
-
+    // Returnerar entitetens id i string format
     protected abstract String getIdString();
-
+    // Sätter entitetens id
     protected abstract void setIdString(String id);
 
     /**
@@ -297,7 +301,6 @@ public abstract class DatabaseObject {
 
             String sql;
 
-            // Ny post → INSERT
             if (getIdString() == null ||getIdString().equals("0") || getIdString().isEmpty()) {
                 String id = Hattmakarna.idb.getAutoIncrement(getTabelName(), getIdAttributeName());
                 attributeNames.add(getIdAttributeName());

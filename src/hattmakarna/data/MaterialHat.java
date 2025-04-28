@@ -8,23 +8,36 @@ import java.awt.Color;
 
 /**
  *
+ * Klass som representerar en entitet i material_hat tabellen.
+ *
  * @author leonb
  */
 public class MaterialHat extends DatabaseObject {
 
+    // ----- Databas fält ------
     private int material_hat_id;
     private int material_id;
     private int hat_id;
     private int amount;
     private String Color;
 
+    /**
+     * Skappar ett objekt utifrån entitet från databasen med det givna id
+     *
+     * @param id
+     */
     public MaterialHat(String id) {
         super(id);
     }
+
+    /**
+     * Skappar ett objekt utan att utgå från databasen.
+     */
     public MaterialHat() {
         super();
     }
 
+    // --------- Getters & setters ---------------
     public int getMaterial_hat_id() {
         return material_hat_id;
     }
@@ -85,16 +98,16 @@ public class MaterialHat extends DatabaseObject {
         material_hat_id = Integer.parseInt(id);
         System.out.println(id);
     }
-    @Override
-public MaterialHat clone() {
-    MaterialHat copy = new MaterialHat();
-    copy.material_hat_id = this.material_hat_id; // Optional: set to 0 if it's a new DB entry
-    copy.material_id = this.material_id;
-    copy.hat_id = this.hat_id;
-    copy.amount = this.amount;
-    copy.Color = this.Color;
-    return copy;
-}
 
+    @Override
+    public MaterialHat clone() {
+        MaterialHat copy = new MaterialHat();
+        copy.material_hat_id = this.material_hat_id; // Optional: set to 0 if it's a new DB entry
+        copy.material_id = this.material_id;
+        copy.hat_id = this.hat_id;
+        copy.amount = this.amount;
+        copy.Color = this.Color;
+        return copy;
+    }
 
 }

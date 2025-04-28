@@ -5,7 +5,8 @@
 package hattmakarna.data;
 
 /**
- *
+ * Enkel container klass för att smidigt dela ett objekt
+ * 
  * @author leonb
  */
 public class MaterialPassContainer {
