@@ -20,6 +20,7 @@ import hattmakarna.data.Specification;
 import hattmakarna.data.Status;
 import hattmakarna.data.User;
 import hattmakarna.util.PrintDebugger;
+import hattmakarna.util.Validerare;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -45,6 +46,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -73,7 +75,7 @@ public class OrderWindow extends javax.swing.JFrame {
     private DefaultListModel<String> customerModel;
 
     private ArrayList<Customer> toDisplay;
-    
+
     int customerID = 0;
     private ArrayList<Pair<Hat, Integer>> hatsToOrder;
 
@@ -89,7 +91,7 @@ public class OrderWindow extends javax.swing.JFrame {
         initComponents();
 
         this.setTitle("Registrera order");
-        
+
         tillagd_label.setVisible(false);
         hatsToOrder = new ArrayList<>();
         tmp_materials = new ArrayList<>();
@@ -117,8 +119,7 @@ public class OrderWindow extends javax.swing.JFrame {
 
         // remove any pre-existing selection
         jtCustomer.clearSelection();
-        
-        
+
         modelRegister.getAllHats().forEach(e -> {
             baseModelCombo.addItem(e.getName());
         });
@@ -130,7 +131,7 @@ public class OrderWindow extends javax.swing.JFrame {
         BoxLayout b = new BoxLayout(materialList, BoxLayout.Y_AXIS);
         materialList.setLayout(b);
         jScrollPane2.setViewportView(materialList);
-        
+
         ((DefaultTableModel) tblSeeOrder.getModel()).addTableModelListener(e -> {
             if (isUpdatingTable) {
                 return;
@@ -145,33 +146,39 @@ public class OrderWindow extends javax.swing.JFrame {
                 }
             }
         });
-        
-        
+
         //Sökrutan
-        
         tfSearch.getDocument().addDocumentListener(new DocumentListener() {
             private void update() {
                 String text = tfSearch.getText();
                 if (text.isEmpty()) {
                     refreshTable();
-                }
-                else{
-                    if(jrbName.isSelected()){
+                } else {
+                    if (jrbName.isSelected()) {
                         toDisplay = customerRegister.searchByName(text);
-                    }
-                    else{
+                    } else {
                         toDisplay = customerRegister.searchByEmail(text);
                     }
                     toDisplay = hattmakarna.util.Util.sortBy(toDisplay, Customer::getFirstName, true);
                     displayResults();
                 }
             }
-            @Override public void insertUpdate(DocumentEvent e) { update(); }
-            @Override public void removeUpdate(DocumentEvent e) { update(); }
-            @Override public void changedUpdate(DocumentEvent e) { update(); }
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
         });
-        
-        
 
     }
 
@@ -815,24 +822,24 @@ public class OrderWindow extends javax.swing.JFrame {
 
     }
 
-    private void displayResults(){
+    private void displayResults() {
         DefaultTableModel listModel = new DefaultTableModel();
         jtCustomer.setModel(listModel);
-        
+
         //clear
         listModel.setRowCount(0);
-        
+
         listModel.addColumn("Namn");
         listModel.addColumn("Email");
-        
-        for(Customer aCustomer : toDisplay){
+
+        for (Customer aCustomer : toDisplay) {
             String[] rowData = new String[2];
             rowData[0] = aCustomer.getFullName();
             rowData[1] = aCustomer.getEmailAdress();
             listModel.addRow(rowData);
         }
     }
-    
+
     private void btnRemoveCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveCustomerActionPerformed
         //Dialogfönster
         int customerIndex = jtCustomer.getSelectedColumn();
@@ -863,7 +870,7 @@ public class OrderWindow extends javax.swing.JFrame {
         btnRemoveCustomer.setEnabled(false);
         btnChooseCustomer.setEnabled(false);
         btnAddOrder.setEnabled(false);
-        
+
         lstModels.clearSelection();
         jtCustomer.clearSelection();
     }//GEN-LAST:event_paneSidebarMouseClicked
@@ -880,14 +887,14 @@ public class OrderWindow extends javax.swing.JFrame {
         btnRemoveCustomer.setEnabled(false);
         btnChooseCustomer.setEnabled(false);
         btnAddOrder.setEnabled(false);
-        
+
         lstModels.clearSelection();
         jtCustomer.clearSelection();
     }//GEN-LAST:event_tabbedPaneMouseClicked
 
     private void btnAddOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddOrderActionPerformed
         fillStockHatToOrder();
-        
+
     }//GEN-LAST:event_btnAddOrderActionPerformed
 
     private void add_materialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_add_materialActionPerformed
@@ -959,7 +966,7 @@ public class OrderWindow extends javax.swing.JFrame {
         btnRemoveCustomer.setEnabled(false);
         btnChooseCustomer.setEnabled(false);
         btnAddOrder.setEnabled(false);
-        
+
         jtCustomer.clearSelection();
         lstModels.clearSelection();
     }//GEN-LAST:event_paneStockMouseClicked
@@ -976,13 +983,13 @@ public class OrderWindow extends javax.swing.JFrame {
         btnAddOrder.setEnabled(true);
         btnRemoveCustomer.setEnabled(false);
         btnChooseCustomer.setEnabled(false);
-        
+
         jtCustomer.clearSelection();
     }//GEN-LAST:event_lstModelsMouseClicked
 
     private void jtCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtCustomerMouseClicked
         lstModels.clearSelection();
-        
+
         btnAddOrder.setEnabled(false);
         btnRemoveCustomer.setEnabled(true);
         btnChooseCustomer.setEnabled(true);
@@ -992,23 +999,23 @@ public class OrderWindow extends javax.swing.JFrame {
         threeDImages = Specification.set3DFilesFromUser();
     }//GEN-LAST:event_btn3DActionPerformed
 
-    private void refreshTable(){
+    private void refreshTable() {
         toDisplay = customerRegister.sortBy(Customer::getFirstName, true);
         PrintDebugger.info("refreshTable()");
         DefaultTableModel listModel = new DefaultTableModel();
         jtCustomer.setModel(listModel);
-        
+
         listModel.addColumn("Namn");
         listModel.addColumn("Email");
-        
-        for(Customer aCustomer : toDisplay){
+
+        for (Customer aCustomer : toDisplay) {
             String[] rowData = new String[2];
             rowData[0] = aCustomer.getFullName();
             rowData[1] = aCustomer.getEmailAdress();
             listModel.addRow(rowData);
         }
     }
-    
+
     private void updateHatsAndTableRow(int row) {
         DefaultTableModel model = (DefaultTableModel) tblSeeOrder.getModel();
 
@@ -1237,7 +1244,7 @@ public class OrderWindow extends javax.swing.JFrame {
 
     public void selectCustomer() {
         int index = jtCustomer.getSelectedRow();
-        
+
         Customer c = toDisplay.get(index);
         customerID = Integer.parseInt(c.getCustomerID());
         customer_label.setText(c.getFullName());
@@ -1251,15 +1258,15 @@ public class OrderWindow extends javax.swing.JFrame {
     private void initTable() {
         DefaultTableModel listModel = new DefaultTableModel();
         jtCustomer.setModel(listModel);
-        
+
         listModel.addColumn("Namn");
         listModel.addColumn("Email");
-        
-        for(Customer aCustomer : toDisplay){
+
+        for (Customer aCustomer : toDisplay) {
             String[] rowData = new String[2];
             rowData[0] = aCustomer.getFullName();
             rowData[1] = !aCustomer.getEmailAdresses().isEmpty()
-                ? aCustomer.getEmailAdress() : "";
+                    ? aCustomer.getEmailAdress() : "";
             listModel.addRow(rowData);
         }
     }
@@ -1326,8 +1333,15 @@ public class OrderWindow extends javax.swing.JFrame {
         String description = txtSpecialDesc.getText();
         String size = cbxSize.getSelectedItem().toString();
         String priceString = txtPrice.getText();
-        double price = Double.parseDouble(priceString);
+        double price = 0;
 
+        if (!Validerare.validatePrice(priceString)) {
+            JOptionPane.showMessageDialog(this,
+                    "Pris har fel format");
+            return;
+        }
+
+        price = Double.parseDouble(priceString);
         String pickedBaseModel = modelRegister.getAllHats().get(baseModelCombo.getSelectedIndex()).getModelID();
 
         Hat h = new Hat();
@@ -1339,7 +1353,7 @@ public class OrderWindow extends javax.swing.JFrame {
         h.getSpecification().setSkiss(tmp_spec_sketch_holder);
         h.getSpecification().setImgImage(tmp_spec_image_holder);
         h.getSpecification().setExtraImages(threeDImages);
-        
+
         h.getMaterials().clear();
         h.getMaterials().addAll(tmp_materials);
         h.setIsExpress(checkFastDeliverySpec.isSelected());
