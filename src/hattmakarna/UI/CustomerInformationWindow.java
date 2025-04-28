@@ -68,7 +68,6 @@ public CustomerInformationWindow(User userLoggedIn) {
 }
     
 private void fillTable() {
-    System.out.println("fillTableKörs");
     ArrayList<Customer> customers = customerRegister.getAllCustomers();
 
     String[] columnNames = {"ID", "Namn", "E-mail", "Telefon", "Adress", "Postnummer", "Land"};
@@ -137,6 +136,35 @@ jTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             }
         }
     });
+}
+
+private void updateComboBoxes() {
+    try {
+        cbMail.removeActionListener(cbMail.getActionListeners()[0]);
+        cbName.removeActionListener(cbName.getActionListeners()[0]);
+
+        // Uppdatera email-listan
+        ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
+        cbMail.removeAllItems();
+        for (String mail : mailList) {
+            cbMail.addItem(mail);
+        }
+
+        // Uppdatera namn-listan
+        ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
+        cbName.removeAllItems();
+        for (HashMap<String, String> row : customerRows) {
+            String fName = row.get("first_name");
+            String lName = row.get("last_name");
+            cbName.addItem(fName + " " + lName);
+        }
+
+        cbMail.addActionListener(e -> mailSelected());
+        cbName.addActionListener(e -> nameSelected());
+
+    } catch (InfException e) {
+        JOptionPane.showMessageDialog(this, "Kunde inte hämta uppdaterad information: " + e.getMessage());
+    }
 }
     
 private void openEditCustomerWindow(String email) {
@@ -246,6 +274,7 @@ private Customer findCustomerByFullName(String fullName) {
         btnBack = new javax.swing.JButton();
         btnRefresh = new javax.swing.JButton();
         btnRegNewCustomer = new javax.swing.JButton();
+        btnDeleteCustomer = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -301,6 +330,13 @@ private Customer findCustomerByFullName(String fullName) {
             }
         });
 
+        btnDeleteCustomer.setText("Ta bort");
+        btnDeleteCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeleteCustomerActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -327,7 +363,9 @@ private Customer findCustomerByFullName(String fullName) {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEditCustomer)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnRegNewCustomer))
+                        .addComponent(btnRegNewCustomer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnDeleteCustomer))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 818, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -351,7 +389,8 @@ private Customer findCustomerByFullName(String fullName) {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBack)
                     .addComponent(btnEditCustomer)
-                    .addComponent(btnRegNewCustomer))
+                    .addComponent(btnRegNewCustomer)
+                    .addComponent(btnDeleteCustomer))
                 .addContainerGap())
         );
 
@@ -393,6 +432,48 @@ private Customer findCustomerByFullName(String fullName) {
       // TODO add your handling code here:
     }//GEN-LAST:event_btnRegNewCustomerActionPerformed
 
+    private void btnDeleteCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteCustomerActionPerformed
+        int selectedRow = jTable1.getSelectedRow();
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Välj en kund i tabellen först.");
+        return;
+    }
+
+    String customerID = jTable1.getValueAt(selectedRow, 0).toString();
+    Customer toRemove = customerRegister.getCustomer(customerID);
+
+    if (toRemove == null) {
+        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+        return;
+    }
+
+    Object[] options = {"Ja", "Nej"};
+
+    int result = JOptionPane.showOptionDialog(this,
+            "Är du säker på att du vill ta bort " + toRemove.getFullName() + "?",
+            "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+            null, options, options[0]);
+
+    if (result == 0) { // Om "Ja" klickas
+        try {
+            toRemove.delete(); // Ta bort från databasen
+
+            customerRegister = new CustomerRegister(); // Ladda om kundlistan
+            fillTable(); // Ladda om tabellen
+
+            // Uppdatera comboboxarna
+            updateComboBoxes();
+
+            JOptionPane.showMessageDialog(this, "Kunden togs bort.");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Något gick fel vid borttagning: " + e.getMessage());
+        }
+    } else {
+        jTable1.clearSelection();
+    }
+
+    }//GEN-LAST:event_btnDeleteCustomerActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -430,6 +511,7 @@ private Customer findCustomerByFullName(String fullName) {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBack;
+    private javax.swing.JButton btnDeleteCustomer;
     private javax.swing.JButton btnEditCustomer;
     private javax.swing.JButton btnRefresh;
     private javax.swing.JButton btnRegNewCustomer;
