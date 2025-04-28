@@ -143,7 +143,7 @@ public class Specification extends DatabaseObject {
 
     public static ArrayList<BufferedImage> set3DFilesFromUser() {
         JFileChooser chooser = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("png");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG files", "png");
         chooser.setFileFilter(filter);
         chooser.setMultiSelectionEnabled(true); // Tillåt flera filer
 
