@@ -150,6 +150,22 @@ public class User {
         }
     }
     
+    public void setID(){
+        if(userID == null){
+            int newID = 0;
+        
+            try{
+                newID = Integer.parseInt(idb.getAutoIncrement("user", "user_id"));
+            }catch(InfException ex){
+                System.out.println(ex.getMessage());
+            }
+            this.userID = String.valueOf(newID);
+        }
+        else{
+            PrintDebugger.warn( ("ID not set for " + this.toString()) );
+        }
+    }
+    
     /*Tänker med denna att om en användare skulle vilja byta lösneord sätts då
     detta fältet först, med någon lämplig validering kanske. (att det inte är
     samma lösneord igen, att det inte är tomt, osv). Sen när lösneordet uppdaterats
@@ -226,18 +242,11 @@ public class User {
     }
     
     public void create(){
-        int newID = 0;
-        
-        try{
-            newID = Integer.parseInt(idb.getAutoIncrement("user", "user_id"));
-        }catch(InfException ex){
-            System.out.println(ex.getMessage());
-        }
-        this.setID(String.valueOf(newID));
+        setID();
         
         String sqlQuery = "INSERT INTO user (user_id, first_name, last_name, "
                 + "email, password) "
-                + "VALUES (" + newID + ", '" + firstName + "', '" + lastName
+                + "VALUES (" + userID + ", '" + firstName + "', '" + lastName
                 + "', '" + email + "', '" + pwCandidate + "');";
         
         try{
@@ -250,7 +259,7 @@ public class User {
         // ---------- ADMIN ----------
         if(isAdmin){
             sqlQuery = "INSERT INTO admin (user_id) " +
-                "VALUES (" + newID + ");";
+                "VALUES (" + userID + ");";
             try{
             idb.insert(sqlQuery);
             PrintDebugger.info(sqlQuery);

@@ -105,7 +105,6 @@ public class OrderWindow extends javax.swing.JFrame {
         btnAddOrder.setEnabled(false);
 
         jrbName.setSelected(true);
-        jtCustomer.setAutoCreateRowSorter(true);
         jtCustomer.setDefaultEditor(Object.class, null);
         // only allow whole-row selection (optional, but often desirable)
         jtCustomer.setRowSelectionAllowed(true);
@@ -820,7 +819,7 @@ public class OrderWindow extends javax.swing.JFrame {
     
     private void btnRemoveCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoveCustomerActionPerformed
         //Dialogfönster
-        int customerIndex = jtCustomer.getSelectedColumn();
+        int customerIndex = jtCustomer.getSelectedRow();
         Customer toRemove = toDisplay.get(customerIndex);
         Object[] options = {"Ja", "Nej"};
 

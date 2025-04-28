@@ -185,7 +185,7 @@ public class MainMenu extends javax.swing.JFrame {
 
     private void btnSignOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSignOutActionPerformed
         // TODO add your handling code here:
-        new LogInWindow(idb).setVisible(true);
+        new LogInWindow().setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnSignOutActionPerformed
 

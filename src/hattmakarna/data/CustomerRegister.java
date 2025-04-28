@@ -27,6 +27,10 @@ public class CustomerRegister {
         allCustomers = initAllCustomers();
     }
 
+    /**
+     * Initializes an ArrayList of customers from db.
+     * @return an ArrayList of 'Customer'-objects.
+     */
     private ArrayList<Customer> initAllCustomers(){
         String sqlQuery = "SELECT * FROM customer";
         
@@ -125,6 +129,11 @@ public class CustomerRegister {
         return sorted;
     }
     
+    /**
+     * 
+     * @param customerID The customer to return.
+     * @return a 'Customer'-object identified by its associated customerID.
+     */
     public Customer getCustomer(String customerID){
         for(Customer aCustomer : allCustomers){
             if(customerID.equals(aCustomer.getCustomerID())){
@@ -135,6 +144,11 @@ public class CustomerRegister {
         return null;
     }
     
+    /**
+     * 
+     * @param indexPos the index position of the customer to be returned. 
+     * @return a 'Customer'-object with the specified indexposition.
+     */
     public Customer getCustomer(int indexPos){
         if(indexPos >= 0 && indexPos < allCustomers.size()){
             return allCustomers.get(indexPos);
@@ -167,6 +181,11 @@ public class CustomerRegister {
         return allCustomers;
     }
     
+    /**
+     * 
+     * @param aCustomer to add. Will not be added if the list already contains
+     * that customer, asserted through {@link #customerExists(hattmakarna.data.Customer) }
+     */
     public void add(Customer aCustomer){
         if(!customerExists(aCustomer)){
             allCustomers.add(aCustomer);
@@ -182,15 +201,21 @@ public class CustomerRegister {
         return false;
     }
     
+    /**
+     * 
+     * @param email The email with which to search the list.
+     * @return a customer with specified email.
+     */
     public Customer getCustomerByEmail(String email) {
-      for (Customer aCustomer : allCustomers) {
-          for (String e : aCustomer.getEmailAdresses()) {
-              if (e.equalsIgnoreCase(email)) {
-                  return aCustomer;
-              }
-          }
-      }
-      return null;
+        for (Customer aCustomer : allCustomers) {
+            for (String e : aCustomer.getEmailAdresses()) {
+                if (e.equalsIgnoreCase(email)) {
+                    return aCustomer;
+                }
+            }
+        }
+        PrintDebugger.error("getCustomerByEmail() returned null!");
+        return null;
     }
    
 }
