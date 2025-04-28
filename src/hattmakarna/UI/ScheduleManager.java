@@ -54,7 +54,7 @@ public class ScheduleManager {
         this.scrollOrders = scrollOrders;
         startDate = LocalDate.now().with(java.time.DayOfWeek.MONDAY);
         taskRegister = new TaskRegister();
-        tasks = taskRegister.getOngoingTasks();
+        tasks = taskRegister.getUsersOngoingTasks(userLoggedIn.getID());
         orderRegister = new OrderRegister();
         emptyCells = new ArrayList<>();
 
@@ -69,8 +69,7 @@ public class ScheduleManager {
     }
 
     public void refreshSchedule() {
-        taskRegister.refreshTasks();
-        tasks = taskRegister.getOngoingTasks();
+        taskRegister.refreshUsersOngoingTasks(userLoggedIn.getID());
         HashMap<LocalDate, ArrayList<Task>> taskDates = createTaskDateMap();
 
         for (Component comp : calendarPanel.getComponents()) {
