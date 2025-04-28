@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import hattmakarna.data.Customer;
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.User;
+import java.util.Comparator;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -43,6 +44,9 @@ public CustomerInformationWindow(User userLoggedIn) {
 
     try {
         ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
+        if (mailList != null) {
+            mailList.sort(String.CASE_INSENSITIVE_ORDER); // <-- Lägg till sortering här
+        }
         cbMail.removeAllItems();
         for (String mail : mailList) {
             cbMail.addItem(mail);
@@ -53,11 +57,16 @@ public CustomerInformationWindow(User userLoggedIn) {
 
     try {
         ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
-        cbName.removeAllItems();
+        ArrayList<String> fullNameList = new ArrayList<>();
         for (HashMap<String, String> row : customerRows) {
             String fName = row.get("first_name");
             String lName = row.get("last_name");
-            cbName.addItem(fName + " " + lName);
+            fullNameList.add(fName + " " + lName);
+        }
+        fullNameList.sort(String.CASE_INSENSITIVE_ORDER); // <-- Lägg till sortering här
+        cbName.removeAllItems();
+        for (String fullName : fullNameList) {
+            cbName.addItem(fullName);
         }
     } catch (InfException e) {
         JOptionPane.showMessageDialog(this, "Kunde inte hämta namn: " + e.getMessage());
@@ -69,6 +78,9 @@ public CustomerInformationWindow(User userLoggedIn) {
     
 private void fillTable() {
     ArrayList<Customer> customers = customerRegister.getAllCustomers();
+    
+    // Sortera listan innan du fyller tabellen
+    customers.sort(Comparator.comparing(Customer::getFullName, String.CASE_INSENSITIVE_ORDER));
 
     String[] columnNames = {"ID", "Namn", "E-mail", "Telefon", "Adress", "Postnummer", "Land"};
     Object[][] data = new Object[customers.size()][7];
@@ -127,7 +139,7 @@ jTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
                     String customerID = jTable1.getValueAt(selectedRow, 0).toString();
                     Customer selectedCustomer = customerRegister.getCustomer(customerID);
                     if (selectedCustomer != null) {
-                        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+                        EditCustomer editWindow = new EditCustomer(selectedCustomer, CustomerInformationWindow.this);
                         editWindow.setVisible(true);
                     } else {
                         JOptionPane.showMessageDialog(null, "Kunden kunde inte hittas.");
@@ -140,23 +152,35 @@ jTable1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
 
 private void updateComboBoxes() {
     try {
-        cbMail.removeActionListener(cbMail.getActionListeners()[0]);
-        cbName.removeActionListener(cbName.getActionListeners()[0]);
+        if (cbMail.getActionListeners().length > 0) {
+            cbMail.removeActionListener(cbMail.getActionListeners()[0]);
+        }
+        if (cbName.getActionListeners().length > 0) {
+            cbName.removeActionListener(cbName.getActionListeners()[0]);
+        }
 
-        // Uppdatera email-listan
+        // --- 1. Hämta och sortera email ---
         ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");
+        if (mailList != null) {
+            mailList.sort(String.CASE_INSENSITIVE_ORDER); // <-- sortera!
+        }
         cbMail.removeAllItems();
         for (String mail : mailList) {
             cbMail.addItem(mail);
         }
 
-        // Uppdatera namn-listan
+        // --- 2. Hämta och sortera namn ---
         ArrayList<HashMap<String, String>> customerRows = idb.fetchRows("SELECT first_name, last_name FROM customer");
-        cbName.removeAllItems();
+        ArrayList<String> fullNameList = new ArrayList<>();
         for (HashMap<String, String> row : customerRows) {
             String fName = row.get("first_name");
             String lName = row.get("last_name");
-            cbName.addItem(fName + " " + lName);
+            fullNameList.add(fName + " " + lName);
+        }
+        fullNameList.sort(String.CASE_INSENSITIVE_ORDER); // <-- sortera!
+        cbName.removeAllItems();
+        for (String fullName : fullNameList) {
+            cbName.addItem(fullName);
         }
 
         cbMail.addActionListener(e -> mailSelected());
@@ -164,19 +188,49 @@ private void updateComboBoxes() {
 
     } catch (InfException e) {
         JOptionPane.showMessageDialog(this, "Kunde inte hämta uppdaterad information: " + e.getMessage());
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Något gick fel: " + e.getMessage());
+    }
+}
+    
+    private void reload() {
+    customerRegister = new CustomerRegister();
+}
+
+public void refreshData() {
+    int selectedRow = jTable1.getSelectedRow(); // Spara vilken rad som är vald
+    String selectedCustomerID = null;
+
+    if (selectedRow != -1) {
+        selectedCustomerID = (String) jTable1.getValueAt(selectedRow, 0); // Hämta customerID från vald rad
+    }
+
+    reload();
+    fillTable(); // Fyll tabellen igen
+    updateComboBoxes(); // Uppdatera namn- och mail-comboboxarna
+
+    if (selectedCustomerID != null) {
+        // Försök hitta samma kund och markera rätt rad igen
+        for (int i = 0; i < jTable1.getRowCount(); i++) {
+            if (jTable1.getValueAt(i, 0).toString().equals(selectedCustomerID)) {
+                jTable1.setRowSelectionInterval(i, i);
+                break;
+            }
+        }
     }
 }
     
 private void openEditCustomerWindow(String email) {
     Customer selectedCustomer = customerRegister.getCustomerByEmail(email);
     if (selectedCustomer != null) {
-        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+        EditCustomer editWindow = new EditCustomer(selectedCustomer, this);
         editWindow.setVisible(true);
     } else {
         JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
     }
 }
 private void updateTable(ArrayList<Customer> customers) {
+    customers.sort(Comparator.comparing(Customer::getFullName, String.CASE_INSENSITIVE_ORDER));
     String[] columnNames = {"ID", "Namn", "E-mail", "Telefon", "Adress", "Postnummer", "Land"};
     Object[][] data = new Object[customers.size()][7];
 
@@ -204,7 +258,9 @@ private void updateTable(ArrayList<Customer> customers) {
     jTable1.getColumnModel().getColumn(0).setWidth(0);
 }
     
-    private void mailSelected() {
+ private void mailSelected() {
+     reload(); 
+
     String selectedMail = (String) cbMail.getSelectedItem();
     if (selectedMail != null && !selectedMail.isEmpty()) {
         Customer c = findCustomerByEmail(selectedMail);
@@ -217,17 +273,19 @@ private void updateTable(ArrayList<Customer> customers) {
 }
 
 private void nameSelected() {
+     reload(); 
+
     String selectedName = (String) cbName.getSelectedItem();
     if (selectedName != null && !selectedName.isEmpty()) {
         String[] nameParts = selectedName.split(" ");
         if (nameParts.length == 2) {
             String firstName = nameParts[0];
             String lastName = nameParts[1];
-             Customer c = findCustomerByFullName(firstName + " " + lastName);
+            Customer c = findCustomerByFullName(firstName + " " + lastName);
             ArrayList<Customer> customers = new ArrayList<>();
             if (c != null){
-    customers.add(c);
-}
+                customers.add(c);
+            }
             updateTable(customers);
         }
     }
@@ -409,7 +467,7 @@ private Customer findCustomerByFullName(String fullName) {
 
     Customer selectedCustomer = customerRegister.getCustomer(customerID);
     if (selectedCustomer != null) {
-        EditCustomer editWindow = new EditCustomer(selectedCustomer);
+        EditCustomer editWindow = new EditCustomer(selectedCustomer, this);
         editWindow.setVisible(true);
     } else {
         JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
@@ -424,12 +482,11 @@ private Customer findCustomerByFullName(String fullName) {
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnRefreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefreshActionPerformed
-        fillTable();
+            refreshData();
     }//GEN-LAST:event_btnRefreshActionPerformed
 
     private void btnRegNewCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegNewCustomerActionPerformed
-    new RegisterCustomerWindow(userLoggedIn).setVisible(true);
-      // TODO add your handling code here:
+      new RegisterCustomerWindow(userLoggedIn, this).setVisible(true);
     }//GEN-LAST:event_btnRegNewCustomerActionPerformed
 
     private void btnDeleteCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteCustomerActionPerformed
