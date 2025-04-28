@@ -242,13 +242,12 @@ public class Hat extends DatabaseObject {
     @Override
     public boolean save() {
 
-        
         System.err.println("Sparar order");
         if (!super.save()) {
             System.err.println("Order ej sparad");
-
             return false;
         }
+
         System.err.println("Order sparad");
 
         if (specification != null) {
@@ -259,18 +258,23 @@ public class Hat extends DatabaseObject {
 
         if (materials != null) {
             materials.forEach(e -> {
-                e.setHat_id(hat_id);
-                System.err.println("Sparar hat material");
-                e.save();
+                
+                // Nånstans läggs de till dupleter vettefan hur men nu sparas dem ej ifall de redan har ett id
+                if (e.getIdString() == null || e.getIdString().isEmpty()) {
+                    e.setHat_id(hat_id);
+
+                    System.err.println("Sparar hat material");
+                    e.save();
+                }
+
             });
         }
-        if(materials != null)
-        {
+        if (materials != null) {
             materials.forEach(e -> {
                 e.setHat_id(hat_id);
                 e.setIdString(String.valueOf(hat_id));
-                
-            e.save();
+
+                e.save();
             });
         }
 
