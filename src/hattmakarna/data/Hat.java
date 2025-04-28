@@ -77,7 +77,7 @@ public class Hat extends DatabaseObject {
         super(hatId);
 
         try {
-            
+
             setSpecial();
 
             materials = new ArrayList<>();
@@ -125,8 +125,7 @@ public class Hat extends DatabaseObject {
             String specialId = idb.fetchSingle(query);
             if (String.valueOf(model_id).equals(specialId)) {
                 isSpecial = true;
-            }
-            else{
+            } else {
                 isSpecial = false;
             }
         } catch (InfException ex) {
@@ -243,53 +242,67 @@ public class Hat extends DatabaseObject {
     @Override
     public boolean save() {
 
+        System.err.println("Sparar order");
         if (!super.save()) {
+            System.err.println("Order ej sparad");
             return false;
         }
 
+        System.err.println("Order sparad");
+
         if (specification != null) {
             specification.setHatId(hat_id);
-            return specification.save();
+            specification.save();
+
+        }
+        System.err.println("Matierla lista check");
+      
+        if (materials != null) {
+            materials.forEach(e -> {
+                e.setHat_id(hat_id);
+               
+                e.save();
+            });
         }
 
         return true;
     }
-    
+
     @Override
-public Hat clone() {
-    Hat clone = new Hat();
-    clone.setHat_id(this.hat_id); // depending on your logic, you might want a new hat_id
-    clone.setModel_id(this.model_id);
-    clone.setOrder_id(this.order_id);
-    clone.setPrice(this.price);
-    clone.setSize(this.size);
-    clone.setIsExpress(this.isExpress);
-    clone.setIsSpecial(this.isSpecial);
+    public Hat clone() {
+        Hat clone = new Hat();
+        clone.setHat_id(this.hat_id); // depending on your logic, you might want a new hat_id
+        clone.setModel_id(this.model_id);
+        clone.setOrder_id(this.order_id);
+        clone.setPrice(this.price);
+        clone.setSize(this.size);
+        clone.setIsExpress(this.isExpress);
+        clone.setIsSpecial(this.isSpecial);
 
-    // Clone specification if it exists
-    if (this.specification != null) {
-        clone.specification =(Specification) this.specification.clone();
-    }
-
-    // Clone material list
-    if (this.materials != null) {
-        List<MaterialHat> clonedMaterials = new ArrayList<>();
-        for (MaterialHat mat : this.materials) {
-            clonedMaterials.add((MaterialHat)mat.clone());
+        // Clone specification if it exists
+        if (this.specification != null) {
+            clone.specification = (Specification) this.specification.clone();
         }
-        clone.materials = clonedMaterials;
-    }
 
-    // Clone deprecated materialBehov
-    if (this.materialBehov != null) {
-        ArrayList<MaterialOrder> clonedMaterialBehov = new ArrayList<>();
-        for (MaterialOrder order : this.materialBehov) {
-            clonedMaterialBehov.add(order.clone());
+        // Clone material list
+        if (this.materials != null) {
+            List<MaterialHat> clonedMaterials = new ArrayList<>();
+            for (MaterialHat mat : this.materials) {
+                clonedMaterials.add((MaterialHat) mat.clone());
+            }
+            clone.materials = clonedMaterials;
         }
-        clone.materialBehov = clonedMaterialBehov;
-    }
 
-    return clone;
-}
+        // Clone deprecated materialBehov
+        if (this.materialBehov != null) {
+            ArrayList<MaterialOrder> clonedMaterialBehov = new ArrayList<>();
+            for (MaterialOrder order : this.materialBehov) {
+                clonedMaterialBehov.add(order.clone());
+            }
+            clone.materialBehov = clonedMaterialBehov;
+        }
+
+        return clone;
+    }
 
 }

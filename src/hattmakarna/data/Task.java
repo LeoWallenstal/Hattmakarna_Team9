@@ -99,5 +99,9 @@ public class Task extends DatabaseObject {
     public int getOrderId(){
         return order_id;
     }
+    
+    public void setStatus(TaskStatus status){
+        this.status = status;
+    }
 
 }

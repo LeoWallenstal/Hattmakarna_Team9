@@ -16,9 +16,11 @@ import oru.inf.InfException;
 public class TaskRegister {
 
     private ArrayList<Task> allTasks;
+    private ArrayList<Task> ongoingTasks;
 
     public TaskRegister() {
         allTasks = new ArrayList<>();
+        ongoingTasks = new ArrayList<>();
         initAllTasks();
     }
 
@@ -41,6 +43,28 @@ public class TaskRegister {
         } catch (InfException ex) {
             System.out.println(" in initAllTasks()");
         }
+    }
+
+    private void initUsersOngoingTasks(String userId) {
+        String sqlQuery = """
+            SELECT 
+            t.*, 
+            m.name,
+            h.order_id
+            FROM task t       
+            JOIN hat h ON t.hat_id = h.hat_id
+            JOIN hat_model m ON h.model_id = m.model_id
+            WHERE t.status = 'PÅGÅENDE' AND
+            t.user_id = """ + userId;
+
+        try {
+            ArrayList<HashMap<String, String>> tasks = idb.fetchRows(sqlQuery);
+            for (HashMap<String, String> taskMap : tasks) {
+                ongoingTasks.add(new Task(taskMap));
+            }
+        } catch (InfException ex) {
+            System.out.println(" in initAllTasks()");
+        }
 
     }
 
@@ -48,8 +72,13 @@ public class TaskRegister {
         return allTasks;
     }
 
-    public void refreshTasks() {
-        allTasks.clear();
-        initAllTasks();
+    public ArrayList<Task> getUsersOngoingTasks(String userId) {
+        initUsersOngoingTasks(userId);
+        return ongoingTasks;
+    }
+
+    public void refreshUsersOngoingTasks(String UserId) {
+        ongoingTasks.clear();
+        initUsersOngoingTasks(UserId);
     }
 }

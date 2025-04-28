@@ -6,6 +6,7 @@
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
       <Dimension value="[829, 545]"/>
     </Property>
+    <Property name="resizable" type="boolean" value="false"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
@@ -30,39 +31,53 @@
               <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <Component id="scrollOrders" min="-2" pref="196" max="-2" attributes="0"/>
-                      <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
-                      <Component id="calendarPanel" min="-2" max="-2" attributes="0"/>
+                      <Component id="btnSignOut" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="btnSignOut" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="scrollOrders" pref="196" max="32767" attributes="0"/>
+                      <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
+                      <Component id="calendarPanel" max="32767" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace min="0" pref="6" max="32767" attributes="0"/>
           </Group>
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
+              <Component id="btnCustomer" min="-2" pref="120" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="btnCustomer" min="-2" pref="120" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
-                      <Component id="btnOrder" min="-2" pref="120" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
-                      <Component id="btnMaterial" min="-2" pref="120" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="162" max="-2" attributes="0"/>
+                      <Component id="lblCompanyName" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Component id="btnUsers" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="54" max="-2" attributes="0"/>
-                      <Component id="btnHat" min="-2" pref="122" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="lblUserName" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="btnUsers" min="-2" pref="120" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="btnOrder" min="-2" pref="120" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="btnHat" min="-2" pref="120" max="-2" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="btnMaterial" min="-2" pref="120" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
+                      <Component id="btnStatistics" min="-2" pref="120" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="288" max="-2" attributes="0"/>
-              <Component id="lblCompanyName" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="lblUserName" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -71,23 +86,30 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="lblCompanyName" min="-2" pref="163" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
               <Component id="lblUserName" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnCustomer" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnOrder" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnHat" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnUsers" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnOrder" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnStatistics" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnMaterial" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="calendarPanel" min="-2" max="-2" attributes="0"/>
-                  <Component id="scrollOrders" min="-2" pref="279" max="-2" attributes="0"/>
+                  <Component id="calendarPanel" max="32767" attributes="0"/>
+                  <Component id="scrollOrders" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="btnSignOut" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btnSignOut" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -97,6 +119,9 @@
     <Component class="javax.swing.JButton" name="btnSignOut">
       <Properties>
         <Property name="text" type="java.lang.String" value="Logga ut"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSignOutActionPerformed"/>
@@ -111,10 +136,16 @@
           <Image iconType="3" name="/resources/icons/logo256.png"/>
         </Property>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lblCompanyNameMouseClicked"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnCustomer">
       <Properties>
         <Property name="text" type="java.lang.String" value="Kunder"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCustomerActionPerformed"/>
@@ -123,6 +154,9 @@
     <Component class="javax.swing.JButton" name="btnOrder">
       <Properties>
         <Property name="text" type="java.lang.String" value="Order"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnOrderActionPerformed"/>
@@ -131,6 +165,9 @@
     <Component class="javax.swing.JButton" name="btnMaterial">
       <Properties>
         <Property name="text" type="java.lang.String" value="Material"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMaterialActionPerformed"/>
@@ -139,6 +176,9 @@
     <Component class="javax.swing.JButton" name="btnHat">
       <Properties>
         <Property name="text" type="java.lang.String" value="Hattar"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHatActionPerformed"/>
@@ -146,12 +186,18 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblUserName">
       <Properties>
+        <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+          <Font name="SansSerif" size="14" style="1"/>
+        </Property>
         <Property name="text" type="java.lang.String" value="Inloggad: "/>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnUsers">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Hantera anst&#xe4;llda"/>
+        <Property name="text" type="java.lang.String" value="Anst&#xe4;llda"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Hand Cursor"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnUsersActionPerformed"/>
@@ -159,6 +205,11 @@
     </Component>
     <Container class="javax.swing.JScrollPane" name="scrollOrders">
       <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
 
@@ -187,5 +238,45 @@
         <Property name="useNullLayout" type="boolean" value="true"/>
       </Layout>
     </Container>
+    <Component class="javax.swing.JButton" name="btnStatistics">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Statistik"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnStatisticsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel1">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/resources/icons/doneColor.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="= Klar"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel2">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/resources/icons/expressColor.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="= Express"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel3">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/resources/icons/underWorkColor.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="= P&#xe5;g&#xe5;ende"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel4">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/resources/icons/readyColor.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="= Ej p&#xe5;b&#xf6;rjad"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>

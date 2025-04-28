@@ -17,7 +17,6 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
     /**
      * Creates new form UnsavedChangesWindow
      */
-    
     private Customer aCustomer;
     private User userLoggedIn;
     private Window previousWindow;
@@ -26,7 +25,6 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
         this.aCustomer = aCustomer;
         this.userLoggedIn = userLoggedIn;
         this.previousWindow = previousWindow;
-        
         initComponents();
         setLocationRelativeTo(null);
     }

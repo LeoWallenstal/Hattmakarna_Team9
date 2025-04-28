@@ -27,7 +27,6 @@ public class StatisticsWindow extends javax.swing.JFrame {
     private ArrayList<Model> hatModels;
     ModelRegister modelRegister;
     CustomerRegister customerRegister;
-    private DefaultTableModel tblModel;
     Calendar cal = Calendar.getInstance();
     private final Date defaultFromDate = new GregorianCalendar(2024, Calendar.JANUARY, 1).getTime();
     private final Date defaultToDate = new Date();
@@ -39,11 +38,15 @@ public class StatisticsWindow extends javax.swing.JFrame {
      */
     public StatisticsWindow() {
         initComponents();
-
-        // Sätt dagens datum till "Till datum"
+        init();
+    }
+    
+    
+    private void init() {
+        
+        this.setTitle("Statistik");
+        
         datePickerTo.setDate(new Date());
-
-        // Sätt 1 januari 2024 till "Från datum"
         cal.set(Calendar.YEAR, 2024);
         cal.set(Calendar.MONTH, Calendar.JANUARY);
         cal.set(Calendar.DAY_OF_MONTH, 1);
@@ -55,10 +58,11 @@ public class StatisticsWindow extends javax.swing.JFrame {
         modelRegister = new ModelRegister();
         hatModels = modelRegister.getAllHats();
         fillModels();
-        tblModel = new DefaultTableModel(new String[]{"Kund", "Antal hattar", "Summa"}, 0);
-        tblStats.setModel(tblModel);
         loadAllDataToTable();
+        
     }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -268,7 +272,16 @@ public class StatisticsWindow extends javax.swing.JFrame {
             new String [] {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblStats.getTableHeader().setReorderingAllowed(false);
         paneStats.setViewportView(tblStats);
 
         btnFilter.setText("Filter");
@@ -288,31 +301,27 @@ public class StatisticsWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(paneStats, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnBack)
-                        .addGap(84, 84, 84)
-                        .addComponent(lblTitle)
-                        .addGap(78, 78, 78)
-                        .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(paneStats, javax.swing.GroupLayout.DEFAULT_SIZE, 712, Short.MAX_VALUE)))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnBack)
+                            .addComponent(lblTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblTitle)
+                            .addComponent(btnFilter, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(37, 37, 37)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTitle)
-                    .addComponent(btnFilter))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
+                .addComponent(lblTitle)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnFilter)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
                 .addComponent(paneStats, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblTotal)
-                .addGap(29, 29, 29)
+                .addGap(35, 35, 35)
                 .addComponent(btnBack)
                 .addContainerGap())
         );
@@ -393,16 +402,16 @@ public class StatisticsWindow extends javax.swing.JFrame {
 
     private void lstHatModelsValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_lstHatModelsValueChanged
         if (!evt.getValueIsAdjusting()) {
-        // Få alla valda hattmodeller från den första listan
-        List<String> selectedModels = lstHatModels.getSelectedValuesList();
+            // Få alla valda hattmodeller från den första listan
+            List<String> selectedModels = lstHatModels.getSelectedValuesList();
             for (String model : selectedModels) {
-                if(!selectedModelNames.contains(model)) {
+                if (!selectedModelNames.contains(model)) {
                     selectedModelNames.add(model);
                 }
             }
-        DefaultListModel<String> modelListModel = new DefaultListModel<>();
+            DefaultListModel<String> modelListModel = new DefaultListModel<>();
             for (String model : selectedModelNames) {
-            modelListModel.addElement(model);
+                modelListModel.addElement(model);
             }
             lstSelectedHatModels.setModel(modelListModel);
         }
@@ -412,11 +421,9 @@ public class StatisticsWindow extends javax.swing.JFrame {
         String selectedCustomer = lstCustomers.getSelectedValue();
         for (Customer customer : customerRegister.getAllCustomers()) {
             if (customer.getFullName().equalsIgnoreCase(selectedCustomer)) {
-                //customerID = Integer.parseInt(customer.getCustomerID());
                 break;
             }
         }
-        //lblCustomerOrder.setText("Vald kund: " + selectedCustomer);
     }
 
     private void fillSearchResults() {
@@ -491,16 +498,19 @@ public class StatisticsWindow extends javax.swing.JFrame {
 
             return idb.fetchRows(sql);
 
-        } catch (Exception e) {
+        } catch (InfException e) {
             JOptionPane.showMessageDialog(null, "Fel vid filtrering: " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
 
     private void updateTable(ArrayList<HashMap<String, String>> data) {
-        String[] columnNames = {"Kund", "Antal hattar", "Summa"};
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        DefaultTableModel tableModel = new DefaultTableModel(new String[]{"Kund", "Antal hattar", "Summa"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
 
         int totalCount = 0;
         double totalSum = 0.0;
@@ -512,6 +522,8 @@ public class StatisticsWindow extends javax.swing.JFrame {
 
             totalCount += count;
             totalSum += sum;
+
+            tblStats.getTableHeader().setReorderingAllowed(false);
 
             tableModel.addRow(new Object[]{customerName, count, sum});
         }

@@ -25,6 +25,8 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     private boolean isInitialized;
     private boolean initializedMaterialOrder;
     private OrderOverviewWindow window;
+    private ScheduleManager scheduleManager;
+    private HashMap<String, String> modelToFirstHatId = new HashMap<>();
 
     /**
      * Creates new form OrderInfoWindow
@@ -33,6 +35,28 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         initComponents();
         this.currentOrder = order;
         this.window = window;
+        scheduleManager = null;
+        this.table = (DefaultTableModel) tblHats.getModel();
+        this.setTitle("Order information");
+
+        fillTable();
+        initStatusCb();
+        setStatus();
+        initMaterialOrderCb();
+        setStatusMaterialOrder();
+        lblSuccessFailed.setVisible(false);
+        btnDeleteOrder.setVisible(false);
+        setInfo();
+        setLocationRelativeTo(null);
+        this.isInitialized = true;
+        initializedMaterialOrder = true;
+    }
+    
+    public OrderInfoWindow(ScheduleManager scheduleManager, Order order) {
+        initComponents();
+        this.currentOrder = order;
+        this.window = null;
+        this.scheduleManager = scheduleManager;
         this.table = (DefaultTableModel) tblHats.getModel();
 
         fillTable();
@@ -193,6 +217,11 @@ public class OrderInfoWindow extends javax.swing.JFrame {
             }
         });
         tblHats.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        tblHats.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblHatsMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblHats);
         if (tblHats.getColumnModel().getColumnCount() > 0) {
             tblHats.getColumnModel().getColumn(0).setResizable(false);
@@ -287,7 +316,11 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         }
         currentOrder.setStatus(Status.valueOf(cbStatus.getSelectedItem().toString()));
         currentOrder.save();
-        window.initTable();
+        if(window != null)
+            window.initTable();
+        else if (scheduleManager != null){
+            scheduleManager.buildOrdersPanel(true);
+        }
 
         if (cbStatus.getSelectedItem().toString().equals("MOTTAGEN")) {
             btnDeleteOrder.setVisible(true);
@@ -323,7 +356,8 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_cbStatusActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        window.initTable();
+        if(window != null)
+            window.initTable();
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -331,6 +365,40 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
         new FraktSedelUI(this, id).setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void tblHatsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblHatsMouseClicked
+        System.out.println("Klickad på tabellrad");
+
+        int row = tblHats.getSelectedRow();
+        if (row == -1) {
+            System.out.println("Ingen rad vald.");
+            return;
+        }
+
+        String clickedModelName = "Special";
+        System.out.println("Klickat modellnamn: " + clickedModelName);
+
+        ArrayList<String> hatIds = (ArrayList<String>) currentOrder.fetchHatIds();
+        boolean matchFound = false;
+
+        for (String hatId : hatIds) {
+            Hat hat = new Hat(hatId);
+            String modelName = new ModelRegister().getModel(hat.getModelId()).getName();
+
+            System.out.println("Kontrollerar hatt: " + hatId + " med modellnamn: " + modelName);
+
+            if (modelName.equals(clickedModelName)) {
+                System.out.println("Match hittad! Öppnar HattViewerWindow med ID: " + hatId);
+                new HattViewerWindow(Integer.parseInt(hatId)).setVisible(true);
+                matchFound = true;
+                break;
+            }
+        }
+
+        if (!matchFound) {
+            System.out.println("Ingen matchande hatt hittades.");
+        }
+    }//GEN-LAST:event_tblHatsMouseClicked
 
     /**
      * @param args the command line arguments
