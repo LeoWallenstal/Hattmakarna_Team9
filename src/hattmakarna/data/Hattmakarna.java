@@ -61,6 +61,11 @@ public class Hattmakarna {
      */
     public static void main(String[] args) {
         
+        
+        /*För att undvika konstiga grafiska artefakter 
+          när man har HDMIkabel inkopplad! */
+        System.setProperty("sun.java2d.opengl", "true");
+        
         //Loading icons
         List<Image> icons = List.of(
             Toolkit.getDefaultToolkit().getImage(Hattmakarna.class.getResource("/resources/icons/appIcon16.png")),
@@ -87,6 +92,8 @@ public class Hattmakarna {
                 if(w instanceof JDialog jd){
                     jd.setIconImages(icons);
                 }
+                /*Nått liknande här för fönstret i statistikfönstret som 
+                  inte får namnprefixet.*/
             }
         }, AWTEvent.WINDOW_EVENT_MASK);
 
@@ -102,7 +109,8 @@ public class Hattmakarna {
         try {
             connectToDB();
 
-            new LogInWindow(idb).setVisible(true);
+            new LogInWindow().setVisible(true);
+                    
         } catch (InfException e) {
             JOptionPane.showMessageDialog(null, "Koppling till databasen misslyckades! :/");
             e.printStackTrace();

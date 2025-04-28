@@ -7,20 +7,18 @@ package hattmakarna.UI;
 import hattmakarna.UI.MainMenu;
 import hattmakarna.data.User;
 import hattmakarna.util.Validerare;
-import oru.inf.InfDB;
 import oru.inf.InfException;
+import static hattmakarna.data.Hattmakarna.idb;
 /**
  *
  * @author Edvard
  */
 public class LogInWindow extends javax.swing.JFrame {
 
-    private final InfDB idb;
     /**
      * Creates new form LogInWindow
      */
-    public LogInWindow(InfDB idb) {
-        this.idb = idb;
+    public LogInWindow() {
         initComponents();
         setLocationRelativeTo(null);
         lblError.setVisible(false);
@@ -59,7 +57,7 @@ public class LogInWindow extends javax.swing.JFrame {
         lblPassword.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblPassword.setText("Lösenord:");
 
-        txtEmail.setText("otto@hatt.se");
+        txtEmail.setText("otto.svensson@hatt.se");
 
         pwdPassword.setText("pass123");
 
@@ -139,10 +137,9 @@ public class LogInWindow extends javax.swing.JFrame {
                     lblError.setText("Fel epost eller lösenord");
                 }
                 
-            }
-        catch (InfException ex) {
+            }catch (InfException ex) {
                 System.out.println(ex.getMessage());
-                }
+            }
         }
     }//GEN-LAST:event_btnLogInActionPerformed
 
@@ -156,9 +153,9 @@ public class LogInWindow extends javax.swing.JFrame {
             return false;
         }
         if (!Validerare.validateEmail(email)) {
-        lblError.setVisible(true);
-        lblError.setText("Ogiltig epost");
-        return false;
+            lblError.setVisible(true);
+            lblError.setText("Ogiltig epost");
+            return false;
         }
         return true;
     }

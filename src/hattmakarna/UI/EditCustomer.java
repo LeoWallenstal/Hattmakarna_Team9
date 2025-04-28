@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import hattmakarna.util.CountryList;
 import javax.swing.ScrollPaneConstants;
 import hattmakarna.data.EmailOrPhone;
+import java.awt.Toolkit;
 import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -671,7 +672,15 @@ public class EditCustomer extends javax.swing.JFrame {
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         if(hasUnsavedChanges()){
-            new UnsavedChangesWindow(aCustomer, userLoggedIn).setVisible(true);
+            Object[] options = {"Ja", "Nej"};
+            
+            Toolkit.getDefaultToolkit().beep();
+            int result = JOptionPane.showOptionDialog(this, "Du har osparade ändringar! Vill du fortsätta utan att spara?", 
+                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            
+            if(result == 0){
+                this.setVisible(false);
+            }
         }
         else{
             this.setVisible(false);
