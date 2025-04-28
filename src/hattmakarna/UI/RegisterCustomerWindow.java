@@ -37,6 +37,7 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
 
     private User userLoggedIn;
     private OrderWindow lastWindow;
+    private CustomerInformationWindow customerInfoWindow;
     private DefaultListModel<String> dlPhoneModel;
     private DefaultListModel<String> dlEmailModel;
     private ArrayList<String> phoneModel;
@@ -46,31 +47,36 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private boolean saved = false;
     
     
-    public RegisterCustomerWindow(User user) {
-    this(user, null);
-}
- 
     public RegisterCustomerWindow(User user, OrderWindow lastWindow) {
-        initComponents();
-        initErrorFlags();
-        this.setTitle("Registrera kund");
-        this.lastWindow = lastWindow;
-        customerRegister = new CustomerRegister();
+    this(user, lastWindow, null);
+    }
 
-        userLoggedIn = user;
-        dlPhoneModel = (DefaultListModel<String>) jlPhone.getModel();
-        dlEmailModel = (DefaultListModel<String>) jlEmail.getModel();
+    public RegisterCustomerWindow(User user, CustomerInformationWindow customerInfoWindow) {
+    this(user, null, customerInfoWindow);
+    }
 
-        jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        jScrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    public RegisterCustomerWindow(User user, OrderWindow lastWindow, CustomerInformationWindow customerInfoWindow) {
+    initComponents();
+    initErrorFlags();
+    this.setTitle("Registrera kund");
+    
+    this.lastWindow = lastWindow;
+    this.customerInfoWindow = customerInfoWindow;
+    customerRegister = new CustomerRegister();
 
-        blankCustomer = new Customer();
+    userLoggedIn = user;
+    dlPhoneModel = (DefaultListModel<String>) jlPhone.getModel();
+    dlEmailModel = (DefaultListModel<String>) jlEmail.getModel();
 
-        initCBCountry();
+    jScrollPane1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    jScrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-        phoneModel = new ArrayList<String>();
+    blankCustomer = new Customer();
 
-        emailModel = new ArrayList<String>();
+    initCBCountry();
+
+    phoneModel = new ArrayList<>();
+    emailModel = new ArrayList<>();
 
         //Listener
         tfFirstName.getDocument().addDocumentListener(new FormChangeListener());
@@ -556,28 +562,26 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
             lblCustomerExistsError.setVisible(true);
         }
         
-        if(creationOK){
-            if(blankCustomer.getFullName().equals("Rick Astley")){
-                getRolled();
-            }
-            
-            if(!customerRegister.customerExists(blankCustomer)){
-
-        if (creationOK) {
-            if (!customerRegister.customerExists(blankCustomer)) {
-                customerRegister.add(blankCustomer);
-                blankCustomer.insert();
-                saved = true;
-                reset();
-                lblCustomerSaved.setVisible(true);
-
-                lastWindow.refreshCustomers();
-            } else {
-                creationOK = false;
-                lblCustomerExistsError.setVisible(true);
-            }
+       if (creationOK) {
+    if (!customerRegister.customerExists(blankCustomer)) {
+        customerRegister.add(blankCustomer);
+        blankCustomer.insert();
+        saved = true;
+        
+        if (customerInfoWindow != null) {
+            customerInfoWindow.refreshData();
+        }
+        if (lastWindow != null) {
+            lastWindow.refreshCustomers();
         }
         
+        this.dispose();
+
+        reset();
+        lblCustomerSaved.setVisible(true);
+    } else {
+        creationOK = false;
+        lblCustomerExistsError.setVisible(true);
             
     }//GEN-LAST:event_btnSaveActionPerformed
      }
