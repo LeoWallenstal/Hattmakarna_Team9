@@ -216,7 +216,7 @@ public class EditHat extends javax.swing.JFrame {
             currentModel.updatePrice(currentModel.getModelID(), price);
             currentModel.updateName(name);
 
-            System.out.println("Priset har uppdaterats för " + currentModel.getModelID());
+            
 
             new HattWindow(userLoggedIn).setVisible(true);
             this.dispose();

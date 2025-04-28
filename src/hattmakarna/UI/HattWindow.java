@@ -212,7 +212,7 @@ this.setVisible(false);
     }//GEN-LAST:event_btnAddActionPerformed
     private void fillTable() {
       
-   System.out.println("fillTable körs");
+   
 
     // Hämta alla hattar och alla modeller
     ArrayList<Model> models = modelRegister.getAllHats();
