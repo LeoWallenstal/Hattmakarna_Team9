@@ -286,29 +286,29 @@ public class ScheduleManager {
 
             try {
                 String specId = idb.fetchSingle(sqlQuery);
-                if (specId != null) {
-                    Specification spec = new Specification(specId);
-                    String imagePath = spec.getImagePath();
-                    String toolTip = "<html>";
-                    if (imagePath != null) {
-                        imagePath = imagePath.trim();
-                        URL imageUrl = getClass().getResource(imagePath);
-                        if (imageUrl != null) {
-                            toolTip += "<img src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>";
-                        } else {
-                            System.err.println("Kunde inte hitta bilden på: ");
-                        }
-
-                    }
-                    String desc = spec.getDescription();
-                    if (desc != null) {
-                        toolTip += desc;
+                if(specId != null){
+                Specification spec = new Specification(specId);
+                String imagePath = spec.getImagePath();
+                String toolTip = "<html>";
+                if (imagePath != null) {
+                    imagePath = imagePath.trim();
+                    URL imageUrl = getClass().getResource(imagePath);
+                    if (imageUrl != null) {
+                        toolTip += "<img src='" + imageUrl.toExternalForm() + "'><br>";
                     } else {
-                        toolTip += "Finns ingen beskrivning...";
+                        System.err.println("Kunde inte hitta bilden på: ");
                     }
 
-                    toolTip += "<br> </html>";
-                    panel.setToolTipText(toolTip);
+                }
+                String desc = spec.getDescription();
+                if (desc != null) {
+                    toolTip += desc;
+                } else {
+                    toolTip += "Finns ingen beskrivning...";
+                }
+
+                toolTip += "<br> </html>";
+                panel.setToolTipText(toolTip);
                 }
             } catch (InfException ex) {
                 Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
