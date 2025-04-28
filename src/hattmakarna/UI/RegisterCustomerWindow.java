@@ -515,7 +515,7 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         boolean creationOK = true;
-       
+
         if (!validateName(tfFirstName.getText())) {
             creationOK = false;
             lblFirstNameError.setVisible(true);
