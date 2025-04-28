@@ -40,6 +40,7 @@ public CustomerInformationWindow(User userLoggedIn) {
 
     initComponents();
     fillTable();
+        this.setTitle("Hantera kunder");
 
     try {
         ArrayList<String> mailList = idb.fetchColumn("SELECT mail FROM mail;");

@@ -48,6 +48,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -60,6 +61,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import org.junit.runners.ParentRunner;
 import oru.inf.InfException;
 
 /**
@@ -73,7 +75,7 @@ public class OrderWindow extends javax.swing.JFrame {
     private ArrayList<Model> hatModels;
     private ArrayList<MaterialHat> tmp_materials;
     private DefaultListModel<String> customerModel;
-
+    private JFrame parent;
     private ArrayList<Customer> toDisplay;
 
     int customerID = 0;
@@ -87,11 +89,11 @@ public class OrderWindow extends javax.swing.JFrame {
     /**
      * Creates new form OrderWindow
      */
-    public OrderWindow(User userLoggedIn) {
+    public OrderWindow(User userLoggedIn, JFrame parent) {
         initComponents();
 
         this.setTitle("Registrera order");
-
+        this.parent = parent;
         tillagd_label.setVisible(false);
         hatsToOrder = new ArrayList<>();
         tmp_materials = new ArrayList<>();
@@ -810,8 +812,9 @@ public class OrderWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNewCustomerActionPerformed
 
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
-        new MainMenu(userLoggedIn).setVisible(true);
         this.setVisible(false);
+        parent.setVisible(true);
+
     }//GEN-LAST:event_btnReturnActionPerformed
 
     private void btnChooseCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseCustomerActionPerformed

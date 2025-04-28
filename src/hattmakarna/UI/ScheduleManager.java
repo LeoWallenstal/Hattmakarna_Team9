@@ -294,7 +294,7 @@ public class ScheduleManager {
                         imagePath = imagePath.trim();
                         URL imageUrl = getClass().getResource(imagePath);
                         if (imageUrl != null) {
-                            toolTip += "<img src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>";
+                            toolTip += "<img style=\"object-fit:cover\" src='" + imageUrl.toExternalForm() + "' width='64' height='64'><br>";
                         } else {
                             System.err.println("Kunde inte hitta bilden på: ");
                         }

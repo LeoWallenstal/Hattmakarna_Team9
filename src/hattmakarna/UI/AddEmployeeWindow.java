@@ -27,6 +27,7 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         btnAdd.setEnabled(false);
         pfPassword.setEchoChar('*');
+        this.setTitle("Hantera anställda");
     }
     
     public boolean fieldsCorrect(){

@@ -16,14 +16,14 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
     /**
      * Creates new form UnsavedChangesWindow
      */
-    
     private Customer aCustomer;
     private User userLoggedIn;
-    
+
     public UnsavedChangesWindow(Customer aCustomer, User userLoggedIn) {
         this.aCustomer = aCustomer;
         this.userLoggedIn = userLoggedIn;
-        
+        this.setTitle("Spara ändringar");
+
         initComponents();
         setLocationRelativeTo(null);
     }
@@ -104,7 +104,7 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
 
     private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
         this.setVisible(false);
-        new OrderWindow(userLoggedIn).setVisible(true);
+        new OrderWindow(userLoggedIn,this).setVisible(true);
     }//GEN-LAST:event_btnContinueActionPerformed
 
     /**

@@ -33,7 +33,8 @@ public class EditHat extends javax.swing.JFrame {
     lblModelNummer.setText(currentModel.getModelID());
     tfPrice.setText(String.valueOf(currentModel.getPrice()));
     tfName.setText(String.valueOf(currentModel.getName()));
-}
+}        this.setTitle("Hantera hatt");
+
          
         
     }
