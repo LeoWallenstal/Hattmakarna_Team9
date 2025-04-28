@@ -253,27 +253,14 @@ public class Hat extends DatabaseObject {
         if (specification != null) {
             specification.setHatId(hat_id);
             specification.save();
+
         }
         System.err.println("Matierla lista check");
-
-        if (materials != null) {
-            materials.forEach(e -> {
-                
-                // Nånstans läggs de till dupleter vettefan hur men nu sparas dem ej ifall de redan har ett id
-                if (e.getIdString() == null || e.getIdString().isEmpty()) {
-                    e.setHat_id(hat_id);
-
-                    System.err.println("Sparar hat material");
-                    e.save();
-                }
-
-            });
-        }
+      
         if (materials != null) {
             materials.forEach(e -> {
                 e.setHat_id(hat_id);
-                e.setIdString(String.valueOf(hat_id));
-
+               
                 e.save();
             });
         }
