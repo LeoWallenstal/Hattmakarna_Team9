@@ -502,10 +502,6 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         boolean creationOK = true;
-        for (int i = 0; i < 10; i++){
-             getRickRolled();
-        }
-       
         
         if (!validateName(tfFirstName.getText())) {
             creationOK = false;
@@ -811,20 +807,6 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         @Override
         public void changedUpdate(DocumentEvent e) {
             checkFormCompletion();
-        }
-    }
-
-    private void getRickRolled() {
-
-        if (tfFirstName.getText().equals("Rick") || tfLastName.getText().equals("Astley")) {
-            try {
-                Desktop desktop = Desktop.getDesktop();
-                // Ange URL du vill öppna
-                URI uri = new URI("https://shattereddisk.github.io/rickroll/rickroll.mp4");
-                desktop.browse(uri);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
