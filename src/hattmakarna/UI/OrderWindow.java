@@ -810,7 +810,7 @@ public class OrderWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_btnNewCustomerActionPerformed
 
     private void btnReturnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReturnActionPerformed
-        new MainMenu(userLoggedIn).setVisible(true);
+        new OrderOverviewWindow(userLoggedIn).setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnReturnActionPerformed
 
