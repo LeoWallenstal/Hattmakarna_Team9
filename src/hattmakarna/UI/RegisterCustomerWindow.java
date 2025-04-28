@@ -7,12 +7,18 @@ import hattmakarna.data.CustomerRegister;
 import hattmakarna.data.User;
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.util.CountryList;
-import hattmakarna.util.Util;
+import static hattmakarna.util.Util.*;
 import java.util.ArrayList;
 import oru.inf.InfException;
 import static hattmakarna.util.Validerare.*;
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -37,10 +43,14 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
     private boolean saved = false;
     
     
+    public RegisterCustomerWindow(User user) {
+    this(user, null);
+}
+    
     public RegisterCustomerWindow(User user, OrderWindow lastWindow) {
         initComponents();
         initErrorFlags();
-        this.setTitle("Hattmakarna - Registrera kund");
+        this.setTitle("Registrera kund");
         this.lastWindow = lastWindow;
         customerRegister = new CustomerRegister();
         
@@ -537,6 +547,10 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         }
         
         if(creationOK){
+            if(blankCustomer.getFullName().equals("Rick Astley")){
+                getRolled();
+            }
+            
             if(!customerRegister.customerExists(blankCustomer)){
                 customerRegister.add(blankCustomer);
                 blankCustomer.insert();
@@ -554,7 +568,7 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
         
     
     }//GEN-LAST:event_btnSaveActionPerformed
-
+    
     private void tfEmailKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfEmailKeyReleased
         if(!tfEmail.getText().isEmpty()){
             btnAddEmail.setEnabled(true);
@@ -716,13 +730,10 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
             return;
         }
         else if(saved && !hasChanges()){
-            //DEBUG
-            System.out.println("Allt är ok, och sparat.");
             //Gå tillbaka till något annat fönster
         }
         else if(!saved && hasChanges()){
-            //DEBUG
-            System.out.println("Inte sparat, och det finns osparade ändringar");
+
             Object[] options = {"Ja", "Nej"};
 
             int result = JOptionPane.showOptionDialog(this, "Det finns osparade ändringar, vill du återgå?", 
@@ -773,8 +784,8 @@ public class RegisterCustomerWindow extends javax.swing.JFrame {
             && tfPostalCode.getText().equals(blankCustomer.getPostalCode());
         boolean countrySame = cbCountry.getSelectedItem().toString()
             .equals(blankCustomer.getCountry());
-        boolean listsSame = Util.contentEquals(emailModel, blankCustomer.getEmailAdresses())
-            && Util.contentEquals(phoneModel, blankCustomer.getTelephoneNumbers());
+        boolean listsSame = contentEquals(emailModel, blankCustomer.getEmailAdresses())
+            && contentEquals(phoneModel, blankCustomer.getTelephoneNumbers());
         
         return !(textFieldsSame && countrySame && listsSame); //returnerar true om något har förändrats
     }

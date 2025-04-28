@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import oru.inf.InfDB;
+import java.util.*; 
 /**
  *
  * @author joelf
@@ -68,8 +69,8 @@ private ModelRegister modelRegister;
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         btnRedigering = new javax.swing.JButton();
-        btnUpdate = new javax.swing.JButton();
         btnBack = new javax.swing.JButton();
+        btnAdd = new javax.swing.JButton();
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
@@ -100,17 +101,10 @@ private ModelRegister modelRegister;
         ));
         jScrollPane2.setViewportView(jTable1);
 
-        btnRedigering.setText("Redigera lagerförda hattar");
+        btnRedigering.setText("Redigera");
         btnRedigering.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRedigeringActionPerformed(evt);
-            }
-        });
-
-        btnUpdate.setText("Uppdatera Lista");
-        btnUpdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUpdateActionPerformed(evt);
             }
         });
 
@@ -121,6 +115,13 @@ private ModelRegister modelRegister;
             }
         });
 
+        btnAdd.setText("Lägg till");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -128,29 +129,41 @@ private ModelRegister modelRegister;
             .addGroup(layout.createSequentialGroup()
                 .addGap(132, 132, 132)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnBack)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnRedigering)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnUpdate)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBack))
+                        .addComponent(btnAdd))
+
+                    
+
+                    .addComponent(jLabel1)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 559, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(26, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(17, 17, 17)
+                .addGap(58, 58, 58)
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnRedigering)
-                    .addComponent(btnUpdate)
-                    .addComponent(btnBack))
+
+
+                
+
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBack)
+
+                    .addComponent(btnRedigering)
+                    .addComponent(btnAdd))
+
+                    
+
+                .addContainerGap(7, Short.MAX_VALUE))
         );
 
         pack();
@@ -160,7 +173,7 @@ private ModelRegister modelRegister;
 
          int selectedRow = jTable1.getSelectedRow();
     if (selectedRow == -1) {
-        JOptionPane.showMessageDialog(this, "Välj en kund i tabellen först.");
+        JOptionPane.showMessageDialog(this, "Välj en hatt i tabellen först.");
         return;
     }
 
@@ -168,17 +181,14 @@ private ModelRegister modelRegister;
 
     Model selectedModel = modelRegister.getModel(model_id);
     if (selectedModel != null) {
-        EditHat editWindow = new EditHat(selectedModel);
+        this.setVisible(false);
+        this.dispose();
+        EditHat editWindow = new EditHat(userLoggedIn, selectedModel);
         editWindow.setVisible(true);
     } else {
         JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
     }
     }//GEN-LAST:event_btnRedigeringActionPerformed
-
-    private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
-       System.out.println("knapp tryckt");
-        fillTable();
-    }//GEN-LAST:event_btnUpdateActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
 
@@ -193,47 +203,89 @@ private ModelRegister modelRegister;
 
 
     }//GEN-LAST:event_btnBackActionPerformed
-    private void fillTable() {
-        System.out.println("fillTableKörs");
-        ArrayList <Model> models = modelRegister.getAllHats();
-        
-        String[] columnNames = {"model_id", "Namn", "Pris"};
-        Object[][] data = new Object[models.size()][3];
-        for (int i = 0; i < models.size(); i++) {
-            Model m = models.get(i);
-            data[i][0] = m.getModelID();
-            data[i][1] = m.getName();
-            data[i][2] = m.getPrice();
-        }
-        
-        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
-            public boolean isCekkEditable(int row, int column) {
-                return false;
-            }
-        };
-        jTable1.setModel(tableModel);
-        jTable1.getColumnModel().getColumn(0).setMinWidth(0);
-         jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
-         jTable1.getColumnModel().getColumn(0).setWidth(0);
 
-       jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-        if (evt.getClickCount() == 2) { //dubbelklick
-        int selectedRow = jTable1.getSelectedRow();
-        if (selectedRow != -1) {
-        String email = (String) jTable1.getValueAt(selectedRow, 1);
-        openEditCustomerWindow(email);
-    }
-      }
-         }
-            });
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+this.setVisible(false);
+        this.dispose();
+        AddHatWindow AddHatWindow = new AddHatWindow(userLoggedIn);
+        AddHatWindow.setVisible(true);        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAddActionPerformed
+    private void fillTable() {
+      
+   System.out.println("fillTable körs");
+
+    // Hämta alla hattar och alla modeller
+    ArrayList<Model> models = modelRegister.getAllHats();
+    ArrayList<Hat> hats = hatRegister.getAllHats();
+
+    // Skapa en lista för de modeller som vi ska visa
+    List<Model> filteredModels = new ArrayList<>();
+
+    // Filtrera bort hattar med namn "special"
+
     
 
+        // Gå igenom varje hatt och kontrollera om namnet är "special"
+        for (Model model : models) {
+            if (!model.getName().equalsIgnoreCase("special")) {
+                filteredModels.add(model);
+            }
+        }
+
+        
+      
+  
+    
+
+    
+
+
+    // Skapa tabellens data och uppdatera den
+    String[] columnNames = {"model_id", "Namn", "Pris"};
+    Object[][] data = new Object[filteredModels.size()][3];
+    for (int i = 0; i < filteredModels.size(); i++) {
+        Model m = filteredModels.get(i);
+        data[i][0] = m.getModelID();
+        data[i][1] = m.getName();
+        data[i][2] = m.getPrice();
     }
+
+    javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+        public boolean isCellEditable(int row, int column) {
+            return false; // Gör tabellen inte redigerbar
+        }
+    };
+
+    jTable1.setModel(tableModel);
+    jTable1.getColumnModel().getColumn(0).setMinWidth(0);
+    jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
+    jTable1.getColumnModel().getColumn(0).setWidth(0);
+
+    // Lägg till MouseListener för att hantera dubbelklick
+    jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+        public void mouseClicked(java.awt.event.MouseEvent evt) {
+            int selectedRow = jTable1.getSelectedRow();
+            if (selectedRow != -1) {
+                // Enkelklick eller dubbelklick
+                String modelId = (String) jTable1.getValueAt(selectedRow, 0);
+                
+                // Dubbelklick (vid event.getClickCount() == 2)
+                if (evt.getClickCount() == 2) {
+
+                    dispose();
+
+
+                    openEditCustomerWindow(modelId); // Öppnar redigeringsfönstret
+                }
+            }
+        }
+    });
+
+}
     private void openEditCustomerWindow(String model_id) {
     Model selectedModel = modelRegister.getModel(model_id);
     if (selectedModel != null) {
-        EditHat editWindow = new EditHat(selectedModel);
+       EditHat editWindow = new EditHat(userLoggedIn, selectedModel);
         editWindow.setVisible(true);
     } else {
         JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
@@ -276,9 +328,9 @@ private ModelRegister modelRegister;
    // }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnRedigering;
-    private javax.swing.JButton btnUpdate;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane2;
