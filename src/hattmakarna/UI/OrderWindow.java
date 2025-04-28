@@ -1340,6 +1340,7 @@ public class OrderWindow extends javax.swing.JFrame {
         h.getSpecification().setImgImage(tmp_spec_image_holder);
         h.getSpecification().setExtraImages(threeDImages);
         
+        h.getMaterials().clear();
         h.getMaterials().addAll(tmp_materials);
         h.setIsExpress(checkFastDeliverySpec.isSelected());
         hatsToOrder.add(new Pair<Hat, Integer>(h, 1));

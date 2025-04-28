@@ -242,35 +242,26 @@ public class Hat extends DatabaseObject {
     @Override
     public boolean save() {
 
-        
         System.err.println("Sparar order");
         if (!super.save()) {
             System.err.println("Order ej sparad");
-
             return false;
         }
+
         System.err.println("Order sparad");
 
         if (specification != null) {
             specification.setHatId(hat_id);
             specification.save();
+
         }
         System.err.println("Matierla lista check");
-
+      
         if (materials != null) {
             materials.forEach(e -> {
                 e.setHat_id(hat_id);
-                System.err.println("Sparar hat material");
+               
                 e.save();
-            });
-        }
-        if(materials != null)
-        {
-            materials.forEach(e -> {
-                e.setHat_id(hat_id);
-                e.setIdString(String.valueOf(hat_id));
-                
-            e.save();
             });
         }
 
