@@ -20,6 +20,7 @@ public class HattViewerWindow extends javax.swing.JFrame {
         images = new ArrayList<>();
         initComponents();
         init();
+                this.setTitle("Hatt vy");
 
         addKeyListener(new KeyAdapter() {
             @Override

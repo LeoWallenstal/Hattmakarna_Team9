@@ -37,6 +37,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         this.window = window;
         scheduleManager = null;
         this.table = (DefaultTableModel) tblHats.getModel();
+        this.setTitle("Order information");
 
         fillTable();
         initStatusCb();

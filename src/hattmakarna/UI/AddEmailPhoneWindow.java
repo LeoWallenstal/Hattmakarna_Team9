@@ -34,7 +34,7 @@ public class AddEmailPhoneWindow extends javax.swing.JFrame {
         emailOrPhone = value;
         this.aCustomer = aCustomer;
         this.previousWindow = previousWindow;
-        
+        this.setTitle("Ändra information");
         lblAddError.setVisible(false);
         btnAdd.setEnabled(false);
         

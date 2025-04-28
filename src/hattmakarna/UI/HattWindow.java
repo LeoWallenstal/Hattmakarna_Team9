@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package hattmakarna.UI;
+
 import hattmakarna.UI.OrderWindow;
 import hattmakarna.data.Customer;
 import hattmakarna.data.User;
@@ -16,24 +17,26 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import oru.inf.InfDB;
-import java.util.*; 
+import java.util.*;
+
 /**
  *
  * @author joelf
  */
 public class HattWindow extends javax.swing.JFrame {
-private Model model;
-private HatRegister hatRegister;
-private ModelRegister modelRegister;
- private User userLoggedIn;
+
+    private Model model;
+    private HatRegister hatRegister;
+    private ModelRegister modelRegister;
+    private User userLoggedIn;
 
     /**
      * Creates new form HattWindow
      */
+    public HattWindow(User userLoggedIn, Model model) {
 
-    public HattWindow(User userLoggedIn,Model model) {
+        this.setTitle("Hatt");
 
-  
         this.userLoggedIn = userLoggedIn;
         this.model = null;
         this.modelRegister = new ModelRegister();
@@ -41,9 +44,10 @@ private ModelRegister modelRegister;
         initComponents();
         fillTable();
     }
-    public HattWindow(User userLoggedIn){
 
-        
+    public HattWindow(User userLoggedIn) {
+
+        this.setTitle("Hatt");
 
         this.userLoggedIn = userLoggedIn;
 
@@ -53,8 +57,8 @@ private ModelRegister modelRegister;
         initComponents();
         fillTable();
 
-        
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -171,60 +175,55 @@ private ModelRegister modelRegister;
 
     private void btnRedigeringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRedigeringActionPerformed
 
-         int selectedRow = jTable1.getSelectedRow();
-    if (selectedRow == -1) {
-        JOptionPane.showMessageDialog(this, "Välj en hatt i tabellen först.");
-        return;
-    }
+        int selectedRow = jTable1.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Välj en hatt i tabellen först.");
+            return;
+        }
 
-    String model_id = jTable1.getValueAt(selectedRow, 0).toString(); // Hämta från kolumn 0 (ID)
+        String model_id = jTable1.getValueAt(selectedRow, 0).toString(); // Hämta från kolumn 0 (ID)
 
-    Model selectedModel = modelRegister.getModel(model_id);
-    if (selectedModel != null) {
-        this.setVisible(false);
-        this.dispose();
-        EditHat editWindow = new EditHat(userLoggedIn, selectedModel);
-        editWindow.setVisible(true);
-    } else {
-        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
-    }
+        Model selectedModel = modelRegister.getModel(model_id);
+        if (selectedModel != null) {
+            this.setVisible(false);
+            this.dispose();
+            EditHat editWindow = new EditHat(userLoggedIn, selectedModel);
+            editWindow.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+        }
     }//GEN-LAST:event_btnRedigeringActionPerformed
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
 
-       try {
-        new MainMenu(userLoggedIn).setVisible(true);
-        this.dispose();
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Ett fel inträffade när vi försökte gå tillbaka till huvudmenyn.");
-    
-}
+        try {
+            new MainMenu(userLoggedIn).setVisible(true);
+            this.dispose();
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Ett fel inträffade när vi försökte gå tillbaka till huvudmenyn.");
+
+        }
 
 
     }//GEN-LAST:event_btnBackActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-this.setVisible(false);
+        this.setVisible(false);
         this.dispose();
         AddHatWindow AddHatWindow = new AddHatWindow(userLoggedIn);
         AddHatWindow.setVisible(true);        // TODO add your handling code here:
     }//GEN-LAST:event_btnAddActionPerformed
     private void fillTable() {
-      
-   
 
-    // Hämta alla hattar och alla modeller
-    ArrayList<Model> models = modelRegister.getAllHats();
-    ArrayList<Hat> hats = hatRegister.getAllHats();
+        // Hämta alla hattar och alla modeller
+        ArrayList<Model> models = modelRegister.getAllHats();
+        ArrayList<Hat> hats = hatRegister.getAllHats();
 
-    // Skapa en lista för de modeller som vi ska visa
-    List<Model> filteredModels = new ArrayList<>();
+        // Skapa en lista för de modeller som vi ska visa
+        List<Model> filteredModels = new ArrayList<>();
 
-    // Filtrera bort hattar med namn "special"
-
-    
-
+        // Filtrera bort hattar med namn "special"
         // Gå igenom varje hatt och kontrollera om namnet är "special"
         for (Model model : models) {
             if (!model.getName().equalsIgnoreCase("special")) {
@@ -232,100 +231,92 @@ this.setVisible(false);
             }
         }
 
-        
-      
-  
-    
-
-    
-
-
-    // Skapa tabellens data och uppdatera den
-    String[] columnNames = {"model_id", "Namn", "Pris"};
-    Object[][] data = new Object[filteredModels.size()][3];
-    for (int i = 0; i < filteredModels.size(); i++) {
-        Model m = filteredModels.get(i);
-        data[i][0] = m.getModelID();
-        data[i][1] = m.getName();
-        data[i][2] = m.getPrice();
-    }
-
-    javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
-        public boolean isCellEditable(int row, int column) {
-            return false; // Gör tabellen inte redigerbar
+        // Skapa tabellens data och uppdatera den
+        String[] columnNames = {"model_id", "Namn", "Pris"};
+        Object[][] data = new Object[filteredModels.size()][3];
+        for (int i = 0; i < filteredModels.size(); i++) {
+            Model m = filteredModels.get(i);
+            data[i][0] = m.getModelID();
+            data[i][1] = m.getName();
+            data[i][2] = m.getPrice();
         }
-    };
 
-    jTable1.setModel(tableModel);
-    jTable1.getColumnModel().getColumn(0).setMinWidth(0);
-    jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
-    jTable1.getColumnModel().getColumn(0).setWidth(0);
+        javax.swing.table.DefaultTableModel tableModel = new javax.swing.table.DefaultTableModel(data, columnNames) {
+            public boolean isCellEditable(int row, int column) {
+                return false; // Gör tabellen inte redigerbar
+            }
+        };
 
-    // Lägg till MouseListener för att hantera dubbelklick
-    jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            int selectedRow = jTable1.getSelectedRow();
-            if (selectedRow != -1) {
-                // Enkelklick eller dubbelklick
-                String modelId = (String) jTable1.getValueAt(selectedRow, 0);
-                
-                // Dubbelklick (vid event.getClickCount() == 2)
-                if (evt.getClickCount() == 2) {
+        jTable1.setModel(tableModel);
+        jTable1.getColumnModel().getColumn(0).setMinWidth(0);
+        jTable1.getColumnModel().getColumn(0).setMaxWidth(0);
+        jTable1.getColumnModel().getColumn(0).setWidth(0);
 
-                    dispose();
+        // Lägg till MouseListener för att hantera dubbelklick
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int selectedRow = jTable1.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Enkelklick eller dubbelklick
+                    String modelId = (String) jTable1.getValueAt(selectedRow, 0);
 
+                    // Dubbelklick (vid event.getClickCount() == 2)
+                    if (evt.getClickCount() == 2) {
 
-                    openEditCustomerWindow(modelId); // Öppnar redigeringsfönstret
+                        dispose();
+
+                        openEditCustomerWindow(modelId); // Öppnar redigeringsfönstret
+                    }
                 }
             }
-        }
-    });
+        });
 
-}
-    private void openEditCustomerWindow(String model_id) {
-    Model selectedModel = modelRegister.getModel(model_id);
-    if (selectedModel != null) {
-       EditHat editWindow = new EditHat(userLoggedIn, selectedModel);
-        editWindow.setVisible(true);
-    } else {
-        JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
     }
-}
+
+    private void openEditCustomerWindow(String model_id) {
+        Model selectedModel = modelRegister.getModel(model_id);
+        if (selectedModel != null) {
+            EditHat editWindow = new EditHat(userLoggedIn, selectedModel);
+            editWindow.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Kunden kunde inte hittas.");
+        }
+    }
 
     /**
      * @param args the command line arguments
      */
-   // public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+    // public static void main(String args[]) {
+    /* Set the Nimbus look and feel */
+    //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+    /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        //try {
-           // for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                //if ("Nimbus".equals(info.getName())) {
-                  //  javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                  //  break;
-               // }
-           // }
-       // } catch (ClassNotFoundException ex) {
-          //  java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-       // } catch (InstantiationException ex) {
-           // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-       // } catch (IllegalAccessException ex) {
-           // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        //} catch (javax.swing.UnsupportedLookAndFeelException ex) {
-           // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-       // }
-        //</editor-fold>
+     */
+    //try {
+    // for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+    //if ("Nimbus".equals(info.getName())) {
+    //  javax.swing.UIManager.setLookAndFeel(info.getClassName());
+    //  break;
+    // }
+    // }
+    // } catch (ClassNotFoundException ex) {
+    //  java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    // } catch (InstantiationException ex) {
+    // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    // } catch (IllegalAccessException ex) {
+    // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    //} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+    // java.util.logging.Logger.getLogger(HattWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    // }
+    //</editor-fold>
 
-        /* Create and display the form */
-       // java.awt.EventQueue.invokeLater(new Runnable() {
-            //public void run() {
-                //new HattWindow().setVisible(true);
-           // }
-       // });
-   // }
+    /* Create and display the form */
+    // java.awt.EventQueue.invokeLater(new Runnable() {
+    //public void run() {
+    //new HattWindow().setVisible(true);
+    // }
+    // });
+    // }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;

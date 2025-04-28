@@ -20,6 +20,8 @@ private  Model model;
     public AddHatWindow(User userLoggedIn) {
         initComponents();
         this.userLoggedIn = userLoggedIn;
+                this.setTitle("Hantera hattar");
+
     }
 public void addHat() {
     boolean addOK = true;

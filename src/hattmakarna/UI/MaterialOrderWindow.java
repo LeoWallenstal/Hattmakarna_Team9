@@ -48,6 +48,7 @@ public class MaterialOrderWindow extends javax.swing.JFrame {
         initHats(null, null);
         totalMaterial = new HashMap<>();
         orderData = getOrderMaterialData();
+        this.setTitle("Material fönster");
 
         initTable();
         setLocationRelativeTo(null);
