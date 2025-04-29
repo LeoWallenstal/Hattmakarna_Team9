@@ -22,6 +22,7 @@ public class Task extends DatabaseObject {
     private int hat_id;
     private String name;
     private int order_id;
+    private boolean isFastProduction;
 
     public Task() {
 
@@ -45,6 +46,7 @@ public class Task extends DatabaseObject {
         hat_id = Integer.parseInt(taskMap.get("hat_id"));
         name = taskMap.get("name");
         order_id = Integer.parseInt(taskMap.get("order_id"));
+        isFastProduction = "1".equals(taskMap.get("isFastProduction"));
 
     }
 
@@ -102,6 +104,10 @@ public class Task extends DatabaseObject {
     
     public void setStatus(TaskStatus status){
         this.status = status;
+    }
+    
+    public boolean isFastProduction(){
+        return isFastProduction;
     }
 
 }
