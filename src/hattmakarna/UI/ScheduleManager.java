@@ -300,7 +300,6 @@ public class ScheduleManager {
                             } else {
                                 System.err.println("Kunde inte hitta bilden på: ");
                             }
-
                         }
                         String desc = "";
                         desc = spec.getDescription();

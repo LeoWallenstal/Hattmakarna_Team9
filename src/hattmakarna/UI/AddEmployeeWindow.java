@@ -7,6 +7,8 @@ package hattmakarna.UI;
 import hattmakarna.data.User;
 import hattmakarna.util.Validerare;
 import javax.swing.JOptionPane;
+import hattmakarna.data.EmailGenerator;
+import java.awt.Toolkit;
 
 /**
  *
@@ -17,20 +19,24 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
     /**
      * Creates new form AddEmployee
      */
+    private EmailGenerator emailGen;
     
     private EmployeesWindow window;
     
     public AddEmployeeWindow(EmployeesWindow window) {
         initComponents();
+        this.setTitle("Registrera anställd");
         this.window = window;
         lblError.setVisible(false);
+        lblEmployeeAdded.setVisible(false);
         setLocationRelativeTo(null);
         btnAdd.setEnabled(false);
         pfPassword.setEchoChar('*');
+        emailGen = new EmailGenerator();
     }
     
     public boolean fieldsCorrect(){
-        if(tfFirstName.getText().isEmpty() || tfLastName.getText().isEmpty() || tfEmail.getText().isEmpty() || pfPassword.getText().isEmpty()){
+        if(tfFirstName.getText().isEmpty() || tfLastName.getText().isEmpty() || pfPassword.getText().isEmpty()){
             lblError.setVisible(true);
             lblError.setText("Fyll i samtliga fält!");
             return false;
@@ -42,24 +48,27 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
             return false;
         }
         
-        if(!Validerare.validateEmail(tfEmail.getText())){
-            lblError.setVisible(true);
-            lblError.setText("Felaktigt format på eposten!");
-            return false;
-        }
-        
         return true;
+    }
+    
+    private void clearFields(){
+        tfFirstName.setText("");
+        tfLastName.setText("");
+        pfPassword.setText("");
     }
     
     public void addEmployee(){
         if(fieldsCorrect()){
             User newUser = new User();
+            newUser.setID();
             newUser.setFirstName(tfFirstName.getText());
             newUser.setLastName(tfLastName.getText());
-            newUser.setEmail(tfEmail.getText());
             newUser.setPWCandidate(pfPassword.getText());
+            newUser.setEmail(emailGen.generateEmail(newUser));
             newUser.create();  
-            this.setVisible(false);
+            lblEmployeeAdded.setText("Användaren " + newUser.getEmail() + " har registrerats!");
+            lblEmployeeAdded.setVisible(true);
+            //this.setVisible(false);
         }
     }
 
@@ -74,17 +83,16 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
 
         lblFirstName = new javax.swing.JLabel();
         lblLastName = new javax.swing.JLabel();
-        lblEmail = new javax.swing.JLabel();
         lblPassword = new javax.swing.JLabel();
         tfFirstName = new javax.swing.JTextField();
         tfLastName = new javax.swing.JTextField();
-        tfEmail = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
         btnAdd = new javax.swing.JButton();
         lblError = new javax.swing.JLabel();
         pfPassword = new javax.swing.JPasswordField();
         tbtnShowPassword = new javax.swing.JToggleButton();
+        lblEmployeeAdded = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -92,30 +100,33 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
 
         lblLastName.setText("Efternamn:");
 
-        lblEmail.setText("E-post:");
-
         lblPassword.setText("Lösenord:");
 
-        tfFirstName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfFirstNameActionPerformed(evt);
+        tfFirstName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfFirstNameFocusGained(evt);
             }
         });
         tfFirstName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tfFirstNameKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 tfFirstNameKeyTyped(evt);
             }
         });
 
-        tfLastName.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                tfLastNameKeyTyped(evt);
+        tfLastName.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                tfLastNameFocusGained(evt);
             }
         });
-
-        tfEmail.addKeyListener(new java.awt.event.KeyAdapter() {
+        tfLastName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tfLastNameKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                tfEmailKeyTyped(evt);
+                tfLastNameKeyTyped(evt);
             }
         });
 
@@ -137,7 +148,15 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
 
         lblError.setText("jLabel2");
 
+        pfPassword.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                pfPasswordFocusGained(evt);
+            }
+        });
         pfPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                pfPasswordKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 pfPasswordKeyTyped(evt);
             }
@@ -149,6 +168,8 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
                 tbtnShowPasswordActionPerformed(evt);
             }
         });
+
+        lblEmployeeAdded.setText("En anställd med användarnamnet ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -163,17 +184,17 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
                                 .addGap(8, 8, 8)
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(lblLastName)
-                                    .addComponent(lblPassword)
-                                    .addComponent(lblFirstName)
-                                    .addComponent(lblEmail))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(tfEmail, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
-                                    .addComponent(tfLastName)
-                                    .addComponent(tfFirstName)
-                                    .addComponent(pfPassword))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(lblLastName)
+                                            .addComponent(lblFirstName))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(tfLastName)
+                                            .addComponent(tfFirstName)
+                                            .addComponent(pfPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(lblPassword))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(tbtnShowPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(0, 0, Short.MAX_VALUE))
@@ -182,33 +203,37 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
                         .addComponent(btnBack)
                         .addGap(18, 18, 18)
                         .addComponent(btnAdd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
                         .addComponent(lblError, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(lblEmployeeAdded)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addComponent(jLabel1)
-                .addGap(43, 43, 43)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblFirstName)
-                    .addComponent(tfFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblLastName)
-                    .addComponent(tfLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblEmail)
-                    .addComponent(tfEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGap(34, 34, 34)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(lblPassword)
-                    .addComponent(pfPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tbtnShowPassword))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(tfFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblFirstName))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblLastName)
+                            .addComponent(tfLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(14, 14, 14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(pfPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tbtnShowPassword))))
+                .addGap(20, 20, 20)
+                .addComponent(lblEmployeeAdded)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnBack)
                     .addComponent(btnAdd)
@@ -220,8 +245,9 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        Toolkit.getDefaultToolkit().beep();
         if(!tfFirstName.getText().isEmpty() || !tfLastName.getText().isEmpty() 
-            || !tfEmail.getText().isEmpty() || !pfPassword.getText().isEmpty()){
+            || !pfPassword.getText().isEmpty()){
             
             Object[] options = {"Ja", "Nej"};
             
@@ -239,12 +265,9 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         addEmployee();
+        clearFields();
         window.fillTable();     
     }//GEN-LAST:event_btnAddActionPerformed
-
-    private void tfFirstNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfFirstNameActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfFirstNameActionPerformed
 
     private void tfFirstNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfFirstNameKeyTyped
         btnAdd.setEnabled(true);
@@ -253,10 +276,6 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
     private void tfLastNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfLastNameKeyTyped
         btnAdd.setEnabled(true);
     }//GEN-LAST:event_tfLastNameKeyTyped
-
-    private void tfEmailKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfEmailKeyTyped
-        btnAdd.setEnabled(true);
-    }//GEN-LAST:event_tfEmailKeyTyped
 
     private void tbtnShowPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbtnShowPasswordActionPerformed
         if (pfPassword.getEchoChar() == '*') {
@@ -272,6 +291,45 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
     private void pfPasswordKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pfPasswordKeyTyped
         btnAdd.setEnabled(true);
     }//GEN-LAST:event_pfPasswordKeyTyped
+
+    private void tfFirstNameKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfFirstNameKeyReleased
+        lblEmployeeAdded.setVisible(false);
+    }//GEN-LAST:event_tfFirstNameKeyReleased
+
+    private void tfLastNameKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tfLastNameKeyReleased
+        lblEmployeeAdded.setVisible(false);
+    }//GEN-LAST:event_tfLastNameKeyReleased
+
+    private void pfPasswordKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pfPasswordKeyReleased
+        lblEmployeeAdded.setVisible(false);
+    }//GEN-LAST:event_pfPasswordKeyReleased
+
+    private void tfFirstNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfFirstNameFocusGained
+        if(lblEmployeeAdded.isVisible()){
+            lblEmployeeAdded.setVisible(false);
+        }
+        if(lblError.isVisible()){
+            lblError.setVisible(false);
+        }
+    }//GEN-LAST:event_tfFirstNameFocusGained
+
+    private void tfLastNameFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tfLastNameFocusGained
+        if(lblEmployeeAdded.isVisible()){
+            lblEmployeeAdded.setVisible(false);
+        }
+        if(lblError.isVisible()){
+            lblError.setVisible(false);
+        }
+    }//GEN-LAST:event_tfLastNameFocusGained
+
+    private void pfPasswordFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_pfPasswordFocusGained
+        if(lblEmployeeAdded.isVisible()){
+            lblEmployeeAdded.setVisible(false);
+        }
+        if(lblError.isVisible()){
+            lblError.setVisible(false);
+        }
+    }//GEN-LAST:event_pfPasswordFocusGained
 
     /**
      * @param args the command line arguments
@@ -313,14 +371,13 @@ public class AddEmployeeWindow extends javax.swing.JFrame {
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnBack;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel lblEmail;
+    private javax.swing.JLabel lblEmployeeAdded;
     private javax.swing.JLabel lblError;
     private javax.swing.JLabel lblFirstName;
     private javax.swing.JLabel lblLastName;
     private javax.swing.JLabel lblPassword;
     private javax.swing.JPasswordField pfPassword;
     private javax.swing.JToggleButton tbtnShowPassword;
-    private javax.swing.JTextField tfEmail;
     private javax.swing.JTextField tfFirstName;
     private javax.swing.JTextField tfLastName;
     // End of variables declaration//GEN-END:variables

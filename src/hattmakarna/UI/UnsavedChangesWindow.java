@@ -6,6 +6,7 @@ package hattmakarna.UI;
 
 import hattmakarna.data.Customer;
 import hattmakarna.data.User;
+import java.awt.Window;
 
 /**
  *
@@ -16,14 +17,14 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
     /**
      * Creates new form UnsavedChangesWindow
      */
-    
     private Customer aCustomer;
     private User userLoggedIn;
+    private Window previousWindow;
     
-    public UnsavedChangesWindow(Customer aCustomer, User userLoggedIn) {
+    public UnsavedChangesWindow(Customer aCustomer, User userLoggedIn, Window previousWindow) {
         this.aCustomer = aCustomer;
         this.userLoggedIn = userLoggedIn;
-        
+        this.previousWindow = previousWindow;
         initComponents();
         setLocationRelativeTo(null);
     }
@@ -48,14 +49,14 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
 
         lblQuestion.setText("Vill du fortsätta utan att spara?");
 
-        btnContinue.setText("Fortsätt");
+        btnContinue.setText("Ja");
         btnContinue.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnContinueActionPerformed(evt);
             }
         });
 
-        btnEdit.setText("Redigera");
+        btnEdit.setText("Nej");
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEditActionPerformed(evt);
@@ -84,15 +85,15 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(65, 65, 65)
+                .addGap(46, 46, 46)
                 .addComponent(lblUnsavedChanges)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblQuestion)
-                .addGap(45, 45, 45)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnContinue)
                     .addComponent(btnEdit))
-                .addContainerGap(38, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
         pack();
@@ -104,7 +105,7 @@ public class UnsavedChangesWindow extends javax.swing.JFrame {
 
     private void btnContinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinueActionPerformed
         this.setVisible(false);
-        new OrderWindow(userLoggedIn).setVisible(true);
+        previousWindow.dispose();
     }//GEN-LAST:event_btnContinueActionPerformed
 
     /**

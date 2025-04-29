@@ -180,7 +180,7 @@ public class ChangePassWindow extends javax.swing.JFrame {
                         .addGroup(layout.createSequentialGroup()
                             .addComponent(lblNewPWAgain)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(pwNewAgain, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
+                            .addComponent(pwNewAgain, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
                         .addGroup(layout.createSequentialGroup()
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(lblOldPWError, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -251,7 +251,7 @@ public class ChangePassWindow extends javax.swing.JFrame {
         if(saveOK){
             lblPwChanged.setVisible(true);
             loggedIn.setPWCandidate(newPw);
-            //loggedIn.savePW();
+            loggedIn.savePW();
             PrintDebugger.info("Här savear man till DB då, men inte just nu");
         }
     }//GEN-LAST:event_btnSaveActionPerformed

@@ -20,6 +20,7 @@ import javax.swing.JTextField;
 import hattmakarna.util.CountryList;
 import javax.swing.ScrollPaneConstants;
 import hattmakarna.data.EmailOrPhone;
+import java.awt.Toolkit;
 import javax.swing.JButton;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -44,11 +45,13 @@ public class EditCustomer extends javax.swing.JFrame {
     private ArrayList<String> phoneModel;
     private ArrayList<String> emailModel;
     private boolean editOK = true;
+    private CustomerInformationWindow parentWindow;
 
     
     
-    public EditCustomer(Customer aCustomer) {
+    public EditCustomer(Customer aCustomer, CustomerInformationWindow parentWindow) {
         this.aCustomer = aCustomer;
+        this.parentWindow = parentWindow;
         copy = new Customer(aCustomer);
  
         
@@ -132,6 +135,7 @@ public class EditCustomer extends javax.swing.JFrame {
         }
             
     }
+
     
     private void checkChanges() {
         boolean fieldsChanged = !tfFirstName.getText().equals(aCustomer.getFirstName()) ||
@@ -614,6 +618,9 @@ public class EditCustomer extends javax.swing.JFrame {
             aCustomer.save(copy);
             lblSaved.setText("Kunduppgifter uppdaterade!");
             lblSaved.setVisible(true);
+            
+            parentWindow.refreshData();
+            this.dispose();
         }
         
     }//GEN-LAST:event_btnSaveActionPerformed
@@ -640,15 +647,22 @@ public class EditCustomer extends javax.swing.JFrame {
     }//GEN-LAST:event_tfAdressKeyTyped
 
     private void btnDeletePhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeletePhoneActionPerformed
-        aCustomer.removeTelephoneNumber(jlPhone.getSelectedIndex());
-        dlPhoneModel.remove(jlPhone.getSelectedIndex());
-        dlPhoneModel.removeElementAt(jlPhone.getSelectedIndex());
+      int selectedIndex = jlPhone.getSelectedIndex();
+    
+    if (selectedIndex != -1) {
+        aCustomer.removeTelephoneNumber(selectedIndex);
+        dlPhoneModel.removeElementAt(selectedIndex);
         btnSave.setEnabled(true);
         btnDeletePhone.setEnabled(false);
-        if(dlPhoneModel.getSize() == 0){
+
+        if (dlPhoneModel.getSize() == 0) {
             btnDeletePhone.setEnabled(false);
         }
         lblSaved.setVisible(false);
+    } else {
+        JOptionPane.showMessageDialog(this, "Välj ett telefonnummer att ta bort.");
+    }
+
     }//GEN-LAST:event_btnDeletePhoneActionPerformed
 
     private void btnAddPhoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPhoneActionPerformed
@@ -658,7 +672,15 @@ public class EditCustomer extends javax.swing.JFrame {
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
         if(hasUnsavedChanges()){
-            new UnsavedChangesWindow(aCustomer, userLoggedIn).setVisible(true);
+            Object[] options = {"Ja", "Nej"};
+            
+            Toolkit.getDefaultToolkit().beep();
+            int result = JOptionPane.showOptionDialog(this, "Du har osparade ändringar! Vill du fortsätta utan att spara?", 
+                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            
+            if(result == 0){
+                this.setVisible(false);
+            }
         }
         else{
             this.setVisible(false);
@@ -692,15 +714,22 @@ public class EditCustomer extends javax.swing.JFrame {
     }//GEN-LAST:event_jlEmailMouseClicked
 
     private void btnDeleteEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteEmailActionPerformed
-        aCustomer.removeEmailAdress(jlEmail.getSelectedIndex());
-        dlEmailModel.removeElement(jlEmail.getSelectedIndex());
-        dlEmailModel.remove(jlEmail.getSelectedIndex());
+        int selectedIndex = jlEmail.getSelectedIndex();
+    
+    if (selectedIndex != -1) {
+        aCustomer.removeEmailAdress(selectedIndex);
+        dlEmailModel.removeElementAt(selectedIndex);
         btnSave.setEnabled(true);
         btnDeleteEmail.setEnabled(false);
-        if(dlEmailModel.getSize() == 0){
+
+        if (dlEmailModel.getSize() == 0) {
             btnDeleteEmail.setEnabled(false);
         }
         lblSaved.setVisible(false);
+    } else {
+        JOptionPane.showMessageDialog(this, "Välj en e-postadress att ta bort.");
+    }
+
     }//GEN-LAST:event_btnDeleteEmailActionPerformed
 
     private void btnAddEmailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddEmailActionPerformed

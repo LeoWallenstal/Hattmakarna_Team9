@@ -32,6 +32,8 @@ public class EmployeesWindow extends javax.swing.JFrame {
         fillTable();
         setLocationRelativeTo(null);
         delete = false;
+        this.setTitle("Hantera anställd");
+
     }
 
     public void fillTable() {
@@ -182,8 +184,7 @@ public class EmployeesWindow extends javax.swing.JFrame {
             btnBack.setEnabled(false);
             btnAdd.setEnabled(false);
             btnDelete.setText("Ångra");
-        }
-        else{
+        } else {
             delete = false;
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             btnBack.setEnabled(true);
@@ -195,21 +196,20 @@ public class EmployeesWindow extends javax.swing.JFrame {
 
     private void tblEmployeesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEmployeesMouseClicked
         if (delete) {
-            
-            
+
             int row = tblEmployees.rowAtPoint(evt.getPoint());
             User user = users.get(row);
-            
+
             Object[] options = {"Ja", "Nej"};
-            
+
             int result = JOptionPane.showOptionDialog(this, "Är du säker på att du vill ta bort " + user.getFullName() + "?",
-                "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
-            
-            if(result == 0){
+                    "Varning", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+
+            if (result == 0) {
                 user.delete();
                 fillTable();
             }
-            
+
             delete = false;
             btnBack.setEnabled(true);
             btnAdd.setEnabled(true);
@@ -218,10 +218,9 @@ public class EmployeesWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_tblEmployeesMouseClicked
 
     private void tblEmployeesMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblEmployeesMouseMoved
-        if(delete){
+        if (delete) {
             tblEmployees.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        }
-        else{
+        } else {
             tblEmployees.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
     }//GEN-LAST:event_tblEmployeesMouseMoved

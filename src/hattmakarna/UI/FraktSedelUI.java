@@ -64,6 +64,8 @@ public class FraktSedelUI extends javax.swing.JFrame {
 
         setupCustomerInfo(id);
         setupDefaultOrderInfo();
+                this.setTitle("Skappa fraktsedel");
+
     }
 
     /**
