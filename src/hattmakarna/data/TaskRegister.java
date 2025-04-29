@@ -47,15 +47,16 @@ public class TaskRegister {
 
     private void initUsersOngoingTasks(String userId) {
         String sqlQuery = """
-            SELECT 
-            t.*, 
-            m.name,
-            h.order_id
-            FROM task t       
-            JOIN hat h ON t.hat_id = h.hat_id
-            JOIN hat_model m ON h.model_id = m.model_id
-            WHERE t.status = 'PÅGÅENDE' AND
-            t.user_id = """ + userId;
+    SELECT 
+        t.*, 
+        m.name,
+        h.order_id,
+        o.isFastProduction
+    FROM task t       
+    JOIN hat h ON t.hat_id = h.hat_id
+    JOIN hat_model m ON h.model_id = m.model_id
+    JOIN sales_order o ON h.order_id = o.order_id
+    WHERE t.status = 'PÅGÅENDE' AND t.user_id = """ + userId;
 
         try {
             ArrayList<HashMap<String, String>> tasks = idb.fetchRows(sqlQuery);

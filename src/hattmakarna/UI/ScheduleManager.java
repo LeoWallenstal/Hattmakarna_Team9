@@ -247,7 +247,7 @@ public class ScheduleManager {
 
                 if (n < tasksForThisDay.size()) {
                     Task task = tasksForThisDay.get(n);
-                    JPanel taskPanel = createTaskPanel(task.getModelName(), String.valueOf(task.getHatId()));
+                    JPanel taskPanel = createTaskPanel(task.getModelName(), String.valueOf(task.getHatId()), task.isFastProduction());
 
                     JLabel orderLabel = new JLabel("Order #" + task.getOrderId(), SwingConstants.CENTER);
                     orderLabel.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -267,57 +267,58 @@ public class ScheduleManager {
         return daysPanel;
     }
 
-    private JPanel createTaskPanel(String modelName, String hatId) {
+    private JPanel createTaskPanel(String modelName, String hatId, boolean isFastProduction) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(underWorkColor);
+        if(isFastProduction)
+            panel.setBackground(expressColor);
+        else
+            panel.setBackground(underWorkColor);
 
         JLabel nameLabel = new JLabel(modelName, SwingConstants.CENTER);
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 12));
         panel.add(nameLabel, BorderLayout.CENTER);
 
-        String sqlQuery = """ 
-        SELECT hs.spec_id
-        FROM hat_spec hs
-        JOIN hat h ON hs.hat_id = h.hat_id                         
-        WHERE hs.hat_id =""" + hatId;
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                String sqlQuery = """ 
+                    SELECT hs.spec_id
+                    FROM hat_spec hs
+                    JOIN hat h ON hs.hat_id = h.hat_id                         
+                    WHERE hs.hat_id =""" + hatId;
+                try {
+                    String specId = idb.fetchSingle(sqlQuery);
+                    if (specId != null) {
+                        Specification spec = new Specification(specId);
+                        String imagePath = spec.getImagePath();
+                        String toolTip = "<html>";
+                        if (imagePath != null) {
+                            imagePath = imagePath.trim();
+                            URL imageUrl = getClass().getResource(imagePath);
+                            if (imageUrl != null) {
+                                toolTip += "<img src='" + imageUrl.toExternalForm() + "'><br>";
+                            } else {
+                                System.err.println("Kunde inte hitta bilden på: ");
+                            }
 
-        try {
-            HashMap<String, String> hatMap = idb.fetchRow(sqlQuery);
+                        }
+                        String desc = "";
+                        desc = spec.getDescription();
+                        if (desc != null && !desc.isBlank()) {
+                            toolTip += desc;
+                        } else {
+                            toolTip += "Finns ingen beskrivning...";
+                        }
 
-            try {
-                String specId = idb.fetchSingle(sqlQuery);
-                if(specId != null){
-                Specification spec = new Specification(specId);
-                String imagePath = spec.getImagePath();
-                String toolTip = "<html>";
-                if (imagePath != null) {
-                    imagePath = imagePath.trim();
-                    URL imageUrl = getClass().getResource(imagePath);
-                    if (imageUrl != null) {
-                        toolTip += "<img src='" + imageUrl.toExternalForm() + "'><br>";
-                    } else {
-                        System.err.println("Kunde inte hitta bilden på: ");
+                        toolTip += "<br> </html>";
+                        panel.setToolTipText(toolTip);
                     }
-
-                }
-                String desc = spec.getDescription();
-                if (desc != null) {
-                    toolTip += desc;
-                } else {
-                    toolTip += "Finns ingen beskrivning...";
+                } catch (InfException ex) {
+                    Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
-                toolTip += "<br> </html>";
-                panel.setToolTipText(toolTip);
-                }
-            } catch (InfException ex) {
-                Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-        } catch (InfException ex) {
-            Logger.getLogger(ScheduleManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        });
         return panel;
     }
 
@@ -471,7 +472,7 @@ public class ScheduleManager {
                 boolean isFastProduction = "1".equals(hat.get("isFastProduction"));
                 String taskId = hat.get("task_id");
 
-                JPanel item = createTaskPanel(hatName, hatId);
+                JPanel item = createTaskPanel(hatName, hatId, isFastProduction);
                 int totalHeight = calendarPanel.getHeight();
                 int totalWidth = calendarPanel.getWidth();
                 int slotHeight = totalHeight / 8;
@@ -502,9 +503,10 @@ public class ScheduleManager {
                     item.setBackground(readyColor);
                     makeDraggable(item);
                 }
-                
-                if(!isDone && isFastProduction)
+
+                if (!isDone && isFastProduction) {
                     item.setBackground(expressColor);
+                }
 
                 item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 item.putClientProperty("hat_id", hatId);

@@ -70,7 +70,7 @@ public class Hattmakarna {
         );
 
         //För att toggla printdebuggern av/på
-        PrintDebugger.enabled = true;
+        PrintDebugger.enabled = false;
       
         Toolkit.getDefaultToolkit().addAWTEventListener(event -> {
             if (event instanceof WindowEvent we && we.getID() == WindowEvent.WINDOW_OPENED) {
