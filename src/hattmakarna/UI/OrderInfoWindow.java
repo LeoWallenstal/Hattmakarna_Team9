@@ -7,6 +7,7 @@ package hattmakarna.UI;
 import static hattmakarna.data.Hattmakarna.idb;
 import hattmakarna.data.*;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,7 +52,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         this.isInitialized = true;
         initializedMaterialOrder = true;
     }
-    
+
     public OrderInfoWindow(ScheduleManager scheduleManager, Order order) {
         initComponents();
         this.currentOrder = order;
@@ -91,19 +92,37 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }
 
     private void fillTable() {
-        List<Hat> hatIds = currentOrder.fetchHatObjects();
-       
-        HashMap<String, Integer> hatCount = new HashMap<>();
-        for (Hat hat : hatIds) {
-            String model = new ModelRegister().getModel(hat.getModelId()).getName();
-            hatCount.put(model, hatCount.getOrDefault(model, 0) + 1);
-        }
+        List<Hat> hats = currentOrder.fetchHatObjects();
 
-        for (String model : hatCount.keySet()) {
-            table.addRow(new Object[]{model, hatCount.get(model)});
+        ModelRegister modelRegister = new ModelRegister();
+
+        for (Hat hat : hats) {
+            String modelName;
+
+            if (hat.isSpecial()) {
+                modelName = "Special";
+
+            } else {
+                modelName = modelRegister.getModel(hat.getModelId()).getName();
+            }
+
+            table.addRow(new Object[]{modelName, 1}); // alltid 1 hatt per rad
         }
     }
 
+//    private void fillTable() {
+//        List<Hat> hatIds = currentOrder.fetchHatObjects();
+//       
+//        HashMap<String, Integer> hatCount = new HashMap<>();
+//        for (Hat hat : hatIds) {
+//            String model = new ModelRegister().getModel(hat.getModelId()).getName();
+//            hatCount.put(model, hatCount.getOrDefault(model, 0) + 1);
+//        }
+//
+//        for (String model : hatCount.keySet()) {
+//            table.addRow(new Object[]{model, hatCount.get(model)});
+//        }
+//    }
     private void initStatusCb() {
         for (Status status : Status.values()) {
             cbStatus.addItem(status.name());
@@ -316,9 +335,9 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         }
         currentOrder.setStatus(Status.valueOf(cbStatus.getSelectedItem().toString()));
         currentOrder.save();
-        if(window != null)
+        if (window != null) {
             window.initTable();
-        else if (scheduleManager != null){
+        } else if (scheduleManager != null) {
             scheduleManager.buildOrdersPanel(true);
         }
 
@@ -356,7 +375,7 @@ public class OrderInfoWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_cbStatusActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if(window != null)
+        if (window != null)
             window.initTable();
     }//GEN-LAST:event_formWindowClosing
 
@@ -381,6 +400,11 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         ArrayList<String> hatIds = (ArrayList<String>) currentOrder.fetchHatIds();
         boolean matchFound = false;
 
+        if (hatIds.isEmpty()) {
+            System.out.println("Inga hatt-ID:n hittades.");
+            return;
+        }
+
         for (String hatId : hatIds) {
             Hat hat = new Hat(hatId);
             String modelName = new ModelRegister().getModel(hat.getModelId()).getName();
@@ -389,7 +413,16 @@ public class OrderInfoWindow extends javax.swing.JFrame {
 
             if (modelName.equals(clickedModelName)) {
                 System.out.println("Match hittad! Öppnar HattViewerWindow med ID: " + hatId);
-                new HattViewerWindow(Integer.parseInt(hatId)).setVisible(true);
+
+                // Check if images exist for this hat
+                if (imagesForHatExist(hatId)) {
+                    new HattViewerWindow(Integer.parseInt(hatId)).setVisible(true);
+                } else {
+                    System.out.println("Inga bilder hittades för hatt ID: " + hatId);
+                    // Open the window with a default or message indicating no images
+                    new HattViewerWindow(Integer.parseInt(hatId)).setVisible(true); // Open with default view
+                }
+
                 matchFound = true;
                 break;
             }
@@ -398,7 +431,17 @@ public class OrderInfoWindow extends javax.swing.JFrame {
         if (!matchFound) {
             System.out.println("Ingen matchande hatt hittades.");
         }
+
     }//GEN-LAST:event_tblHatsMouseClicked
+
+    public boolean imagesForHatExist(String hatId) {
+        String imageDir = "images/hattextra" + hatId;
+        File folder = new File(imageDir);
+        File[] files = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".png") || name.toLowerCase().endsWith(".jpg"));
+
+        // Check if any files are found in the directory
+        return files != null && files.length > 0;
+    }
 
     /**
      * @param args the command line arguments
