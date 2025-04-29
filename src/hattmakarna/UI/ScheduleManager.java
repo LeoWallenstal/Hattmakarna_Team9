@@ -361,12 +361,13 @@ public class ScheduleManager {
             }
 
             String query = """
-                SELECT h.hat_id, m.name, u.first_name, u.last_name, t.task_id,
+                SELECT h.hat_id, m.name, u.first_name, u.last_name, t.task_id, o.isFastProduction,
                     CASE WHEN t.task_id IS NOT NULL THEN 1 ELSE 0 END AS in_task,
                     CASE WHEN t.status = 'KLAR' OR 
                            h.hat_id not in (select hat_id from hat_spec) THEN 1 ELSE 0 END AS done
                 FROM hat h
                 JOIN hat_model m ON h.model_id = m.model_id
+                JOIN sales_order o ON h.order_id = o.order_id
                 LEFT JOIN task t ON t.hat_id = h.hat_id
                 LEFT JOIN user u ON t.user_id = u.user_id
                 WHERE h.order_id = """ + aOrder.getOrderId();
@@ -467,6 +468,7 @@ public class ScheduleManager {
                 String userName = hat.get("first_name") + " " + hat.get("last_name");
                 boolean isAssigned = "1".equals(hat.get("in_task"));
                 boolean isDone = "1".equals(hat.get("done"));
+                boolean isFastProduction = "1".equals(hat.get("isFastProduction"));
                 String taskId = hat.get("task_id");
 
                 JPanel item = createTaskPanel(hatName, hatId);
@@ -500,6 +502,9 @@ public class ScheduleManager {
                     item.setBackground(readyColor);
                     makeDraggable(item);
                 }
+                
+                if(!isDone && isFastProduction)
+                    item.setBackground(expressColor);
 
                 item.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 item.putClientProperty("hat_id", hatId);
